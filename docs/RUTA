@@ -1,49 +1,752 @@
 
-fases y solucion del desarrollo del sistema 
+# 🏗️ ARQUITECTURA SIMPLIFICADA - SGDD
 
 
-FASE 0: Preparación del entorno de desarrollo
+## 📊 DIAGRAMA DE ARQUITECTURA
 
-Objetivo: 
+┌─────────────────────────────────────────────────────────┐
 
-Establecer la estructura de directorios, 
-configurar herramientas base 
-y asegurar que el entorno de desarrollo esté listo para codificar
+│                      FRONTEND                           
+
+│                      (React)                            │
+
+│                                                         │
+
+│  • Interfaz de usuario                                  │
+
+│  • Estado global con Zustand                            │
+
+│  • Llamadas API con Axios                               │
+
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+
+│                        API REST                         │
+
+│                       (FastAPI)                         │
+
+│                                                         │
+
+│  • Endpoints /api/v1/*                                  │
+
+│  • Validación con Pydantic                              │
+
+│  • Documentación Swagger automática                     │
+
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+
+│                    CAPA DE APLICACIÓN                   │
+
+│                     (Casos de uso)                      │
+
+│                                                         │
+
+│  • Servicios (auth_service, product_service, etc.)      │
+
+│  • DTOs (Data Transfer Objects)                         │
+
+│  • Orquestación de la lógica de negocio                 │
+
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+
+│                     DOMINIO (Core)                      │
+
+│                    (Modelo de negocio)                  │
+
+│                                                         │
+
+│  • Entidades (Usuario, Producto, Venta, etc.)           │
+
+│  • Value Objects (Dinero, Email, Dirección)             │
+
+│  • Reglas de negocio puras                              │
+
+└────────────────────┬────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────┐
+
+│                       INFRAESTRUCTURA                   │
+
+│                       (Implementación)                  │
+
+├─────────────────────────────────────────────────────────┤
+
+│                                                         │
+
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐   │
+
+│  │  PostgreSQL  │  │    Redis     │  │     IA       │   │
+
+│  │  (Base datos)│  │   (Caché)    │  │  (Modelos)   │   │
+
+│  └──────────────┘  └──────────────┘  └──────────────┘   │
+
+│                                                         │
+
+│  • Repositorios SQLAlchemy                              │
+
+│  • Cliente Redis asíncrono                              │
+
+│  • Modelos NLP y predicción                             │
+
+└─────────────────────────────────────────────────────────┘
 
 
-Pasos detallados:
+## 🎯 **EXPLICACIÓN SIMPLE DE CADA CAPA**
 
-Crear la estructura de carpetas 
+### 🖥️ **FRONTEND (React)**
 
-Crear la raíz del proyecto: sgdd/.
+Lo que el usuario ve y toca.
 
-Dentro, crear las subcarpetas: backend/, frontend/, infrastructure/, scripts/, docs/, .github/.
+• Pantallas (Dashboard, Ventas, Inventario)
 
-Dentro de backend/, crear la estructura de capas: app/, tests/, requirements/, Dockerfile, etc.
+• Botones, formularios, tablas
 
-Dentro de frontend/, crear src/, public/, index.html, vite.config.js, etc.
+• Llamadas al backend
 
-Inicializar el entorno virtual de Python para backend.
 
-Configurar el control de versiones con Git:
+### 🌐 **API REST (FastAPI)**
 
-Crear .gitignore global (incluyendo venv/, node_modules/, .env, __pycache__/, etc.).
+La puerta de entrada al backend.
 
-Hacer commit inicial.
+• Endpoints: /productos, /ventas, /usuarios
 
-✅ Entregables:
+• Recibe peticiones del frontend
 
- Estructura de carpetas, 
- entorno virtual funcional, 
- dependencias instaladas, 
- proyecto frontend básico, 
- repositorio git inicializado.
- 
-----------------------------------------
+• Devuelve respuestas JSON
 
-----------------------------------------
 
-```markdown
+### ⚙️ **CAPA DE APLICACIÓN**
+
+El coordinador.
+
+• Orquesta las operaciones
+
+• Aplica validaciones
+
+• Llama al dominio cuando necesita reglas de negocio
+
+
+### 🧠 **DOMINIO**
+
+El cerebro del negocio.
+
+• Reglas: "No vender sin stock", "Descuento solo para clientes frecuentes"
+
+• No sabe de bases de datos ni APIs
+
+• Lenguaje puro del negocio
+
+
+### 🗄️ **INFRAESTRUCTURA**
+
+Los detalles técnicos.
+
+• Guardar en PostgreSQL
+
+• Cachear en Redis
+
+• Ejecutar modelos de IA
+
+
+## 🔄 **FLUJO DE UNA PETICIÓN**
+
+
+1. USUARIO                     → Hace clic en "Ver productos"
+
+2. FRONTEND                    → GET /api/v1/productos
+
+3. API                         → Recibe la petición
+
+4. APLICACIÓN (Servicio)       → Llama al repositorio
+
+5. INFRAESTRUCTURA (BD)        → Consulta PostgreSQL
+
+6. APLICACIÓN (Servicio)       → Formatea los datos (DTO)
+
+7. API                         → Responde con JSON
+
+8. FRONTEND                    → Muestra la lista al usuario
+
+
+## ✅ **BENEFICIOS DE ESTA ARQUITECTURA**
+
+| Beneficio | Explicación |
+
+|-----------|-------------|
+
+| **Separación clara**    | Cada capa tiene una responsabilidad única                     |
+
+| **Mantenibilidad**      | Cambiar una capa no afecta a las demás                        |
+
+| **Escalabilidad**       | Podemos escalar frontend y backend por separado               |
+
+| **Testeabilidad**       | Podemos probar cada capa de forma aislada                     |
+
+| **Flexibilidad**        | Podemos cambiar PostgreSQL por otra BD sin tocar el dominio   |
+
+
+## 📁 **ESTRUCTURA DE CARPETAS**
+
+
+sgdd_structure/
+├── frontend/                    # 🖥️ Capa de presentación
+├── backend/
+│   ├── app/
+│   │   ├── api/                 # 🌐 Capa de API (endpoints)
+│   │   ├── aplicacion/          # ⚙️ Capa de aplicación (servicios, DTOs)
+│   │   ├── dominio/             # 🧠 Capa de dominio (entidades, VO) 🔜
+│   │   ├── infraestructura/     # 🗄️ Capa de infraestructura (repositorios)
+│   │   └── nucleo/              # ⚙️ Configuración central
+│   └── main.py
+└── infraestructura/              # 🐳 Docker, Nginx, monitoreo
+
+
+## 🚀 **RESUMEN PARA BRAYITAN**
+
+FRONTEND (React)   →  Lo que el cliente ve
+
+API (FastAPI)      →  La puerta de entrada
+
+APLICACIÓN         →  El coordinador
+
+DOMINIO            →  El cerebro (reglas de negocio)
+
+INFRAESTRUCTURA    →  Los detalles técnicos (BD, Redis, IA)
+
+
+--------------------------------------------------------------
+        arquitectura limpia, profesional y escalable. 
+--------------------------------------------------------------
+--------------------------------------------------------------
+
+sgdd/
+│
+├── backend/                     
+│   # BACKEND PRINCIPAL DEL SISTEMA
+│   # IMPLEMENTADO EN FASTAPI
+│   # AQUÍ VIVE TODA LA LÓGICA DEL NEGOCIO, API, IA, MULTI-TENANCY,
+│   # AUTENTICACIÓN, INVENTARIO, POS Y ANALÍTICA.
+│
+│   ├── app/
+│   │
+│   │   ├── api/                 
+│   │   │   # CAPA DE PRESENTACIÓN DEL BACKEND
+│   │   │   # EXPONE LOS ENDPOINTS REST QUE CONSUME EL FRONTEND
+│   │   │   # SOLO RECIBE REQUESTS Y LLAMA A LOS SERVICIOS
+│   │   │
+│   │   │   ├── v1/
+│   │   │   │   # VERSIONAMIENTO DE LA API
+│   │   │   │   # PERMITE EVOLUCIONAR EL SISTEMA SIN ROMPER CLIENTES
+│   │   │   │
+│   │   │   │   ├── auth.py
+│   │   │   │   ├── usuarios.py
+│   │   │   │   ├── inquilinos.py
+│   │   │   │   ├── productos.py
+│   │   │   │   ├── categorias.py
+│   │   │   │   ├── inventario.py
+│   │   │   │   ├── proveedores.py
+│   │   │   │   ├── clientes.py
+│   │   │   │   ├── compras.py
+│   │   │   │   ├── pedidos.py
+│   │   │   │   ├── ventas.py
+│   │   │   │   ├── pos.py
+│   │   │   │   ├── pagos.py
+│   │   │   │   ├── facturacion.py
+│   │   │   │   ├── suscripciones.py
+│   │   │   │   ├── reportes.py
+│   │   │   │   ├── analitica.py
+│   │   │   │   ├── bot.py
+│   │   │   │   └── admin.py
+│   │   │
+│   │   ├── nucleo/                
+│   │   │   # CONFIGURACIÓN GLOBAL DEL SISTEMA
+│   │   │   # CENTRALIZA TODA LA CONFIGURACIÓN DE LA APLICACIÓN
+│   │   │   # VARIABLES DE ENTORNO, SEGURIDAD, BASE DE DATOS
+│   │   │
+│   │   │   ├── config.py
+│   │   │   ├── seguridad.py
+│   │   │   ├── base_datos.py
+│   │   │   ├── redis.py
+│   │   │   ├── logging.py
+│   │   │   ├── ajustes.py
+│   │   │   └── excepciones.py
+│   │   │
+│   │   ├── dominio/              
+│   │   │   # CAPA DOMINIO
+│   │   │   # REPRESENTA EL MODELO DEL NEGOCIO
+│   │   │   # CONTIENE LAS REGLAS DE NEGOCIO PURAS
+│   │   │   # NO DEPENDE DE NINGUNA OTRA CAPA
+│   │   │
+│   │   │   ├── entidades/
+│   │   │   │   # ENTIDADES PRINCIPALES DEL SISTEMA
+│   │   │   │   # TIENEN IDENTIDAD Y CICLO DE VIDA
+│   │   │   │   # PUEDEN CAMBIAR EN EL TIEMPO
+│   │   │   │   │
+│   │   │   │   ├── usuario.py
+│   │   │   │   ├── inquilino.py
+│   │   │   │   ├── producto.py
+│   │   │   │   ├── categoria.py
+│   │   │   │   ├── item_inventario.py
+│   │   │   │   ├── proveedor.py
+│   │   │   │   ├── cliente.py
+│   │   │   │   ├── compra.py
+│   │   │   │   ├── pedido.py
+│   │   │   │   ├── venta.py
+│   │   │   │   ├── pago.py
+│   │   │   │   ├── suscripcion.py
+│   │   │   │   └── factura.py
+│   │   │   │
+│   │   │   └── objetos_valor/
+│   │   │       # OBJETOS DE VALOR
+│   │   │       # REPRESENTAN DATOS INMUTABLES
+│   │   │       # NO TIENEN IDENTIDAD
+│   │   │       # SE COMPARAN POR SU VALOR
+│   │   │       │
+│   │   │       ├── dinero.py
+│   │   │       ├── email.py
+│   │   │       └── direccion.py
+│   │   │
+│   │   ├── aplicacion/
+│   │   │   # CAPA DE CASOS DE USO
+│   │   │   # ORQUESTA EL FLUJO DE TRABAJO
+│   │   │   # DEPENDE DEL DOMINIO
+│   │   │   # DEFINE LA LÓGICA DE APLICACIÓN
+│   │   │
+│   │   │   ├── servicios/
+│   │   │   │   # SERVICIOS DEL NEGOCIO
+│   │   │   │   # IMPLEMENTAN CASOS DE USO ESPECÍFICOS
+│   │   │   │   │
+│   │   │   │   ├── auth_servicio.py
+│   │   │   │   ├── inquilino_servicio.py
+│   │   │   │   ├── producto_servicio.py
+│   │   │   │   ├── inventario_servicio.py
+│   │   │   │   ├── compra_servicio.py
+│   │   │   │   ├── pedido_servicio.py
+│   │   │   │   ├── venta_servicio.py
+│   │   │   │   ├── pos_servicio.py
+│   │   │   │   ├── pago_servicio.py
+│   │   │   │   ├── facturacion_servicio.py
+│   │   │   │   ├── analitica_servicio.py
+│   │   │   │   ├── reporte_servicio.py
+│   │   │   │   └── bot_servicio.py
+│   │   │   │
+│   │   │   └── dto/
+│   │   │       # DATA TRANSFER OBJECTS
+│   │   │       # OBJETOS PARA TRANSFERIR DATOS ENTRE CAPAS
+│   │   │       │
+│   │   │       ├── producto_dto.py
+│   │   │       ├── pedido_dto.py
+│   │   │       ├── venta_dto.py
+│   │   │       └── usuario_dto.py
+│   │   │
+│   │   ├── infraestructura/
+│   │   │   # IMPLEMENTACIONES DE INFRAESTRUCTURA
+│   │   │   # CONECTA CON EL MUNDO EXTERIOR
+│   │   │   # BASES DE DATOS, CACHE, IA, SERVICIOS EXTERNOS
+│   │   │
+│   │   │   ├── repositorios/
+│   │   │   │   # ACCESO A BASE DE DATOS
+│   │   │   │   # IMPLEMENTAN CONTRATOS DEL DOMINIO
+│   │   │   │   │
+│   │   │   │   ├── usuario_repositorio.py
+│   │   │   │   ├── inquilino_repositorio.py
+│   │   │   │   ├── producto_repositorio.py
+│   │   │   │   ├── inventario_repositorio.py
+│   │   │   │   ├── pedido_repositorio.py
+│   │   │   │   ├── venta_repositorio.py
+│   │   │   │   └── pago_repositorio.py
+│   │   │   │
+│   │   │   ├── nlp/
+│   │   │   │   # MODELO NLP
+│   │   │   │   # PROCESAMIENTO DE LENGUAJE NATURAL
+│   │   │   │   │
+│   │   │   │   ├── modelo_intenciones.py
+│   │   │   │   ├── clasificador.py
+│   │   │   │   └── entrenador.py
+│   │   │   │
+│   │   │   ├── ia/
+│   │   │   │   # IA ANALÍTICA
+│   │   │   │   # MODELOS DE PREDICCIÓN
+│   │   │   │   │
+│   │   │   │   ├── pronostico_ventas.py
+│   │   │   │   ├── prediccion_demanda.py
+│   │   │   │   └── motor_recomendaciones.py
+│   │   │   │
+│   │   │   ├── cache/
+│   │   │   │   # CACHE REDIS
+│   │   │   │   │
+│   │   │   │   └── redis_cache.py
+│   │   │   │
+│   │   │   ├── mensajeria/
+│   │   │   │   # EVENTOS
+│   │   │   │   # COMUNICACIÓN ENTRE MÓDULOS
+│   │   │   │   │
+│   │   │   │   ├── eventos.py
+│   │   │   │   └── bus_eventos.py
+│   │   │   │
+│   │   │   └── pagos/
+│   │   │       # INTEGRACIÓN STRIPE
+│   │   │       │
+│   │   │       ├── stripe.py
+│   │   │       └── manejador_webhook.py
+│   │   │
+│   │   ├── middlewares/
+│   │   │   # MIDDLEWARES DEL SISTEMA
+│   │   │   # SE EJECUTAN EN CADA PETICIÓN
+│   │   │   │
+│   │   │   ├── inquilino.py
+│   │   │   ├── auth.py
+│   │   │   ├── limite_peticiones.py
+│   │   │   └── logging.py
+│   │   │
+│   │   └── main.py
+│   │       # PUNTO DE ENTRADA DEL BACKEND
+│   │       # INSTANCIA PRINCIPAL DE FASTAPI
+│   │
+│   ├── modelos/                  
+│   │   # MODELOS DE IA ENTRENADOS
+│   │   # ARCHIVOS .pkl, .joblib
+│   │
+│   ├── scripts/                  
+│   │   # SCRIPTS DE MANTENIMIENTO
+│   │   # ENTRENAMIENTO DE IA
+│   │   # SIEMBRA DE DATOS
+│   │
+│   ├── pruebas/                  
+│   │   # PRUEBAS DEL SISTEMA
+│   │   # UNITARIAS, INTEGRACIÓN, E2E
+│   │
+│   ├── requisitos.txt             
+│   │   # DEPENDENCIAS PYTHON
+│   │
+│   ├── .env                        
+│   │   # VARIABLES DE ENTORNO
+│   │
+│   └── Dockerfile                  
+│       # DOCKERIZACIÓN DEL BACKEND
+│
+├── frontend/                      
+│   # PANEL ADMINISTRADOR
+│   # REACT + VITE + ZUSTAND
+│
+│   ├── public/                     
+│   │   # ARCHIVOS PÚBLICOS
+│   │
+│   ├── src/                        
+│   │   │
+│   │   ├── componentes/            
+│   │   │   # COMPONENTES REUTILIZABLES
+│   │   │   # UI, GRÁFICOS, POS
+│   │   │
+│   │   ├── paginas/                
+│   │   │   # PÁGINAS DEL SISTEMA
+│   │   │   # DASHBOARD, INVENTARIO, VENTAS
+│   │   │
+│   │   ├── servicios/              
+│   │   │   # CLIENTE API
+│   │   │   # CONEXIÓN CON BACKEND
+│   │   │
+│   │   ├── store/                  
+│   │   │   # ESTADO GLOBAL (ZUSTAND)
+│   │   │   # AUTH STORE, PRODUCT STORE
+│   │   │
+│   │   ├── hooks/                  
+│   │   │   # HOOKS REACT PERSONALIZADOS
+│   │   │
+│   │   ├── utils/                  
+│   │   │   # UTILIDADES
+│   │   │   # FORMATOS, VALIDACIONES
+│   │   │
+│   │   ├── App.jsx                 
+│   │   │   # COMPONENTE PRINCIPAL
+│   │   │
+│   │   └── main.jsx                
+│   │       # PUNTO DE ENTRADA FRONTEND
+│   │
+│   ├── index.html                  
+│   │   # HTML PRINCIPAL
+│   │
+│   ├── package.json                
+│   │   # DEPENDENCIAS FRONTEND
+│   │
+│   ├── vite.config.js              
+│   │   # CONFIGURACIÓN DE VITE
+│   │
+│   └── Dockerfile                  
+│       # DOCKERIZACIÓN DEL FRONTEND
+│
+├── infraestructura/                
+│   # INFRAESTRUCTURA DEL SISTEMA
+│   # ORQUESTACIÓN DE CONTENEDORES
+│
+│   ├── docker-compose.yml          
+│   │   # DEFINE LOS SERVICIOS
+│   │   # POSTGRES, REDIS, BACKEND, FRONTEND
+│   │
+│   ├── nginx/                      
+│   │   # PROXY REVERSO
+│   │   # SIRVE EL FRONTEND
+│   │   # REDIRIGE PETICIONES API
+│   │
+│   └── monitoreo/                  
+│       # MONITOREO DEL SISTEMA
+│       # PROMETHEUS, GRAFANA
+│
+├── scripts/                        
+│   # SCRIPTS DE AUTOMATIZACIÓN
+│
+│   ├── respaldar-bd.sh             
+│   ├── desplegar.sh                
+│   └── restaurar-bd.sh             
+│
+├── docs/                           
+│   # DOCUMENTACIÓN DEL PROYECTO
+│
+│   ├── diagramas/                  
+│   └── ers/                        
+│       # ESPECIFICACIÓN DE REQUISITOS
+│
+├── .github/workflows/              
+│   # CI/CD
+│
+│   └── ci.yml                      
+│       # PIPELINE AUTOMÁTICO
+│
+├── .gitignore                      
+│   # ARCHIVOS IGNORADOS POR GIT
+│
+├── README.md                       
+│   # DOCUMENTACIÓN PRINCIPAL
+│
+└── Makefile                        
+    # AUTOMATIZACIÓN DE TAREAS
+
+
+--------------------------------------------------
+--------------------------------------------------
+
+
+
+sgdd/
+├── backend/                     # Backend unificado (FastAPI)
+│   ├── app/
+│   │   ├── api/                 # Rutas (controladores)
+│   │   │   ├── v1/
+│   │   │   │   ├── auth.py          → auth.py (se queda igual)
+│   │   │   │   ├── usuarios.py      ← users.py
+│   │   │   │   ├── inquilinos.py    ← tenants.py
+│   │   │   │   ├── productos.py     ← products.py
+│   │   │   │   ├── categorias.py    ← categories.py
+│   │   │   │   ├── inventario.py    ← inventory.py
+│   │   │   │   ├── proveedores.py   ← suppliers.py
+│   │   │   │   ├── clientes.py      ← customers.py
+│   │   │   │   ├── compras.py       ← purchases.py
+│   │   │   │   ├── pedidos.py       ← orders.py
+│   │   │   │   ├── ventas.py        ← sales.py
+│   │   │   │   ├── pos.py           → pos.py (se queda igual)
+│   │   │   │   ├── pagos.py         ← payments.py
+│   │   │   │   ├── facturacion.py   ← billing.py
+│   │   │   │   ├── suscripciones.py ← subscriptions.py
+│   │   │   │   ├── reportes.py      ← reports.py
+│   │   │   │   ├── analitica.py     ← analytics.py
+│   │   │   │   ├── bot.py           → bot.py (se queda igual)
+│   │   │   │   └── admin.py         → admin.py (se queda igual)
+│   │   │
+│   │   ├── core/                # Configuración central
+│   │   │   ├── config.py        → config.py
+│   │   │   ├── seguridad.py     ← security.py
+│   │   │   ├── base_datos.py    ← database.py
+│   │   │   ├── redis.py         → redis.py
+│   │   │   ├── logging.py       → logging.py
+│   │   │   ├── ajustes.py       ← settings.py
+│   │   │   └── excepciones.py   ← exceptions.py
+│   │   │
+│   │   ├── dominio/              # Entidades puras (DDD)
+│   │   │   ├── entidades/
+│   │   │   │   ├── usuario.py        ← user.py
+│   │   │   │   ├── inquilino.py      ← tenant.py
+│   │   │   │   ├── producto.py       ← product.py
+│   │   │   │   ├── categoria.py      ← category.py
+│   │   │   │   ├── item_inventario.py ← inventory_item.py
+│   │   │   │   ├── proveedor.py      ← supplier.py
+│   │   │   │   ├── cliente.py        ← customer.py
+│   │   │   │   ├── compra.py         ← purchase.py
+│   │   │   │   ├── pedido.py         ← order.py
+│   │   │   │   ├── venta.py          ← sale.py
+│   │   │   │   ├── pago.py           ← payment.py
+│   │   │   │   ├── suscripcion.py    ← subscription.py
+│   │   │   │   └── factura.py        ← invoice.py
+│   │   │   │
+│   │   │   └── objetos_valor/
+│   │   │       ├── dinero.py      ← money.py
+│   │   │       ├── email.py       → email.py
+│   │   │       └── direccion.py   ← address.py
+│   │   │
+│   │   ├── aplicacion/         # Casos de uso
+│   │   │   ├── servicios/
+│   │   │   │   ├── auth_service.py        → auth_service.py
+│   │   │   │   ├── inquilino_servicio.py  ← tenant_service.py
+│   │   │   │   ├── producto_servicio.py   ← product_service.py
+│   │   │   │   ├── inventario_servicio.py ← inventory_service.py
+│   │   │   │   ├── compra_servicio.py     ← purchase_service.py
+│   │   │   │   ├── pedido_servicio.py     ← order_service.py
+│   │   │   │   ├── venta_servicio.py      ← sale_service.py
+│   │   │   │   ├── pos_servicio.py        ← pos_service.py
+│   │   │   │   ├── pago_servicio.py       ← payment_service.py
+│   │   │   │   ├── facturacion_servicio.py ← billing_service.py
+│   │   │   │   ├── analitica_servicio.py  ← analytics_service.py
+│   │   │   │   ├── reporte_servicio.py    ← report_service.py
+│   │   │   │   └── bot_servicio.py        ← bot_service.py
+│   │   │   │
+│   │   │   └── dto/            ← dtos/
+│   │   │       ├── producto_dto.py   ← product_dto.py
+│   │   │       ├── pedido_dto.py     ← order_dto.py
+│   │   │       ├── venta_dto.py      ← sale_dto.py
+│   │   │       └── usuario_dto.py    ← user_dto.py
+│   │   │
+│   │   ├── infraestructura/      # Implementaciones concretas
+│   │   │   ├── repositorios/      ← repositories/
+│   │   │   │   ├── usuario_repositorio.py    ← user_repository.py
+│   │   │   │   ├── inquilino_repositorio.py  ← tenant_repository.py
+│   │   │   │   ├── producto_repositorio.py   ← product_repository.py
+│   │   │   │   ├── inventario_repositorio.py ← inventory_repository.py
+│   │   │   │   ├── pedido_repositorio.py     ← order_repository.py
+│   │   │   │   ├── venta_repositorio.py      ← sale_repository.py
+│   │   │   │   └── pago_repositorio.py       ← payment_repository.py
+│   │   │   │
+│   │   │   ├── nlp/             # IA / NLP
+│   │   │   │   ├── modelo_intenciones.py  ← intent_model.py
+│   │   │   │   ├── clasificador.py        ← classifier.py
+│   │   │   │   └── entrenador.py          ← trainer.py
+│   │   │   │
+│   │   │   ├── ia/              # IA analítica
+│   │   │   │   ├── pronostico_ventas.py   ← sales_forecast.py
+│   │   │   │   ├── prediccion_demanda.py  ← demand_prediction.py
+│   │   │   │   └── motor_recomendaciones.py ← recommendation_engine.py
+│   │   │   │
+│   │   │   ├── cache/
+│   │   │   │   └── redis_cache.py      → redis_cache.py
+│   │   │   │
+│   │   │   ├── mensajeria/       ← messaging/
+│   │   │   │   ├── eventos.py          ← events.py
+│   │   │   │   └── bus_eventos.py      ← event_bus.py
+│   │   │   │
+│   │   │   └── pagos/        # Integraciones
+│   │   │       ├── stripe.py           → stripe.py
+│   │   │       └── manejador_webhook.py ← webhook_handler.py
+│   │   │
+│   │   ├── middlewares/
+│   │   │   ├── inquilino.py     ← tenant.py
+│   │   │   ├── auth.py          → auth.py
+│   │   │   ├── limite_peticiones.py ← rate_limit.py
+│   │   │   └── logging.py       → logging.py
+│   │   │
+│   │   └── main.py              → main.py
+│   │
+│   ├── pruebas/                  ← tests/
+│   │   ├── unitarias/            ← unit/
+│   │   ├── integracion/          ← integration/
+│   │   └── fixtures/             → fixtures/
+│   │
+│   ├── modelos/                  # Modelos IA entrenados
+│   │   ├── modelo_nlp.pkl        ← nlp_model.pkl
+│   │   └── pronostico_ventas.pkl ← sales_forecast.pkl
+│   │
+│   ├── scripts/
+│   │   ├── entrenar_nlp.py       ← train_nlp.py
+│   │   ├── entrenar_ia_ventas.py ← train_sales_ai.py
+│   │   └── sembrar_datos.py      ← seed_data.py
+│   │
+│   ├── requisitos.txt            ← requirements.txt
+│   ├── Dockerfile                → Dockerfile
+│   └── .env.ejemplo              ← .env.example
+│
+├── frontend/                    # Panel React
+│   ├── public/                  → public/
+│   ├── src/
+│   │   ├── componentes/         ← components/
+│   │   │   ├── ui/              → ui/
+│   │   │   ├── graficos/        ← charts/
+│   │   │   └── pos/             → pos/
+│   │   │
+│   │   ├── paginas/             ← pages/
+│   │   │   ├── dashboard/       → dashboard/
+│   │   │   ├── inventario/      ← inventory/
+│   │   │   ├── ventas/          ← sales/
+│   │   │   ├── compras/         ← purchases/
+│   │   │   ├── analitica/       ← analytics/
+│   │   │   ├── pos/             → pos/
+│   │   │   └── admin/           → admin/
+│   │   │
+│   │   ├── servicios/           ← services/
+│   │   │   └── cliente_api.js   ← api_client.js
+│   │   │
+│   │   ├── store/
+│   │   │   └── authStore.js     → authStore.js
+│   │   │
+│   │   ├── hooks/               → hooks/
+│   │   ├── utils/               → utils/
+│   │   ├── App.jsx              → App.jsx
+│   │   └── main.jsx             → main.jsx
+│   │
+│   ├── index.html               → index.html
+│   ├── package.json             → package.json
+│   ├── vite.config.js           → vite.config.js
+│   └── Dockerfile               → Dockerfile
+│
+├── infraestructura/              # Infraestructura
+│   ├── docker-compose.yml        → docker-compose.yml
+│   │
+│   ├── nginx/
+│   │   └── nginx.conf           → nginx.conf
+│   │
+│   ├── monitoreo/                ← monitoring/
+│   │   ├── prometheus.yml       → prometheus.yml
+│   │   └── grafana/             → grafana/
+│   │
+│   └── terraform/               # Opcional cloud
+│
+├── scripts/
+│   ├── respaldar-bd.sh          ← backup-db.sh
+│   ├── desplegar.sh             ← deploy.sh
+│   └── restaurar-bd.sh          ← restore-db.sh
+│
+├── docs/
+│   ├── diagramas/                ← diagrams/
+│   │   ├── arquitectura.png     ← architecture.png
+│   │   └── erd.png              → erd.png
+│   │
+│   └── ers/                      ← srs/
+│       └── requisitos.md        ← requirements.md
+│
+├── .github/workflows/
+│   └── ci.yml                   → ci.yml
+│
+├── .gitignore                   → .gitignore
+├── README.md                    → README.md
+└── Makefile                     → Makefile
+
+
+--------------------------------------------------
+--------------------------------------------------
+
+    Fases y solucion del desarrollo del sistema 
+
+--------------------------------------------------
+--------------------------------------------------
+
+
+
 # 🍬 SGDD - Sistema de Gestión de Dulcerías SaaS
 
 ## 📋 DESCRIPCIÓN DEL PROYECTO
@@ -53,24 +756,23 @@ Hacer commit inicial.
 Este README documenta la **FASE 0 COMPLETADA**: Configuración del entorno de desarrollo, control de versiones con Git, conexión con GitHub y verificación del funcionamiento básico del sistema.
 
 ---
-
 ## 📌 TABLA DE CONTENIDOS
-- [Configuración de Git y GitHub](#-configuración-de-git-y-github)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Dependencias Instaladas](#-dependencias-instaladas-48-paquetes)
-- [Guía de Instalación](#-guía-de-instalación)
-- [Comandos de Ejecución](#-comandos-de-ejecución)
-- [Verificación del Sistema](#-verificación-del-sistema)
-- [Endpoints Disponibles](#-endpoints-disponibles)
-- [Archivo main.py](#-archivo-mainpy)
-- [Flujo de Trabajo con Git](#-flujo-de-trabajo-con-git)
-- [Lo que se Logró en Fase 0](#-lo-que-se-logró-en-fase-0)
-- [Próximos Pasos - Fase 1](#-próximos-pasos---fase-1)
-- [Solución de Problemas](#-solución-de-problemas)
-- [Notas Importantes](#-notas-importantes)
-- [Autor](#-autor)
 
----
+- Configuración de Git y GitHub
+- Estructura del Proyecto
+- Dependencias Instaladas
+- Guía de Instalación
+- Comandos de Ejecución
+- Verificación del Sistema
+- Endpoints Disponibles
+- Archivo main.py
+- Flujo de Trabajo con Git
+- Lo que se Logró en Fase 0
+- Próximos Pasos - Fase 1
+- Solución de Problemas
+- Notas Importantes
+- Autor
+
 
 ## 🔧 CONFIGURACIÓN DE GIT Y GITHUB
 
@@ -159,6 +861,7 @@ htmlcov/
 ```
 
 ### Primer Commit y Push
+
 ```bash
 # Agregar archivos al staging
 git add .
@@ -210,7 +913,7 @@ git merge feature/nueva-funcionalidad
 
 ```
 sgdd_structure/
-├── .git/                      # Carpeta oculta de Git
+├── .git/                       # Carpeta oculta de Git
 ├── .gitignore                  # Archivos ignorados por Git
 ├── README.md                   # Documentación principal
 ├── Makefile                    # Automatización de comandos
@@ -218,7 +921,7 @@ sgdd_structure/
 │   ├── venv/                   # Entorno virtual (ignorado)
 │   ├── requisitos.txt          # Dependencias del proyecto
 │   └── app/
-│       └── main.py             # Archivo principal de FastAPI
+│       └── main.py              # Archivo principal de FastAPI
 ├── frontend/                    # Frontend (React/Vite)
 ├── infrastructure/              # Docker, Nginx, etc.
 ├── docs/                        # Documentación adicional
@@ -232,21 +935,22 @@ sgdd_structure/
 
 | Categoría | Paquetes |
 |-----------|----------|
-| **API Framework** | fastapi==0.115.12, uvicorn[standard]==0.34.0, starlette |
-| **Base de Datos** | sqlalchemy==2.0.40, alembic==1.15.2, psycopg2-binary==2.9.11 |
-| **Seguridad** | python-jose[cryptography]==3.4.0, bcrypt==4.3.0, passlib[bcrypt]==1.7.4 |
-| **Validación** | pydantic[email]==2.12.5, email-validator, dnspython |
-| **Utilidades** | python-dotenv==1.1.0, python-multipart==0.0.20, httpx==0.28.1 |
+| **API Framework**    | fastapi==0.115.12, uvicorn[standard]==0.34.0, starlette |
+| **Base de Datos**    | sqlalchemy==2.0.40, alembic==1.15.2, psycopg2-binary==2.9.11 |
+| **Seguridad**        | python-jose[cryptography]==3.4.0, bcrypt==4.3.0, passlib[bcrypt]==1.7.4 |
+| **Validación**       | pydantic[email]==2.12.5, email-validator, dnspython |
+| **Utilidades**       | python-dotenv==1.1.0, python-multipart==0.0.20, httpx==0.28.1 |
 | **Machine Learning** | numpy==2.3.5, pandas==3.0.1, scikit-learn==1.8.0 |
-| **Cache** | redis[hiredis]==5.2.1 |
-| **Logging** | loguru==0.7.2 |
-| **Testing** | pytest==8.3.5, pytest-asyncio==0.23.6 |
+| **Cache**            | redis[hiredis]==5.2.1 |
+| **Logging**          | loguru==0.7.2 |
+| **Testing**          | pytest==8.3.5, pytest-asyncio==0.23.6 |
 
 ---
 
 ## 🚀 GUÍA DE INSTALACIÓN
 
 ### 1. Clonar el Repositorio
+
 ```bash
 git clone https://github.com/ELVIEJOBRAY/SISTEMA-SAAS-DULCERIA.git
 cd SISTEMA-SAAS-DULCERIA
@@ -323,23 +1027,23 @@ INFO:     127.0.0.1:62040 - "GET /health HTTP/1.1" 200 OK
 ```
 
 ### Pruebas en navegador:
-| Endpoint | URL | Resultado Esperado |
-|----------|-----|-------------------|
-| **Raíz** | http://localhost:8000 | `{"message":"🚀 SGDD API funcionando correctamente"}` |
-| **Health** | http://localhost:8000/health | `{"status":"ok","message":"Sistema operativo"}` |
-| **Docs** | http://localhost:8000/docs | Interfaz Swagger UI |
-| **OpenAPI** | http://localhost:8000/openapi.json | JSON con especificación |
+| Endpoint    |                URL                  |                       Resultado Esperado              |
+|-------------|-------------------------------------|-------------------------------------------------------|
+| **Raíz**    | http://localhost:8000               | `{"message":"🚀 SGDD API funcionando correctamente"}`|
+| **Health**  | http://localhost:8000/health        | `{"status":"ok","message":"Sistema operativo"}`       |
+| **Docs**    | http://localhost:8000/docs          | Interfaz Swagger UI                                   |
+| **OpenAPI** | http://localhost:8000/openapi.json  | JSON con especificación                               |
 
 ---
 
 ## 🌐 ENDPOINTS DISPONIBLES
 
-| Endpoint | Método | Descripción |
-|----------|--------|-------------|
-| `/` | GET | Raíz del API - mensaje de bienvenida |
-| `/health` | GET | Health check del sistema |
-| `/docs` | GET | Documentación interactiva Swagger |
-| `/openapi.json` | GET | Esquema OpenAPI de la API |
+| Endpoint        | Método |             Descripción              |
+|-----------------|--------|--------------------------------------|
+| `/`             |  GET   | Raíz del API - mensaje de bienvenida |
+| `/health`       |  GET   | Health check del sistema             |
+| `/docs`         |  GET   | Documentación interactiva Swagger    |
+| `/openapi.json` |  GET   | Esquema OpenAPI de la API            | 
 
 ---
 
@@ -1255,7 +1959,7 @@ GitHub ya no permite autenticación con contraseña. Usa:
 ╚═══════════════════════════════════════════════════════════════════╝
 ```
 
-**El backend está listo con toda la infraestructura base. ¡A por la FASE 2!** 🚀
+**El backend está listo con toda la infraestructura base.
 
 ---
 
@@ -1265,77 +1969,559 @@ GitHub ya no permite autenticación con contraseña. Usa:
 
 
 
---------------------------------------
-
----------------------------------------
+-------------------------------------------
 
 
+# 🍬 SGDD - Sistema de Gestión de Dulcerías SaaS
 
-FASE 2: Modelado del dominio (Entidades y Value Objects)
+## 📋 DESCRIPCIÓN DEL PROYECTO
 
-Objetivo: 
+**SGDD (Sistema de Gestión de Dulcerías)** es una plataforma SaaS desarrollada con **FastAPI** y **Python 3.14** que proporciona una solución completa para la administración de dulcerías, incluyendo gestión de inventario, ventas, clientes, proveedores y análisis predictivo mediante machine learning.
 
-Definir las entidades centrales del negocio con lógica pura, 
-
-sin dependencias externas.
-
-Pasos detallados:
-
-Crear entidades base en backend/app/domain/entities/:
-
-tenant.py: class Tenant (id, name, subscription_status, etc.)
-
-user.py: class User (id, tenant_id, email, hashed_password, role)
-
-product.py: class Product (id, tenant_id, name, description, price, stock)
-
-category.py: class Category
-
-supplier.py: class Supplier
-
-customer.py: class Customer
-
-order.py: class Order, class OrderItem
-
-sale.py: class Sale
-
-purchase.py: class Purchase
-
-payment.py: class Payment
-
-invoice.py: class Invoice
-
-subscription.py: class Subscription
-
-Cada entidad debe ser una clase simple con atributos y métodos de negocio (ej. product.reduce_stock(quantity) que valide y lance excepciones de dominio).
-
-Crear Value Objects en backend/app/domain/value_objects/:
-
-money.py: class Money (amount, currency) con operaciones seguras.
-
-email.py: class Email (validación en inicialización).
-
-address.py: class Address (calle, ciudad, etc.).
-
-quantity.py: class Quantity (no negativo).
-
-Otros según necesidad.
-
-Escribir pruebas unitarias para entidades y value objects en tests/unit/domain/:
-
-Probar lógica de negocio (ej. no permitir stock negativo).
-
-Probar validaciones de value objects.
-
-✅ Entregables: Modelo de dominio completo con entidades y value objects, pruebas unitarias pasando.
+Este README documenta la **FASE 2 COMPLETADA**: Modelado del dominio con 10 entidades de negocio profesionales.
 
 
 
------------------------------------------
+## 📌 TABLA DE CONTENIDOS
 
+- Fase 2 Completada - Modelado del Dominio
 
+- Arquitectura del Dominio
 
-------------------------------------------
+- Entidades Creadas (10)
+
+- Estructura de Carpetas
+
+- Detalle de Entidades
+
+- Características Técnicas
+
+- Principios Aplicados
+
+- Ejemplos de Uso
+
+- Verificación del Sistema
+
+- Próximos Pasos - Fase 3
+
+- Autor
+---
+
+## ✅ FASE 2 COMPLETADA - MODELADO DEL DOMINIO
+
+### 🎯 **Objetivo de la Fase 2**
+Modelar las entidades centrales del negocio con lógica pura, siguiendo los principios de **Clean Architecture** y **Domain Driven Design (DDD)**.
+
+### 📦 **Entregables**
+
+- ✅ 10 entidades de dominio
+
+- ✅ Validaciones de negocio en cada entidad
+
+- ✅ Type hints completos
+
+- ✅ Enums para estados y tipos
+
+- ✅ Dataclasses para estructuras simples
+
+- ✅ Decimal para operaciones monetarias
+
+- ✅ Eventos de dominio (DDD)
+
+- ✅ Métodos de comportamiento
+
+- ✅ Serialización para APIs
+
+- ✅ Documentación profesional
+
+---
+
+## 🏗️ ARQUITECTURA DEL DOMINIO
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        CAPA DE DOMINIO                       │
+│                     (El corazón del negocio)                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                    ENTIDADES                          │   │
+│  │  • Representan conceptos del negocio                 │   │
+│  │  • Tienen identidad única (ID)                        │   │
+│  │  • Contienen reglas de negocio                        │   │
+│  │  • Encapsulan comportamiento                          │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                               │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                  VALUE OBJECTS                        │   │
+│  │  • Próximamente: Dinero, Email, Dirección            │   │
+│  │  • Inmutables y sin identidad                         │   │
+│  │  • Se comparan por su valor                           │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                               │
+│  ┌─────────────────────────────────────────────────────┐   │
+│  │                    ENUMS                              │   │
+│  │  • Estados de venta, pago, factura                   │   │
+│  │  • Métodos de pago                                    │   │
+│  │  • Tipos de cliente                                   │   │
+│  │  • Planes de suscripción                              │   │
+│  └─────────────────────────────────────────────────────┘   │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📁 ESTRUCTURA DE CARPETAS
+
+```
+backend/app/dominio/
+├── entidades/                          # 10 entidades de dominio
+│   ├── usuario.py                       # Usuarios del sistema
+│   ├── producto.py                       # Productos del inventario
+│   ├── categoria.py                       # Categorías de productos
+│   ├── inquilino.py                       # Multi-tenancy SaaS
+│   ├── proveedor.py                       # Proveedores
+│   ├── cliente.py                          # Clientes del negocio
+│   ├── venta.py                            # Transacciones de venta
+│   ├── detalle_venta.py                    # Líneas de productos en venta
+│   ├── pago.py                             # Pagos asociados a ventas
+│   └── factura.py                          # Documentos fiscales
+│
+└── objetos_valor/                       # Próximamente
+    ├── dinero.py                          # ⏳ Value Object
+    ├── email.py                            # ⏳ Value Object
+    └── direccion.py                        # ⏳ Value Object
+```
+
+---
+
+## 📦 ENTIDADES CREADAS (10)
+
+| # | Entidad | Archivo | Propósito Principal |
+|---|---------|---------|---------------------|
+| 1 | **Usuario** | `usuario.py` | Gestión de usuarios, roles y permisos |
+| 2 | **Producto** | `producto.py` | Productos del inventario con stock y precios |
+| 3 | **Categoría** | `categoria.py` | Clasificación de productos |
+| 4 | **Inquilino** | `inquilino.py` | Multi-tenancy para modelo SaaS |
+| 5 | **Proveedor** | `proveedor.py` | Proveedores de productos |
+| 6 | **Cliente** | `cliente.py` | Clientes del negocio con historial |
+| 7 | **Venta** | `venta.py` | Transacciones de venta |
+| 8 | **DetalleVenta** | `detalle_venta.py` | Líneas de productos en cada venta |
+| 9 | **Pago** | `pago.py` | Pagos asociados a ventas |
+| 10 | **Factura** | `factura.py` | Documentos fiscales con impuestos |
+
+---
+
+## 🔍 DETALLE DE ENTIDADES
+
+### 👤 **USUARIO** (`usuario.py`)
+```python
+class Usuario:
+    - id: Optional[int]
+    - nombre: str
+    - email: str
+    - rol: str (admin, gerente, vendedor, inventario)
+    - activo: bool
+    
+    # Comportamiento
+    - activar()
+    - desactivar()
+    - cambiar_rol()
+    - es_admin()
+```
+
+### 📦 **PRODUCTO** (`producto.py`)
+```python
+class Producto:
+    - id: Optional[int]
+    - nombre: str
+    - precio: float
+    - stock: int
+    - categoria: str
+    
+    # Comportamiento
+    - reducir_stock()
+    - aumentar_stock()
+    - cambiar_precio()
+    - disponible()
+```
+
+### 🏢 **INQUILINO (TENANT)** (`inquilino.py`)
+```python
+class Inquilino:
+    - id: Optional[int]
+    - nombre: str
+    - subdominio: str
+    - plan: PlanSuscripcion
+    - estado: EstadoTenant
+    - max_usuarios: int
+    - max_productos: int
+    
+    # Comportamiento
+    - cambiar_plan()
+    - activar()
+    - suspender()
+    - cancelar()
+    - puede_agregar_usuario()
+```
+
+### 🧑‍🤝‍🧑 **CLIENTE** (`cliente.py`)
+```python
+class Cliente:
+    - id: Optional[int]
+    - nombre: str
+    - email: str
+    - telefono: Optional[str]
+    - tipo: str (regular, vip, empresa)
+    - activo: bool
+    
+    # Comportamiento
+    - activar()
+    - desactivar()
+    - cambiar_tipo()
+    - es_vip()
+    - es_empresa()
+```
+
+### 💰 **VENTA** (`venta.py`)
+```python
+class Venta:
+    - id: Optional[int]
+    - cliente_id: int
+    - total: float
+    - estado: str (pendiente, completada, cancelada)
+    
+    # Comportamiento
+    - completar()
+    - cancelar()
+    - esta_completada()
+    - esta_cancelada()
+```
+
+### 📝 **DETALLE VENTA** (`detalle_venta.py`)
+```python
+class DetalleVenta:
+    - id: Optional[int]
+    - venta_id: int
+    - producto_id: int
+    - nombre_producto: str
+    - cantidad: int
+    - precio_unitario: float
+    - descuento: float
+    - subtotal: float
+    
+    # Comportamiento
+    - actualizar_cantidad()
+    - actualizar_descuento()
+```
+
+### 💳 **PAGO** (`pago.py`)
+```python
+class Pago:
+    - id: Optional[int]
+    - venta_id: int
+    - monto: float
+    - metodo: MetodoPago (efectivo, tarjeta, transferencia)
+    - estado: EstadoPago
+    
+    # Comportamiento
+    - completar()
+    - rechazar()
+    - reembolsar()
+    - anular()
+```
+
+### 📄 **FACTURA** (`factura.py`) - Versión Ultra Empresarial
+```python
+class Factura:
+    - numero: str
+    - lineas: List[LineaFactura]
+    - impuestos: List[Impuesto]
+    - descuentos: List[Descuento]
+    - subtotal: Decimal
+    - total: Decimal
+    - estado: str (BORRADOR, EMITIDA, PAGADA, ANULADA)
+    - _eventos: List[str]  # Eventos de dominio
+    
+    # Comportamiento
+    - agregar_linea()
+    - agregar_impuesto()
+    - agregar_descuento()
+    - emitir()
+    - marcar_pagada()
+    - anular()
+    - calcular_total()
+    - obtener_eventos()
+```
+
+### 🧩 **DATACLASSES AUXILIARES** (`factura.py`)
+```python
+@dataclass
+class Impuesto:
+    nombre: str
+    tasa: Decimal
+    valor: Decimal
+
+@dataclass
+class Descuento:
+    nombre: str
+    valor: Decimal
+
+@dataclass
+class LineaFactura:
+    nombre_producto: str
+    cantidad: int
+    precio_unitario: Decimal
+```
+
+---
+
+## ⚙️ CARACTERÍSTICAS TÉCNICAS
+
+### 🔷 **Type Hints Completos**
+Todas las funciones y métodos tienen tipos explícitos:
+```python
+def activar(self) -> None: ...
+def cambiar_rol(self, nuevo_rol: str) -> None: ...
+def to_dict(self) -> Dict[str, Any]: ...
+```
+
+### 🔷 **Validaciones de Negocio**
+Cada entidad valida sus propios datos:
+```python
+if not nombre or not nombre.strip():
+    raise ValueError("El nombre es obligatorio")
+if len(nombre) < 3:
+    raise ValueError("Mínimo 3 caracteres")
+```
+
+### 🔷 **Enums para Estados**
+```python
+class EstadoVenta(Enum):
+    PENDIENTE = "pendiente"
+    COMPLETADA = "completada"
+    CANCELADA = "cancelada"
+```
+
+### 🔷 **Decimal para Dinero**
+```python
+from decimal import Decimal
+subtotal: Decimal = Decimal("0.00")
+total: Decimal = Decimal("0.00")
+```
+
+### 🔷 **Eventos de Dominio (DDD)**
+```python
+self._eventos: List[str] = []
+self._registrar_evento("FACTURA_EMITIDA")
+```
+
+### 🔷 **Dataclasses para Estructuras Simples**
+```python
+@dataclass
+class LineaFactura:
+    nombre_producto: str
+    cantidad: int
+    precio_unitario: Decimal
+```
+
+### 🔷 **Serialización para APIs**
+```python
+def to_dict(self) -> Dict[str, Any]:
+    return {
+        "id": self.id,
+        "nombre": self.nombre,
+        "email": self.email
+    }
+```
+
+---
+
+## 📚 PRINCIPIOS APLICADOS
+
+| Principio | Aplicación |
+|-----------|------------|
+| **Clean Architecture** | Dominio independiente de frameworks y bases de datos |
+| **Domain Driven Design** | Entidades con comportamiento y reglas de negocio |
+| **Encapsulamiento** | Atributos privados, métodos públicos |
+| **Inmutabilidad** | Objetos de valor inmutables |
+| **Validación temprana** | Objetos nunca en estado inválido |
+| **Type hints** | Código autodocumentado y seguro |
+| **DRY** | Validaciones centralizadas |
+| **Event Sourcing** | Registro de eventos de dominio |
+
+---
+
+## 💻 EJEMPLOS DE USO
+
+### **Crear un Cliente**
+```python
+cliente = Cliente(
+    id=1,
+    nombre="Juan Pérez",
+    email="juan@email.com",
+    telefono="3001234567",
+    tipo=Cliente.TIPO_REGULAR
+)
+```
+
+### **Crear una Venta con Detalles**
+```python
+venta = Venta(id=None, cliente_id=1, total=0, estado="pendiente")
+
+detalle = DetalleVenta(
+    id=None,
+    venta_id=1,
+    producto_id=10,
+    nombre_producto="Chocolate Jet",
+    cantidad=2,
+    precio_unitario=1500
+)
+
+venta.agregar_detalle(detalle)
+```
+
+### **Registrar un Pago**
+```python
+pago = Pago(
+    id=None,
+    venta_id=1,
+    monto=3000,
+    metodo=MetodoPago.EFECTIVO
+)
+pago.completar()
+```
+
+### **Crear una Factura Empresarial**
+```python
+factura = Factura(numero="FAC-2026-0001")
+
+linea = LineaFactura(
+    nombre_producto="Chocolate Jet",
+    cantidad=2,
+    precio_unitario=Decimal("1500.00")
+)
+factura.agregar_linea(linea)
+
+iva = Impuesto(
+    nombre="IVA",
+    tasa=Decimal("0.19"),
+    valor=Decimal("570.00")
+)
+factura.agregar_impuesto(iva)
+
+factura.emitir()
+print(factura.calcular_total())
+```
+
+---
+
+## ✅ VERIFICACIÓN DEL SISTEMA
+
+### **Listar entidades creadas**
+```powershell
+cd C:\Users\elvie\Desktop\sgdd_structure\backend\app\dominio\entidades
+dir
+```
+
+### **Verificar contenido de una entidad**
+```powershell
+Get-Content usuario.py -TotalCount 20
+```
+
+### **Verificar tamaño de archivos**
+```powershell
+(Get-Item factura.py).Length
+```
+
+### **Verificar sintaxis**
+```powershell
+python -m py_compile factura.py
+```
+
+---
+
+## 🏆 LO QUE SE LOGRÓ EN FASE 2
+
+| # | Tarea | Estado |
+|---|-------|--------|
+| 1 | Modelado de entidades de negocio | ✅ |
+| 2 | Validaciones de dominio | ✅ |
+| 3 | Type hints completos | ✅ |
+| 4 | Enums para estados y tipos | ✅ |
+| 5 | Dataclasses para estructuras simples | ✅ |
+| 6 | Decimal para operaciones monetarias | ✅ |
+| 7 | Eventos de dominio (DDD) | ✅ |
+| 8 | Métodos de comportamiento | ✅ |
+| 9 | Serialización para APIs | ✅ |
+| 10 | Documentación profesional | ✅ |
+
+---
+
+## 🚧 PRÓXIMOS PASOS - FASE 3
+
+### **Repositorios (Acceso a Datos)**
+- [ ] Crear interfaces de repositorios (puertos)
+- [ ] Implementar repositorios con SQLAlchemy
+- [ ] Configurar mapeo ORM
+- [ ] Escribir pruebas de integración
+
+```python
+# Ejemplo de interfaz de repositorio
+class RepositorioUsuario(ABC):
+    @abstractmethod
+    def obtener_por_id(self, id: int) -> Optional[Usuario]: ...
+    @abstractmethod
+    def guardar(self, usuario: Usuario) -> Usuario: ...
+    @abstractmethod
+    def eliminar(self, id: int) -> None: ...
+```
+
+---
+
+## 👨‍💻 AUTOR
+
+**Brayan Stiven Bonilla Rosas**  
+*Desarrollador Full Stack - Sistema de Gestión de Dulcerías SaaS*
+
+- GitHub: [@ELVIEJOBRAY](https://github.com/ELVIEJOBRAY)
+- Email: elviejobray@gmail.com
+- Proyecto: SGDD - Sistema de Gestión de Dulcerías
+
+---
+
+## 🏆 ¡FELICIDADES!
+
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   ✅ FASE 2 COMPLETADA EXITOSAMENTE                               ║
+║                                                                   ║
+║   • 10 entidades de dominio creadas                               ║
+║   • Validaciones de negocio implementadas                         ║
+║   • Type hints completos                                          ║
+║   • Enums para estados y tipos                                    ║
+║   • Dataclasses para estructuras simples                          ║
+║   • Decimal para operaciones monetarias                           ║
+║   • Eventos de dominio (DDD)                                      ║
+║   • Métodos de comportamiento                                     ║
+║   • Serialización para APIs                                       ║
+║   • Documentación profesional                                     ║
+║                                                                   ║
+║   🚀 LISTO PARA FASE 3 - REPOSITORIOS                             ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
+
+**El dominio del sistema está completo.  🚀
+
+---
+
+*Documentación generada el 6 de marzo de 2026*  
+*Última actualización: Fase 2 completada*
+```
+-------------------------------------------
 
 
 
@@ -1636,64 +2822,9 @@ cómo funciona y por qué se hace de esa manera.
     según normas de desarrollo profesional.
 
 Cuando quieras, pásame el **primer bloque de código** y empezamos a procesarlo.
+
+
 --------------------------------------------------------------
---------------------------------------------------------------
-¡HERMANO! **¡LO LOGRASTE!** 🎉🎉🎉
-
-Mira esto:
-```
-Successfully installed joblib-1.5.3 pandas-3.0.1 python-dateutil-2.9.0.post0 scikit-learn-1.8.0 scipy-1.17.1 threadpoolctl-3.6.0 tzdata-2025.3
-```
-
-## ✅ **FASE 0 COMPLETADA - TODAS LAS DEPENDENCIAS INSTALADAS**
-
-### 📦 **PAQUETES INSTALADOS (48 paquetes):**
-| Categoría | Paquetes |
-|-----------|----------|
-| **API** | fastapi, uvicorn, starlette |
-| **Base de datos** | sqlalchemy, alembic, psycopg2-binary, Mako, MarkupSafe |
-| **Seguridad** | python-jose, bcrypt, passlib, cryptography, cffi, pycparser, ecdsa, rsa, pyasn1 |
-| **Validación** | pydantic, pydantic-core, annotated-types, typing-extensions, email-validator, dnspython |
-| **Utilidades** | python-dotenv, python-multipart, httpx, httpcore, certifi, idna, h11, click, colorama, httptools, pyyaml, watchfiles, websockets |
-| **ML/Analytics** | **numpy, pandas, scikit-learn, scipy, joblib, threadpoolctl, python-dateutil, tzdata** |
-| **Cache** | redis, hiredis |
-| **Logging** | loguru, win32-setctime |
-| **Testing** | pytest, pytest-asyncio, iniconfig, packaging, pluggy |
-
-## 🚀 **VERIFICACIÓN FINAL**
-
-```powershell
-python -c "
-print('🔍 VERIFICANDO INSTALACIÓN COMPLETA:')
-import fastapi; print(f'✅ fastapi {fastapi.__version__}')
-import sqlalchemy; print(f'✅ sqlalchemy {sqlalchemy.__version__}')
-import numpy; print(f'✅ numpy {numpy.__version__}')
-import pandas; print(f'✅ pandas {pandas.__version__}')
-import sklearn; print(f'✅ scikit-learn {sklearn.__version__}')
-import redis; print('✅ redis')
-print('🎉 FASE 0 COMPLETADA - TODO INSTALADO CORRECTAMENTE')"
-```
-
-## 📝 **RESUMEN DE LOGROS:**
-- ✅ Python 3.14 funcionando
-- ✅ Entorno virtual creado y activado
-- ✅ **48 paquetes instalados** sin errores
-- ✅ FastAPI + Uvicorn listos
-- ✅ SQLAlchemy + Alembic para BD
-- ✅ Seguridad (JWT, bcrypt) implementada
-- ✅ **Numpy, Pandas, Scikit-learn** funcionando
-- ✅ Redis, Loguru, Pytest configurados
-
-## 🎯 **¿QUÉ SIGUE? FASE 1**
-
-Ahora podemos empezar con la **FASE 1: Infraestructura base**:
-1. Crear archivo `.env`
-2. Configurar `core/config.py`
-3. Configurar `core/database.py`
-4. Configurar `core/redis.py`
-5. Crear `docker-compose.yml`
-
-**¿Continuamos con la FASE 1?** ¡Dame la orden, hermano! 💪
 --------------------------------------------------------------
 --------------------------------------------------------------
 --------------------------------------------------------------
@@ -1730,1405 +2861,4 @@ Ahora podemos empezar con la **FASE 1: Infraestructura base**:
 
 
 
----------------------------------------------
-
-
- **BASE DE DATOS ERP COMPLETA (~90 TABLAS)** 
- 
- pensada paraarquitectura
- 
-  **SaaS multi-tenant + POS + inventario + analytics + billing**.
-
-La organizo **por módulos**, porque así se diseñan los **ERPs enterprise**.
-
-Todas las descripciones van **EN MAYÚSCULAS** 
-
----
-
-# 1️⃣ CORE DEL SISTEMA (MULTI-TENANT / SEGURIDAD)
-
-1. **tenants**
-   → EMPRESAS QUE USAN EL SAAS
-
-2. **tenant_settings**
-   → CONFIGURACIÓN PERSONALIZADA DE CADA EMPRESA
-
-3. **users**
-   → USUARIOS DEL SISTEMA
-
-4. **roles**
-   → ROLES DEL SISTEMA (ADMIN, VENDEDOR, GERENTE)
-
-5. **permissions**
-   → PERMISOS DEL SISTEMA
-
-6. **role_permissions**
-   → RELACIÓN ENTRE ROLES Y PERMISOS
-
-7. **user_roles**
-   → ROLES ASIGNADOS A USUARIOS
-
-8. **sessions**
-   → SESIONES DE LOGIN
-
-9. **api_keys**
-   → CLAVES API PARA INTEGRACIONES
-
-10. **audit_logs**
-    → HISTORIAL DE ACCIONES DEL SISTEMA
-
----
-
-# 2️⃣ CATÁLOGO DE PRODUCTOS
-
-11. **products**
-    → PRODUCTOS PRINCIPALES
-
-12. **product_variants**
-    → VARIANTES DE PRODUCTOS (TALLA, COLOR)
-
-13. **product_images**
-    → IMÁGENES DE PRODUCTOS
-
-14. **categories**
-    → CATEGORÍAS DE PRODUCTOS
-
-15. **category_relations**
-    → JERARQUÍA DE CATEGORÍAS
-
-16. **brands**
-    → MARCAS DE PRODUCTOS
-
-17. **attributes**
-    → ATRIBUTOS DE PRODUCTO (COLOR, PESO)
-
-18. **attribute_values**
-    → VALORES DE ATRIBUTOS
-
-19. **product_attribute_values**
-    → RELACIÓN PRODUCTO ↔ ATRIBUTOS
-
-20. **product_tags**
-    → ETIQUETAS PARA FILTROS Y BÚSQUEDA
-
----
-
-# 3️⃣ INVENTARIO
-
-21. **warehouses**
-    → BODEGAS O ALMACENES
-
-22. **warehouse_locations**
-    → UBICACIONES INTERNAS DE ALMACÉN
-
-23. **inventory_items**
-    → STOCK ACTUAL
-
-24. **inventory_movements**
-    → MOVIMIENTOS DE INVENTARIO
-
-25. **inventory_adjustments**
-    → AJUSTES MANUALES DE INVENTARIO
-
-26. **stock_reservations**
-    → STOCK RESERVADO PARA PEDIDOS
-
-27. **stock_transfers**
-    → TRANSFERENCIAS ENTRE ALMACENES
-
-28. **lot_batches**
-    → LOTES DE PRODUCTOS
-
-29. **serial_numbers**
-    → NÚMEROS DE SERIE
-
-30. **reorder_rules**
-    → REGLAS AUTOMÁTICAS DE REABASTECIMIENTO
-
----
-
-# 4️⃣ PROVEEDORES Y COMPRAS
-
-31. **suppliers**
-    → PROVEEDORES
-
-32. **supplier_contacts**
-    → CONTACTOS DE PROVEEDORES
-
-33. **purchase_orders**
-    → ÓRDENES DE COMPRA
-
-34. **purchase_order_items**
-    → PRODUCTOS DE LA ORDEN
-
-35. **purchase_receipts**
-    → RECEPCIÓN DE MERCANCÍA
-
-36. **purchase_receipt_items**
-    → ITEMS RECIBIDOS
-
-37. **supplier_invoices**
-    → FACTURAS DE PROVEEDORES
-
-38. **supplier_payments**
-    → PAGOS A PROVEEDORES
-
-39. **supplier_returns**
-    → DEVOLUCIONES A PROVEEDORES
-
-40. **supplier_return_items**
-    → PRODUCTOS DEVUELTOS
-
----
-
-# 5️⃣ CLIENTES
-
-41. **customers**
-    → CLIENTES
-
-42. **customer_addresses**
-    → DIRECCIONES DE CLIENTES
-
-43. **customer_contacts**
-    → CONTACTOS DE CLIENTES
-
----
-
-# 6️⃣ VENTAS
-
-44. **sales_orders**
-    → PEDIDOS DE CLIENTES
-
-45. **sales_order_items**
-    → PRODUCTOS DEL PEDIDO
-
-46. **sales_quotes**
-    → COTIZACIONES
-
-47. **sales_quote_items**
-    → ITEMS DE COTIZACIÓN
-
-48. **shipments**
-    → ENVÍOS
-
-49. **shipment_items**
-    → PRODUCTOS ENVIADOS
-
-50. **sales_returns**
-    → DEVOLUCIONES DE CLIENTES
-
----
-
-# 7️⃣ POS (POINT OF SALE)
-
-51. **pos_sessions**
-    → SESIONES DE CAJA
-
-52. **pos_transactions**
-    → TRANSACCIONES DE CAJA
-
-53. **pos_transaction_items**
-    → PRODUCTOS VENDIDOS
-
-54. **pos_payments**
-    → PAGOS EN POS
-
-55. **pos_cash_movements**
-    → MOVIMIENTOS DE EFECTIVO
-
----
-
-# 8️⃣ FINANZAS
-
-56. **invoices**
-    → FACTURAS DE VENTA
-
-57. **invoice_items**
-    → PRODUCTOS FACTURADOS
-
-58. **payments**
-    → PAGOS RECIBIDOS
-
-59. **payment_methods**
-    → MÉTODOS DE PAGO
-
-60. **payment_transactions**
-    → TRANSACCIONES DE PAGO
-
-61. **refunds**
-    → REEMBOLSOS
-
-62. **tax_rates**
-    → TASAS DE IMPUESTOS
-
-63. **tax_rules**
-    → REGLAS DE IMPUESTOS
-
-64. **discounts**
-    → DESCUENTOS
-
-65. **discount_rules**
-    → REGLAS DE DESCUENTO
-
----
-
-# 9️⃣ BILLING SAAS
-
-66. **plans**
-    → PLANES DE SUSCRIPCIÓN
-
-67. **plan_features**
-    → CARACTERÍSTICAS DE PLANES
-
-68. **subscriptions**
-    → SUSCRIPCIONES DE CLIENTES
-
-69. **subscription_items**
-    → COMPONENTES DE SUSCRIPCIÓN
-
-70. **subscription_invoices**
-    → FACTURAS DE SUSCRIPCIÓN
-
-71. **usage_records**
-    → USO DEL SISTEMA
-
-72. **billing_events**
-    → EVENTOS DE FACTURACIÓN
-
----
-
-# 🔟 ANALÍTICA E IA
-
-73. **sales_metrics**
-    → MÉTRICAS DE VENTAS
-
-74. **inventory_metrics**
-    → MÉTRICAS DE INVENTARIO
-
-75. **customer_metrics**
-    → MÉTRICAS DE CLIENTES
-
-76. **product_metrics**
-    → MÉTRICAS DE PRODUCTOS
-
-77. **demand_forecasts**
-    → PREDICCIÓN DE DEMANDA
-
-78. **recommendation_logs**
-    → LOGS DE RECOMENDACIONES IA
-
----
-
-# 1️⃣1️⃣ SISTEMA Y EVENTOS
-
-79. **events**
-    → EVENTOS DEL SISTEMA
-
-80. **event_consumers**
-    → CONSUMIDORES DE EVENTOS
-
-81. **notifications**
-    → NOTIFICACIONES
-
-82. **notification_templates**
-    → PLANTILLAS DE NOTIFICACIÓN
-
-83. **emails_queue**
-    → COLA DE EMAILS
-
-84. **webhooks**
-    → WEBHOOKS DE INTEGRACIÓN
-
-85. **webhook_deliveries**
-    → ENTREGAS DE WEBHOOK
-
----
-
-# 1️⃣2️⃣ SISTEMA DE ARCHIVOS Y JOBS
-
-86. **file_storage**
-    → ARCHIVOS DEL SISTEMA
-
-87. **attachments**
-    → ARCHIVOS ADJUNTOS
-
-88. **imports**
-    → IMPORTACIÓN DE DATOS
-
-89. **export_jobs**
-    → EXPORTACIONES
-
-90. **background_jobs**
-    → TAREAS ASÍNCRONAS
-
----
-
-# Resultado
-
-Tu SaaS tendría:
-
-✔ **90 tablas ERP reales**
-✔ **multi-tenant**
-✔ **POS completo**
-✔ **inventario profesional**
-✔ **compras y ventas**
-✔ **facturación**
-✔ **suscripciones SaaS**
-✔ **IA analytics**
-
------------------------------------------------------------------------------
------------------------------------------------------------------------------
-
-# SGDD
-
-### Smart Global Digital Dashboard
-
-Plataforma **SaaS empresarial modular** 
-
-diseñada para gestionar operaciones de negocio modernas.
-
-SGDD integra en un solo sistema:
-
-* Inventario inteligente
-
-* Punto de venta (POS)
-
-* Gestión de ventas y compras
-
-* Analítica empresarial
-
-* Automatización con IA
-
-* Arquitectura multi-tenant para SaaS
-
-Construido con una arquitectura
-
-**escalable, modular y cloud-ready**.
-
----
-
-# Visión del Proyecto
-
-SGDD busca convertirse en una plataforma capaz de 
-
-**centralizar la operación completa de un negocio**
-
- desde inventario hasta analítica avanzada.
-
-El objetivo es ofrecer:
-
-* Operación empresarial centralizada
-
-* Automatización inteligente
-
-* Infraestructura SaaS escalable
-
-* Analítica basada en datos
-
-El sistema está diseñado para empresas que necesitan 
-
-**control operativo, escalabilidad y automatización**.
-
----
-
-# Características Principales
-
-### Gestión de Inventario
-
-* Productos
-
-* Categorías
-
-* Control de stock
-
-* Movimientos de inventario
-
-* Proveedores
-
-...
-
-
-### Ventas y POS
-
-* Punto de venta
-
-* Registro de ventas
-
-* Historial de transacciones
-
-* Procesamiento de pagos
-
-...
-
-### Gestión Comercial
-
-* Clientes
-
-* Pedidos
-
-* Compras a proveedores
-
-...
-
-
-### Analítica Empresarial
-
-* Métricas
-
-* KPIs
-
-* Reportes
-
-* Forecast de ventas con IA
-
-...
-
-
-### Automatización Inteligente
-
-* Bot empresarial
-
-* Consultas en lenguaje natural
-
-* Recomendaciones automáticas
-
-...
-
-### Arquitectura SaaS
-
-* Multi-tenant
-
-* Gestión de suscripciones
-
-* Facturación
-
-* Panel administrador global
-
-...
-
----
-
-# Arquitectura del Sistema
-
-SGDD sigue una arquitectura basada en:
-
-* **Clean Architecture**
-
-* **Domain Driven Design (DDD)**
-
-* **API First Design**
-
-...
-
-
-Arquitectura simplificada:
-
-```
-Frontend (React)
-        │
-        ▼
-API REST (FastAPI)
-        │
-        ▼
-Application Layer (Casos de uso)
-        │
-        ▼
-Domain Layer (Modelo de negocio)
-        │
-        ▼
-Infrastructure Layer
-        │
-        ▼
-PostgreSQL / Redis / AI Services
-```
-
-Esto permite:
-
-* Separación clara de responsabilidades
-* Alta mantenibilidad
-* Escalabilidad horizontal
-
----
-
-# Stack Tecnológico
-
-## Backend
-
-* FastAPI
-* SQLAlchemy
-* PostgreSQL
-* Redis
-* Alembic
-* JWT Authentication
-* Python
-
-## Frontend
-
-* React
-* Vite
-* Zustand
-* Axios
-* React Router
-
-## Inteligencia Artificial
-
-* NLP
-* Modelos predictivos
-* Motor de recomendaciones
-
-## Infraestructura
-
-* Docker
-* Docker Compose
-* Nginx
-* Terraform (opcional)
-* GitHub Actions
-
----
-
-# Estructura del Proyecto
-
-    
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
-
-sgdd/
-│
-├── backend/                     
-│   # BACKEND PRINCIPAL DEL SISTEMA
-│   # IMPLEMENTADO EN FASTAPI
-│   # AQUÍ VIVE TODA LA LÓGICA DEL NEGOCIO, API, IA, MULTI-TENANCY,
-│   # AUTENTICACIÓN, INVENTARIO, POS Y ANALÍTICA.
-│
-│   ├── app/
-│   │
-│   │   ├── api/                 
-│   │   │   # CAPA DE PRESENTACIÓN DEL BACKEND
-│   │   # EXPONE LOS ENDPOINTS REST QUE CONSUME EL FRONTEND
-│   │   # SOLO RECIBE REQUESTS Y LLAMA A LOS SERVICES
-│   │
-│   │   ├── v1/
-│   │   │   # VERSIONAMIENTO DE LA API
-│   │   # PERMITE EVOLUCIONAR EL SISTEMA SIN ROMPER CLIENTES
-│
-│   │   │   ├── auth.py
-│   │   │   # MANEJA AUTENTICACIÓN DEL SISTEMA
-│   │   # LOGIN
-│   │   # REGISTRO
-│   │   # REFRESH TOKENS
-│   │   # JWT AUTHENTICATION
-│
-│   │   │   ├── users.py
-│   │   │   # GESTIÓN DE USUARIOS DEL SISTEMA
-│   │   # CREAR USUARIOS
-│   │   # EDITAR USUARIOS
-│   │   # ROLES Y PERMISOS
-│
-│   │   │   ├── tenants.py
-│   │   │   # GESTIÓN MULTI-TENANT
-│   │   # CADA EMPRESA ES UN TENANT
-│   │   # SE USA PARA SAAS
-│
-│   │   │   ├── products.py
-│   │   │   # CRUD DE PRODUCTOS
-│   │   # PRODUCTOS DEL INVENTARIO
-│
-│   │   │   ├── categories.py
-│   │   │   # CATEGORÍAS DE PRODUCTOS
-│   │   # ORGANIZA EL INVENTARIO
-│
-│   │   │   ├── inventory.py
-│   │   │   # CONTROL DE INVENTARIO
-│   │   # STOCK
-│   │   # MOVIMIENTOS DE INVENTARIO
-│
-│   │   │   ├── suppliers.py
-│   │   │   # PROVEEDORES
-│   │   # EMPRESAS QUE VENDEN PRODUCTOS
-│
-│   │   │   ├── customers.py
-│   │   │   # CLIENTES DEL NEGOCIO
-│   │   # HISTORIAL DE COMPRAS
-│
-│   │   │   ├── purchases.py
-│   │   │   # COMPRAS A PROVEEDORES
-│   │   # INGRESO DE INVENTARIO
-│
-│   │   │   ├── orders.py
-│   │   │   # PEDIDOS DEL SISTEMA
-│   │   # FLUJO DE VENTAS
-│
-│   │   │   ├── sales.py
-│   │   │   # REGISTRO DE VENTAS
-│   │   # HISTORIAL DE TRANSACCIONES
-│
-│   │   │   ├── pos.py
-│   │   │   # SISTEMA POS (POINT OF SALE)
-│   │   # CAJA
-│   │   # VENTAS RÁPIDAS
-│
-│   │   │   ├── payments.py
-│   │   │   # PROCESAMIENTO DE PAGOS
-│   │   # TARJETAS
-│   │   # EFECTIVO
-│
-│   │   │   ├── billing.py
-│   │   │   # FACTURACIÓN DEL SAAS
-│   │   # FACTURAS
-│
-│   │   │   ├── subscriptions.py
-│   │   │   # SUSCRIPCIONES DE CLIENTES SAAS
-│   │   # PLANES
-│
-│   │   │   ├── reports.py
-│   │   │   # REPORTES DEL SISTEMA
-│   │   # INVENTARIO
-│   │   # VENTAS
-│
-│   │   │   ├── analytics.py
-│   │   │   # ANALÍTICA AVANZADA
-│   │   # MÉTRICAS
-│   │   # KPIs
-│
-│   │   │   ├── bot.py
-│   │   │   # BOT INTELIGENTE DEL SISTEMA
-│   │   # CONSULTAS AUTOMÁTICAS
-│
-│   │   │   └── admin.py
-│   │   │   # PANEL ADMINISTRADOR DEL SAAS
-│   │   # CONTROL GLOBAL DEL SISTEMA
-│
-│   │
-│   │   ├── core/                
-│   │   # CONFIGURACIÓN GLOBAL DEL SISTEMA
-│
-│   │   ├── config.py
-│   │   # VARIABLES DE CONFIGURACIÓN
-│
-│   │   ├── security.py
-│   │   # SEGURIDAD DEL SISTEMA
-│   │   # HASH PASSWORDS
-│   │   # JWT TOKENS
-│
-│   │   ├── database.py
-│   │   # CONEXIÓN A BASE DE DATOS
-│   │   # SQLALCHEMY SESSION
-│
-│   │   ├── redis.py
-│   │   # CONEXIÓN A REDIS
-│   │   # CACHE
-│   │
-│   │   ├── logging.py
-│   │   # SISTEMA DE LOGS
-│
-│   │   ├── settings.py
-│   │   # SETTINGS DEL PROYECTO
-│
-│   │   └── exceptions.py
-│   │   # EXCEPCIONES PERSONALIZADAS
-│
-│
-│   ├── domain/              
-│   # CAPA DOMAIN
-│   # REPRESENTA EL MODELO DEL NEGOCIO
-│
-│   ├── entities/
-│   # ENTIDADES PRINCIPALES DEL SISTEMA
-│
-│   │   ├── user.py
-│   │   # MODELO DE USUARIO
-│
-│   │   ├── tenant.py
-│   │   # EMPRESA QUE USA EL SAAS
-│
-│   │   ├── product.py
-│   │   # PRODUCTO DEL INVENTARIO
-│
-│   │   ├── category.py
-│   │   # CATEGORÍA DE PRODUCTO
-│
-│   │   ├── inventory_item.py
-│   │   # ITEM DE INVENTARIO
-│
-│   │   ├── supplier.py
-│   │   # PROVEEDOR
-│
-│   │   ├── customer.py
-│   │   # CLIENTE
-│
-│   │   ├── purchase.py
-│   │   # COMPRA
-│
-│   │   ├── order.py
-│   │   # PEDIDO
-│
-│   │   ├── sale.py
-│   │   # VENTA
-│
-│   │   ├── payment.py
-│   │   # PAGO
-│
-│   │   ├── subscription.py
-│   │   # SUSCRIPCIÓN SAAS
-│
-│   │   └── invoice.py
-│   │   # FACTURA
-│
-│
-│   ├── value_objects/
-│   # OBJETOS DE VALOR
-│   # REPRESENTAN DATOS INMUTABLES
-│
-│   ├── money.py
-│   # REPRESENTA DINERO
-│
-│   ├── email.py
-│   # VALIDACIÓN DE EMAIL
-│
-│   └── address.py
-│   # DIRECCIÓN
-│
-│
-│   ├── application/
-│   # CAPA DE CASOS DE USO
-│
-│   ├── services/
-│   # SERVICIOS DEL NEGOCIO
-│
-│   ├── auth_service.py
-│   # LÓGICA DE AUTENTICACIÓN
-│
-│   ├── tenant_service.py
-│   # LÓGICA MULTI TENANT
-│
-│   ├── product_service.py
-│   # GESTIÓN DE PRODUCTOS
-│
-│   ├── inventory_service.py
-│   # LÓGICA DE INVENTARIO
-│
-│   ├── purchase_service.py
-│   # COMPRAS
-│
-│   ├── order_service.py
-│   # PEDIDOS
-│
-│   ├── sale_service.py
-│   # VENTAS
-│
-│   ├── pos_service.py
-│   # SISTEMA POS
-│
-│   ├── payment_service.py
-│   # PAGOS
-│
-│   ├── billing_service.py
-│   # FACTURACIÓN
-│
-│   ├── analytics_service.py
-│   # ANALÍTICA
-│
-│   ├── report_service.py
-│   # REPORTES
-│
-│   └── bot_service.py
-│   # BOT IA
-│
-│
-│   ├── infrastructure/
-│   # IMPLEMENTACIONES DE INFRAESTRUCTURA
-│
-│   ├── repositories/
-│   # ACCESO A BASE DE DATOS
-│
-│   ├── nlp/
-│   # MODELO NLP
-│
-│   ├── ai/
-│   # IA ANALÍTICA
-│
-│   ├── cache/
-│   # CACHE REDIS
-│
-│   ├── messaging/
-│   # EVENTOS
-│
-│   └── payments/
-│   # INTEGRACIÓN STRIPE
-│
-│
-│   ├── middlewares/
-│   # MIDDLEWARES DEL SISTEMA
-│
-│   ├── tenant.py
-│   # DETECTA TENANT
-│
-│   ├── auth.py
-│   # AUTENTICACIÓN
-│
-│   ├── rate_limit.py
-│   # PROTECCIÓN API
-│
-│   └── logging.py
-│   # LOGS
-│
-│   └── main.py
-│   # PUNTO DE ENTRADA DEL BACKEND
-│
-│
-├── frontend/
-│   # PANEL ADMINISTRADOR
-│   # REACT + VITE
-│
-│   ├── components/
-│   # COMPONENTES REUTILIZABLES
-│
-│   ├── pages/
-│   # PÁGINAS DEL SISTEMA
-│
-│   ├── services/
-│   # CLIENTE API
-│
-│   ├── store/
-│   # ESTADO GLOBAL
-│
-│   ├── hooks/
-│   # HOOKS REACT
-│
-│   └── utils/
-│   # UTILIDADES
-│
-│
-├── infrastructure/
-│   # INFRAESTRUCTURA DEL SISTEMA
-│
-│   ├── docker-compose.yml
-│   # DEFINE LOS SERVICIOS
-│   # POSTGRES
-│   # REDIS
-│   # BACKEND
-│   # FRONTEND
-│   # NGINX
-│
-│   ├── nginx/
-│   # PROXY REVERSO
-│
-│   ├── monitoring/
-│   # MONITOREO
-│
-│   └── terraform/
-│   # INFRAESTRUCTURA CLOUD
-│
-│
-├── scripts/
-│   # SCRIPTS DE AUTOMATIZACIÓN
-│
-│   ├── backup-db.sh
-│   # BACKUP BASE DE DATOS
-│
-│   ├── deploy.sh
-│   # DESPLIEGUE
-│
-│   └── restore-db.sh
-│   # RESTORE DB
-│
-│
-├── docs/
-│   # DOCUMENTACIÓN DEL PROYECTO
-│
-│   ├── diagrams/
-│   # DIAGRAMAS
-│
-│   └── srs/
-│   # ESPECIFICACIÓN DE REQUISITOS
-│
-│
-├── .github/workflows/
-│   # CI/CD
-│
-│   └── ci.yml
-│   # PIPELINE AUTOMÁTICO
-│
-│
-├── .gitignore
-│   # ARCHIVOS IGNORADOS POR GIT
-│
-├── README.md
-│   # DOCUMENTACIÓN PRINCIPAL DEL PROYECTO
-│
-└── Makefile
-
-    # COMANDOS DE AUTOMATIZACIÓN
-    # MAKE UP
-    # MAKE DOWN
-    # MAKE TEST
-
---------------------------------------------------
---------------------------------------------------
-sgdd/
-├── backend/                     # Backend unificado (FastAPI)
-│   ├── app/
-│   │   ├── api/                 # Rutas (controladores)
-│   │   │   ├── v1/
-│   │   │   │   ├── auth.py          → auth.py (se queda igual)
-│   │   │   │   ├── usuarios.py      ← users.py
-│   │   │   │   ├── inquilinos.py    ← tenants.py
-│   │   │   │   ├── productos.py     ← products.py
-│   │   │   │   ├── categorias.py    ← categories.py
-│   │   │   │   ├── inventario.py    ← inventory.py
-│   │   │   │   ├── proveedores.py   ← suppliers.py
-│   │   │   │   ├── clientes.py      ← customers.py
-│   │   │   │   ├── compras.py       ← purchases.py
-│   │   │   │   ├── pedidos.py       ← orders.py
-│   │   │   │   ├── ventas.py        ← sales.py
-│   │   │   │   ├── pos.py           → pos.py (se queda igual)
-│   │   │   │   ├── pagos.py         ← payments.py
-│   │   │   │   ├── facturacion.py   ← billing.py
-│   │   │   │   ├── suscripciones.py ← subscriptions.py
-│   │   │   │   ├── reportes.py      ← reports.py
-│   │   │   │   ├── analitica.py     ← analytics.py
-│   │   │   │   ├── bot.py           → bot.py (se queda igual)
-│   │   │   │   └── admin.py         → admin.py (se queda igual)
-│   │   │
-│   │   ├── core/                # Configuración central
-│   │   │   ├── config.py        → config.py
-│   │   │   ├── seguridad.py     ← security.py
-│   │   │   ├── base_datos.py    ← database.py
-│   │   │   ├── redis.py         → redis.py
-│   │   │   ├── logging.py       → logging.py
-│   │   │   ├── ajustes.py       ← settings.py
-│   │   │   └── excepciones.py   ← exceptions.py
-│   │   │
-│   │   ├── dominio/              # Entidades puras (DDD)
-│   │   │   ├── entidades/
-│   │   │   │   ├── usuario.py        ← user.py
-│   │   │   │   ├── inquilino.py      ← tenant.py
-│   │   │   │   ├── producto.py       ← product.py
-│   │   │   │   ├── categoria.py      ← category.py
-│   │   │   │   ├── item_inventario.py ← inventory_item.py
-│   │   │   │   ├── proveedor.py      ← supplier.py
-│   │   │   │   ├── cliente.py        ← customer.py
-│   │   │   │   ├── compra.py         ← purchase.py
-│   │   │   │   ├── pedido.py         ← order.py
-│   │   │   │   ├── venta.py          ← sale.py
-│   │   │   │   ├── pago.py           ← payment.py
-│   │   │   │   ├── suscripcion.py    ← subscription.py
-│   │   │   │   └── factura.py        ← invoice.py
-│   │   │   │
-│   │   │   └── objetos_valor/
-│   │   │       ├── dinero.py      ← money.py
-│   │   │       ├── email.py       → email.py
-│   │   │       └── direccion.py   ← address.py
-│   │   │
-│   │   ├── aplicacion/         # Casos de uso
-│   │   │   ├── servicios/
-│   │   │   │   ├── auth_service.py        → auth_service.py
-│   │   │   │   ├── inquilino_servicio.py  ← tenant_service.py
-│   │   │   │   ├── producto_servicio.py   ← product_service.py
-│   │   │   │   ├── inventario_servicio.py ← inventory_service.py
-│   │   │   │   ├── compra_servicio.py     ← purchase_service.py
-│   │   │   │   ├── pedido_servicio.py     ← order_service.py
-│   │   │   │   ├── venta_servicio.py      ← sale_service.py
-│   │   │   │   ├── pos_servicio.py        ← pos_service.py
-│   │   │   │   ├── pago_servicio.py       ← payment_service.py
-│   │   │   │   ├── facturacion_servicio.py ← billing_service.py
-│   │   │   │   ├── analitica_servicio.py  ← analytics_service.py
-│   │   │   │   ├── reporte_servicio.py    ← report_service.py
-│   │   │   │   └── bot_servicio.py        ← bot_service.py
-│   │   │   │
-│   │   │   └── dto/            ← dtos/
-│   │   │       ├── producto_dto.py   ← product_dto.py
-│   │   │       ├── pedido_dto.py     ← order_dto.py
-│   │   │       ├── venta_dto.py      ← sale_dto.py
-│   │   │       └── usuario_dto.py    ← user_dto.py
-│   │   │
-│   │   ├── infraestructura/      # Implementaciones concretas
-│   │   │   ├── repositorios/      ← repositories/
-│   │   │   │   ├── usuario_repositorio.py    ← user_repository.py
-│   │   │   │   ├── inquilino_repositorio.py  ← tenant_repository.py
-│   │   │   │   ├── producto_repositorio.py   ← product_repository.py
-│   │   │   │   ├── inventario_repositorio.py ← inventory_repository.py
-│   │   │   │   ├── pedido_repositorio.py     ← order_repository.py
-│   │   │   │   ├── venta_repositorio.py      ← sale_repository.py
-│   │   │   │   └── pago_repositorio.py       ← payment_repository.py
-│   │   │   │
-│   │   │   ├── nlp/             # IA / NLP
-│   │   │   │   ├── modelo_intenciones.py  ← intent_model.py
-│   │   │   │   ├── clasificador.py        ← classifier.py
-│   │   │   │   └── entrenador.py          ← trainer.py
-│   │   │   │
-│   │   │   ├── ia/              # IA analítica
-│   │   │   │   ├── pronostico_ventas.py   ← sales_forecast.py
-│   │   │   │   ├── prediccion_demanda.py  ← demand_prediction.py
-│   │   │   │   └── motor_recomendaciones.py ← recommendation_engine.py
-│   │   │   │
-│   │   │   ├── cache/
-│   │   │   │   └── redis_cache.py      → redis_cache.py
-│   │   │   │
-│   │   │   ├── mensajeria/       ← messaging/
-│   │   │   │   ├── eventos.py          ← events.py
-│   │   │   │   └── bus_eventos.py      ← event_bus.py
-│   │   │   │
-│   │   │   └── pagos/        # Integraciones
-│   │   │       ├── stripe.py           → stripe.py
-│   │   │       └── manejador_webhook.py ← webhook_handler.py
-│   │   │
-│   │   ├── middlewares/
-│   │   │   ├── inquilino.py     ← tenant.py
-│   │   │   ├── auth.py          → auth.py
-│   │   │   ├── limite_peticiones.py ← rate_limit.py
-│   │   │   └── logging.py       → logging.py
-│   │   │
-│   │   └── main.py              → main.py
-│   │
-│   ├── pruebas/                  ← tests/
-│   │   ├── unitarias/            ← unit/
-│   │   ├── integracion/          ← integration/
-│   │   └── fixtures/             → fixtures/
-│   │
-│   ├── modelos/                  # Modelos IA entrenados
-│   │   ├── modelo_nlp.pkl        ← nlp_model.pkl
-│   │   └── pronostico_ventas.pkl ← sales_forecast.pkl
-│   │
-│   ├── scripts/
-│   │   ├── entrenar_nlp.py       ← train_nlp.py
-│   │   ├── entrenar_ia_ventas.py ← train_sales_ai.py
-│   │   └── sembrar_datos.py      ← seed_data.py
-│   │
-│   ├── requisitos.txt            ← requirements.txt
-│   ├── Dockerfile                → Dockerfile
-│   └── .env.ejemplo              ← .env.example
-│
-├── frontend/                    # Panel React
-│   ├── public/                  → public/
-│   ├── src/
-│   │   ├── componentes/         ← components/
-│   │   │   ├── ui/              → ui/
-│   │   │   ├── graficos/        ← charts/
-│   │   │   └── pos/             → pos/
-│   │   │
-│   │   ├── paginas/             ← pages/
-│   │   │   ├── dashboard/       → dashboard/
-│   │   │   ├── inventario/      ← inventory/
-│   │   │   ├── ventas/          ← sales/
-│   │   │   ├── compras/         ← purchases/
-│   │   │   ├── analitica/       ← analytics/
-│   │   │   ├── pos/             → pos/
-│   │   │   └── admin/           → admin/
-│   │   │
-│   │   ├── servicios/           ← services/
-│   │   │   └── cliente_api.js   ← api_client.js
-│   │   │
-│   │   ├── store/
-│   │   │   └── authStore.js     → authStore.js
-│   │   │
-│   │   ├── hooks/               → hooks/
-│   │   ├── utils/               → utils/
-│   │   ├── App.jsx              → App.jsx
-│   │   └── main.jsx             → main.jsx
-│   │
-│   ├── index.html               → index.html
-│   ├── package.json             → package.json
-│   ├── vite.config.js           → vite.config.js
-│   └── Dockerfile               → Dockerfile
-│
-├── infraestructura/              # Infraestructura
-│   ├── docker-compose.yml        → docker-compose.yml
-│   │
-│   ├── nginx/
-│   │   └── nginx.conf           → nginx.conf
-│   │
-│   ├── monitoreo/                ← monitoring/
-│   │   ├── prometheus.yml       → prometheus.yml
-│   │   └── grafana/             → grafana/
-│   │
-│   └── terraform/               # Opcional cloud
-│
-├── scripts/
-│   ├── respaldar-bd.sh          ← backup-db.sh
-│   ├── desplegar.sh             ← deploy.sh
-│   └── restaurar-bd.sh          ← restore-db.sh
-│
-├── docs/
-│   ├── diagramas/                ← diagrams/
-│   │   ├── arquitectura.png     ← architecture.png
-│   │   └── erd.png              → erd.png
-│   │
-│   └── ers/                      ← srs/
-│       └── requisitos.md        ← requirements.md
-│
-├── .github/workflows/
-│   └── ci.yml                   → ci.yml
-│
-├── .gitignore                   → .gitignore
-├── README.md                    → README.md
-└── Makefile                     → Makefile
---------------------------------------------------
---------------------------------------------------
-
-
-
-# Testing
-
-Ejecutar pruebas:
-
-```
-pytest
-```
-
-Tipos de pruebas:
-
-* Unit tests
-* Integration tests
-* API tests
-
----
-
-# CI/CD
-
-Pipeline automatizado con **GitHub Actions**.
-
-Incluye:
-
-* Lint
-* Tests
-* Build Docker
-* Deploy
-
-Ubicación:
-
-```
-.github/workflows/ci.yml
-```
-
----
-
-# Seguridad
-
-SGDD implementa:
-
-* Autenticación JWT
-* Hashing de contraseñas con bcrypt
-* Rate limiting con Redis
-* Validación de datos con Pydantic
-
----
-
-# Roadmap
-
-Futuras mejoras:
-
-* Dashboard analítico avanzado
-* Sistema de alertas
-* IA predictiva avanzada
-* Aplicación móvil
-* Integraciones ERP
-
----
-
-# Contribuir
-
-1. Fork del repositorio
-2. Crear rama
-
-```
-git checkout -b feature/nueva-funcionalidad
-```
-
-3. Commit
-
-```
-git commit -m "feat: nueva funcionalidad"
-```
-
-4. Crear Pull Request
-
----
-
-# Licencia
-
-MIT License
-
----
-
-# Autor
-
-Proyecto desarrollado como plataforma empresarial modular basada en micro-servicios y arquitectura limpia.
-
-
-
-
-
-
-
-
-
-
-
-
-----------------------------------------------------------------------------*****************************************
-------------***************************************
-
-
-## **CAPÍTULO 0 – PORTADA Y DATOS GENERALES**
-
-* Título, autor, fecha.
-* Resumen en español e inglés (Abstract).
-* Palabras clave y keywords.
-
----
-
-## **CAPÍTULO 1 – INTRODUCCIÓN**
-
-* Contexto de digitalización del comercio minorista y dulcerías.
-* Brechas actuales y motivación para SaaS multi-tenant.
-* Justificación del proyecto: Clean Architecture + NLP + métricas cuantitativas.
-* Alcance y limitaciones.
-
----
-
-## **CAPÍTULO 2 – PLANTEAMIENTO DEL PROBLEMA**
-
-* Descripción detallada del problema.
-* Formulación y sistematización de preguntas de investigación.
-* Hipótesis de mejora medible con el sistema.
-
----
-
-## **CAPÍTULO 3 – OBJETIVOS**
-
-* Objetivo general.
-* Objetivos específicos: arquitectura, multi-tenant, NLP, validación cuantitativa.
-
----
-
-## **CAPÍTULO 4 – MARCO TEÓRICO**
-
-* **4.1 SaaS vertical vs horizontal**
-* **4.2 Arquitectura Multi-Tenant** (aislamiento lógico por tenant_id, esquema compartido)
-* **4.3 Clean Architecture** (capas: dominio, aplicación, infraestructura, API)
-* **4.4 Procesamiento de Lenguaje Natural (NLP)**
-
-  * Clasificación supervisada
-  * Dataset: 1200 frases comerciales
-  * Métricas: Accuracy, Precision, Recall, F1-score
-* **4.5 Normas ISO/IEC 25010** y estándares de calidad
-* **4.6 Arquitectura de software aplicada al SGDD**
-
-  * Backend (FastAPI + SQLAlchemy + Redis)
-  * Frontend (React + Vite + Zustand)
-  * Infraestructura (Docker + Nginx + Prometheus opcional)
-
----
-
-## **CAPÍTULO 5 – DISEÑO DEL SISTEMA SGDD**
-
-* **5.1 Arquitectura jerárquica del proyecto**
-
-  * Backend: api/core, domain, application, infrastructure, middlewares
-  * Frontend: components, pages, services, store
-  * Infraestructura: docker-compose, nginx, monitoring
-* **5.2 Diagrama C4 / diagramas UML**
-
-  * Flujo de datos, capas, dependencias
-* **5.3 Modelado de datos multi-tenant**
-
-  * Tablas: products, orders, users, tenants
-  * Inclusión de tenant_id para aislamiento lógico
-
----
-
-## **CAPÍTULO 6 – MODELO MATEMÁTICO Y MÉTRICAS**
-
-* **6.1 Variables clave:** Tp, Ei, Ac, TP, FP, FN
-* **6.2 Cálculo de Precision, Recall, F1-Score**
-* **6.3 Función de optimización global O = α/Tp + β/Ei + γ*Ac**
-* **6.4 Proyecciones de mejora esperadas**
-
-  * Tiempos de procesamiento
-  * Reducción de errores
-  * Precisión del modelo NLP
-
----
-
-## **CAPÍTULO 7 – IMPLEMENTACIÓN**
-
-* **7.1 Backend**
-
-  * FastAPI endpoints
-  * Servicios y DTOs
-  * Repositorios SQLAlchemy
-  * Middleware auth, tenant, rate limit
-* **7.2 Frontend**
-
-  * React pages y components
-  * API client (axios)
-  * Estado global con Zustand
-* **7.3 NLP**
-
-  * Entrenamiento de modelo supervisado
-  * Persistencia de modelos (.pkl o transformers)
-* **7.4 Integración y pruebas unitarias / integración**
-
----
-
-## **CAPÍTULO 8 – PRUEBAS Y VALIDACIÓN**
-
-* **8.1 Pruebas unitarias** (entidades, servicios)
-* **8.2 Pruebas de integración** (endpoints, DB, frontend)
-* **8.3 Validación cuantitativa**
-
-  * Tiempos de procesamiento
-  * Reducción de errores
-  * Precisión del modelo NLP
-
----
-
-## **CAPÍTULO 9 – RESULTADOS ESPERADOS / OBSERVADOS**
-
-* Métricas de desempeño y precisión.
-* Comparativa antes y después de implementar SGDD.
-* Análisis de impacto en la operación de dulcerías.
-
----
-
-## **CAPÍTULO 10 – CONCLUSIONES Y RECOMENDACIONES**
-
-* Impacto de la arquitectura Clean + NLP supervisado.
-* Optimización cuantificable en procesos comerciales.
-* Recomendaciones para escalabilidad y adopción en otras microempresas.
-
----
-
-## **CAPÍTULO 11 – DOCUMENTACIÓN TÉCNICA / MANUAL DE USUARIO**
-
-* Guía de instalación (Docker, entorno, backend, frontend).
-* Uso de endpoints API y SPA.
-* Entrenamiento y actualización del modelo NLP.
-
----
-
-## **CAPÍTULO 12 – ANEXOS**
-
-* Diagramas UML y C4
-* Código ejemplo de Product, Order, User
-* Dataset de intenciones comerciales
-* Logs de pruebas y métricas
-
--------------------------------------------------------
-
-
-
--------------------------------------------------------
-
-
-
-
-
-
--------------------------------------------------
-
-
-
-
+--------------------------------------------
