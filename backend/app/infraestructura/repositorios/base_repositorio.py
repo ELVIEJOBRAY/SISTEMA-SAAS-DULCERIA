@@ -1,0 +1,16 @@
+﻿from typing import Optional, List, TypeVar, Generic
+from abc import ABC, abstractmethod
+
+T = TypeVar('T')
+
+class RepositorioBase(ABC, Generic[T]):
+    @abstractmethod
+    def obtener_por_id(self, id: int) -> Optional[T]: ...
+    @abstractmethod
+    def obtener_todos(self) -> List[T]: ...
+    @abstractmethod
+    def guardar(self, entidad: T) -> T: ...
+    @abstractmethod
+    def eliminar(self, id: int) -> bool: ...
+    @abstractmethod
+    def contar(self) -> int: ...
