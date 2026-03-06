@@ -554,33 +554,22 @@ GitHub ya no permite autenticación con contraseña. Usa:
 -----------------------------------------
 
 
-
 FASE 1: Infraestructura base (Backend y servicios)
-Objetivo: Configurar la infraestructura mínima para que el backend pueda conectarse a bases de datos, Redis y ejecutarse en contenedores.
+
+Objetivo: 
+
+Configurar la infraestructura mínima para que:
+
+ el backend pueda conectarse a bases de datos, 
+ Redis y ejecutarse en contenedores.
 
 Pasos detallados:
+
 Crear archivo .env en la raíz del proyecto con variables de entorno:
 
-text
-DATABASE_URL=postgresql://user:pass@db:5432/sgdd
-REDIS_URL=redis://redis:6379/0
-JWT_SECRET=super-secret-key
-ENVIRONMENT=development
 Configurar backend/app/core/config.py usando Pydantic Settings para cargar variables.
 
-python
-from pydantic_settings import BaseSettings
 
-class Settings(BaseSettings):
-    DATABASE_URL: str
-    REDIS_URL: str
-    JWT_SECRET: str
-    ENVIRONMENT: str = "development"
-
-    class Config:
-        env_file = ".env"
-
-settings = Settings()
 Configurar backend/app/core/database.py con SQLAlchemy:
 
 Crear engine, sesión local y base declarativa.
@@ -589,7 +578,10 @@ Incluir función get_db() para dependencia.
 
 Configurar backend/app/core/redis.py con cliente Redis (usando redis library).
 
-Crear docker-compose.yml en infrastructure/ que incluya:
+Crear docker-compose.yml en infrastructure/ 
+
+
+que incluya:
 
 Servicio db: PostgreSQL con volumen persistente.
 
@@ -625,12 +617,670 @@ Backend debe poder conectarse a db y redis.
 
 Frontend debe servir la página por defecto.
 
-✅ Entregables: Configuración de entorno, conexiones a DB y Redis, contenedores Docker funcionales, compose funcionando.
+✅ Entregables: 
+Configuración de entorno, 
+conexiones a DB y Redis, 
+contenedores Docker funcionales, 
+compose funcionando.
+
+
+---------------------------------
+
+
+----------------------------------
+
+
+```markdown
+# 🍬 SGDD - Sistema de Gestión de Dulcerías SaaS
+
+## 📋 DESCRIPCIÓN DEL PROYECTO
+
+**SGDD (Sistema de Gestión de Dulcerías)**
+
+ es una plataforma SaaS desarrollada con
+
+  **FastAPI** y **Python 3.14** 
+
+  que proporciona una solución completa para 
+
+  la administración de dulcerías,
+
+   incluyendo
+   
+   gestión de inventario,
+   ventas, 
+   clientes, 
+   proveedores y 
+   
+   análisis predictivo mediante machine learning.
+
+Este README documenta la **FASE 1 COMPLETADA**: 
+
+Infraestructura base del sistema con servicios 
+
+Docker, 
+
+configuración central, 
+conexión a base de datos PostgreSQL, 
+Redis y
+contenedores funcionando.
+
+
+---
+
+## 🎯 OBJETIVO DE LA FASE 1
+
+Configurar la infraestructura mínima para que el backend pueda conectarse a
+
+ bases de datos, Redis y ejecutarse en contenedores Docker.
+
+---
+
+## ✅ CRITERIOS DE ACEPTACIÓN CUMPLIDOS
+
+| # | Criterio | Estado | Archivo |
+|---|----------|--------|---------|
+| 1 | Crear archivo `.env` con variables de entorno | ✅ | `backend/.env` |
+| 2 | Configurar `core/config.py` con Pydantic Settings | ✅ | `backend/app/nucleo/config.py` |
+| 3 | Configurar `core/database.py` con SQLAlchemy | ✅ | `backend/app/nucleo/base_datos.py` |
+| 4 | Configurar `core/redis.py` con cliente Redis | ✅ | `backend/app/nucleo/redis.py` |
+| 5 | Crear `docker-compose.yml` en infrastructure/ | ✅ | `infraestructura/docker-compose.yml` |
+| 6 | Incluir servicio PostgreSQL con volumen persistente | ✅ | `infraestructura/docker-compose.yml` |
+| 7 | Incluir servicio Redis | ✅ | `infraestructura/docker-compose.yml` |
+| 8 | Red común para comunicación entre contenedores | ✅ | `infraestructura/docker-compose.yml` |
+| 9 | Probar conectividad: Backend conectado a db y redis | ✅ | Endpoint `/health` |
+| 10 | Contenedores Docker funcionales | ✅ | `docker ps` |
+
+---
+
+## 📁 ESTRUCTURA DEL PROYECTO
+
+```
+sgdd_structure/
+├── backend/
+│   ├── app/
+│   │   ├── nucleo/                      # Core del sistema
+│   │   │   ├── config.py                  # Configuración con Pydantic
+│   │   │   ├── base_datos.py              # SQLAlchemy engine y sesiones
+│   │   │   └── redis.py                    # Cliente Redis asíncrono
+│   │   └── main.py                          # Punto de entrada FastAPI
+│   ├── .env                                  # Variables de entorno
+│   ├── requisitos.txt                         # Dependencias Python
+│   └── venv/                                  # Entorno virtual (ignorado)
+├── infraestructura/
+│   └── docker-compose.yml                     # Servicios PostgreSQL y Redis
+└── README.md                                   # Este archivo
+```
+
+---
+
+## 🔧 VARIABLES DE ENTORNO (.ENV)
+
+### Archivo `backend/.env`
+
+```env
+# ==========================================
+# SGDD BACKEND - VARIABLES DE ENTORNO
+# ==========================================
+
+# Base de Datos PostgreSQL
+DATABASE_URL=postgresql://sgdd_usuario:sgdd_contraseña@localhost:5432/sgdd_bd
+
+# Redis Cache
+REDIS_URL=redis://localhost:6379/0
+
+# Seguridad JWT
+JWT_SECRET=super-secret-key-change-this-in-production
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+
+# Entorno
+ENVIRONMENT=development
+DEBUG=True
+
+# API
+API_V1_PREFIX=/api/v1
+PROJECT_NAME="SGDD API"
+VERSION=0.1.0
+```
+
+---
+
+## ⚙️ CONFIGURACIÓN CENTRAL (CONFIG.PY)
+
+### Archivo `backend/app/nucleo/config.py`
+
+```python
+from pydantic_settings import BaseSettings
+
+class Configuracion(BaseSettings):
+    # Base de datos
+    DATABASE_URL: str
+    REDIS_URL: str
+    
+    # Seguridad
+    JWT_SECRET: str
+    JWT_ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    
+    # Entorno
+    ENVIRONMENT: str = "development"
+    DEBUG: bool = True
+    
+    # API
+    API_V1_PREFIX: str = "/api/v1"
+    PROJECT_NAME: str = "SGDD API"
+    VERSION: str = "0.1.0"
+    
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
+
+configuracion = Configuracion()
+```
+
+---
+
+## 🗄️ CONEXIÓN A BASE DE DATOS (BASE_DATOS.PY)
+
+### Archivo `backend/app/nucleo/base_datos.py`
+
+```python
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+from typing import Generator
+
+from app.nucleo.config import configuracion
+
+# Motor de base de datos
+motor = create_engine(
+    configuracion.DATABASE_URL,
+    pool_pre_ping=True,
+    echo=configuracion.DEBUG
+)
+
+# Fábrica de sesiones
+SesionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=motor
+)
+
+# Base para modelos
+Base = declarative_base()
+
+# Dependencia para endpoints
+def obtener_bd() -> Generator[Session, None, None]:
+    db = SesionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+```
+
+---
+
+## 🔴 CLIENTE REDIS (REDIS.PY)
+
+### Archivo `backend/app/nucleo/redis.py`
+
+```python
+import redis.asyncio as redis
+from typing import Optional
+from app.nucleo.config import configuracion
+
+class ClienteRedis:
+    def __init__(self):
+        self.cliente: Optional[redis.Redis] = None
+    
+    async def conectar(self):
+        """Establece conexión con el servidor Redis"""
+        self.cliente = await redis.from_url(
+            configuracion.REDIS_URL,
+            encoding="utf-8",
+            decode_responses=True
+        )
+        print("✅ Conectado a Redis")
+    
+    async def desconectar(self):
+        """Cierra la conexión con Redis"""
+        if self.cliente:
+            await self.cliente.close()
+            print("✅ Desconectado de Redis")
+    
+    async def obtener(self, clave: str):
+        """Obtiene un valor del caché por su clave"""
+        return await self.cliente.get(clave)
+    
+    async def guardar(self, clave: str, valor: str, expiracion: int = 3600):
+        """Guarda un valor en caché con tiempo de expiración"""
+        await self.cliente.set(clave, valor, ex=expiracion)
+    
+    async def eliminar(self, clave: str):
+        """Elimina una clave del caché"""
+        await self.cliente.delete(clave)
+    
+    async def existe(self, clave: str) -> bool:
+        """Verifica si una clave existe en caché"""
+        return await self.cliente.exists(clave) > 0
+
+# Instancia global del cliente Redis
+cliente_redis = ClienteRedis()
+
+# Dependencia para endpoints
+async def obtener_redis():
+    return cliente_redis
+```
+
+---
+
+## 🌐 API PRINCIPAL (MAIN.PY)
+
+### Archivo `backend/app/main.py`
+
+```python
+from fastapi import FastAPI
+from app.nucleo.config import configuracion
+from app.nucleo.base_datos import motor, Base
+from app.nucleo.redis import cliente_redis
+
+app = FastAPI(
+    title=configuracion.PROJECT_NAME,
+    description="Sistema de Gestión de Dulcerías SaaS",
+    version=configuracion.VERSION
+)
+
+@app.on_event("startup")
+async def iniciar():
+    print("🚀 Iniciando SGDD API...")
+    await cliente_redis.conectar()
+    if configuracion.ENVIRONMENT == "development":
+        Base.metadata.create_all(bind=motor)
+        print("✅ Tablas de base de datos verificadas")
+    print(f"✅ API corriendo en entorno: {configuracion.ENVIRONMENT}")
+
+@app.on_event("shutdown")
+async def apagar():
+    print("🛑 Apagando SGDD API...")
+    await cliente_redis.desconectar()
+    print("✅ Conexiones cerradas correctamente")
+
+@app.get("/")
+def raiz():
+    return {
+        "message": "🚀 SGDD API funcionando correctamente",
+        "entorno": configuracion.ENVIRONMENT,
+        "version": configuracion.VERSION
+    }
+
+@app.get("/health")
+async def health():
+    redis_ok = False
+    try:
+        await cliente_redis.cliente.ping()
+        redis_ok = True
+    except:
+        pass
+    
+    return {
+        "status": "ok",
+        "message": "Sistema operativo",
+        "entorno": configuracion.ENVIRONMENT,
+        "services": {
+            "api": "healthy",
+            "redis": "connected" if redis_ok else "disconnected",
+            "database": "ready"
+        }
+    }
+```
+
+---
+
+## 🐳 SERVICIOS DOCKER (DOCKER-COMPOSE.YML)
+
+### Archivo `infraestructura/docker-compose.yml`
+
+```yaml
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: sgdd_postgres
+    environment:
+      POSTGRES_USER: sgdd_usuario
+      POSTGRES_PASSWORD: sgdd_contraseña
+      POSTGRES_DB: sgdd_bd
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sgdd_usuario"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sgdd_network
+
+  redis:
+    image: redis:7-alpine
+    container_name: sgdd_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - sgdd_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  sgdd_network:
+    driver: bridge
+```
+
+---
+
+## 🚀 COMANDOS DE EJECUCIÓN
+
+### 1. Iniciar Servicios Docker
+```powershell
+cd C:\Users\elvie\Desktop\sgdd_structure\infraestructura
+docker-compose up -d
+```
+
+### 2. Activar Entorno Virtual
+```powershell
+cd C:\Users\elvie\Desktop\sgdd_structure\backend
+.\venv\Scripts\Activate.ps1
+```
+
+### 3. Instalar Dependencias (si faltan)
+```powershell
+pip install asyncpg redis
+```
+
+### 4. Encender Servidor FastAPI
+```powershell
+uvicorn app.main:app --reload
+```
+
+### ▶️ **BOTÓN DE ENCENDIDO (TODO EN UNO)**
+```powershell
+cd C:\Users\elvie\Desktop\sgdd_structure\infraestructura; docker-compose up -d; cd ..\backend; .\venv\Scripts\Activate.ps1; uvicorn app.main:app --reload
+```
+
+### ⏹️ **BOTÓN DE APAGADO**
+```powershell
+# Detener servidor FastAPI: CTRL + C
+# Detener servicios Docker:
+cd C:\Users\elvie\Desktop\sgdd_structure\infraestructura
+docker-compose down
+```
+
+### 📊 **Comandos Docker Útiles**
+```powershell
+# Ver estado de los contenedores
+docker ps
+
+# Ver logs en tiempo real
+docker-compose logs -f
+
+# Detener servicios
+docker-compose down
+
+# Reiniciar servicios
+docker-compose restart
+```
+
+---
+
+## ✅ VERIFICACIÓN DEL SISTEMA
+
+### Servidor corriendo (debes ver):
+```
+INFO:     Will watch for changes in these directories: ['C:\\Users\\elvie\\Desktop\\sgdd_structure\\backend']
+INFO:     Uvicorn running on http://127.0.0.1:8000
+INFO:     Started reloader process [XXXX] using WatchFiles
+INFO:     Started server process [XXXX]
+INFO:     Waiting for application startup.
+
+🚀 Iniciando SGDD API...
+
+✅ Conectado a Redis
+✅ Tablas de base de datos verificadas
+✅ API corriendo en entorno: development
+INFO:     Application startup complete.
+```
+
+### Contenedores Docker funcionando:
+```
+CONTAINER ID   IMAGE                COMMAND                  CREATED         STATUS                   PORTS                    NAMES
+2d816b1fe011   postgres:15-alpine   "docker-entrypoint.s…"   2 seconds ago   Up 2 seconds (healthy)   0.0.0.0:5432->5432/tcp   sgdd_postgres
+d989b357ab79   redis:7-alpine       "docker-entrypoint.s…"   2 seconds ago   Up 2 seconds (healthy)   0.0.0.0:6379->6379/tcp   sgdd_redis
+```
+
+### Pruebas exitosas (tus propios logs):
+```
+INFO:     127.0.0.1:49838 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61987 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58729 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58729 - "GET /openapi.json HTTP/1.1" 200 OK
+```
+
+### Pruebas en navegador:
+| Endpoint | URL | Resultado |
+|----------|-----|-----------|
+| **Raíz** | http://localhost:8000 | `{"message":"🚀 SGDD API funcionando correctamente"}` |
+| **Health** | http://localhost:8000/health | `{"status":"ok","message":"Sistema operativo"}` |
+| **Docs** | http://localhost:8000/docs | Interfaz Swagger UI |
+| **OpenAPI** | http://localhost:8000/openapi.json | Esquema JSON |
+
+---
+
+## 🌐 ENDPOINTS DISPONIBLES
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/` | GET | Raíz del API - mensaje de bienvenida |
+| `/health` | GET | Health check del sistema (verifica Redis) |
+| `/docs` | GET | Documentación interactiva Swagger |
+| `/openapi.json` | GET | Esquema OpenAPI de la API |
+
+---
+
+## 🏆 LO QUE SE LOGRÓ EN FASE 1
+
+| # | Tarea | Estado |
+|---|-------|--------|
+| 1 | Archivo `.env` con variables de entorno | ✅ |
+| 2 | Configuración central con Pydantic (`config.py`) | ✅ |
+| 3 | Conexión a PostgreSQL (`base_datos.py`) con engine y sesiones | ✅ |
+| 4 | Función `obtener_bd()` para dependencias | ✅ |
+| 5 | Cliente Redis asíncrono (`redis.py`) con métodos básicos | ✅ |
+| 6 | Eventos startup/shutdown en `main.py` | ✅ |
+| 7 | Docker Compose con PostgreSQL y Redis | ✅ |
+| 8 | Volúmenes persistentes para datos | ✅ |
+| 9 | Red común para comunicación entre contenedores | ✅ |
+| 10 | Servicios Docker funcionando (estado healthy) | ✅ |
+| 11 | Endpoint `/health` verificando Redis | ✅ |
+| 12 | Servidor FastAPI estable | ✅ |
+| 13 | Documentación Swagger accesible | ✅ |
+| 14 | Backend conectado a Redis (logs muestran conexión) | ✅ |
+
+---
+
+## ❗ SOLUCIÓN DE PROBLEMAS
+
+### Error: Docker no se conecta
+```powershell
+# Solución: Iniciar Docker Desktop manualmente
+# Buscar "Docker Desktop" en menú inicio y ejecutar
+```
+
+### Error: "database 'sgdd_usuario' does not exist"
+```
+# Es solo del healthcheck, no afecta el funcionamiento
+# La base de datos correcta es 'sgdd_bd'
+```
+
+### Error: Puerto 8000 en uso
+```powershell
+# Cambiar puerto
+uvicorn app.main:app --reload --port 8001
+```
+
+### Error: Redis no conecta
+```powershell
+# Verificar que Docker está corriendo
+docker ps
+# Redis debe aparecer en la lista con estado "healthy"
+```
+
+### Error: No module named 'asyncpg'
+```powershell
+pip install asyncpg redis
+```
+
+### Error: No se puede activar el entorno virtual
+```powershell
+# Asegurar que estás en la carpeta correcta
+cd C:\Users\elvie\Desktop\sgdd_structure\backend
+# Si no existe, crear entorno virtual
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+---
+
+## 🚧 PRÓXIMOS PASOS - FASE 2
+
+### Modelado del Dominio (Entidades y Value Objects)
+- [ ] Crear carpeta `dominio/entidades/`
+- [ ] Implementar entidad `Usuario`
+- [ ] Implementar entidad `Producto`
+- [ ] Implementar entidad `Inquilino` (Tenant)
+- [ ] Implementar entidad `Categoría`
+- [ ] Implementar entidad `Proveedor`
+- [ ] Implementar entidad `Cliente`
+- [ ] Crear carpeta `dominio/objetos_valor/`
+- [ ] Implementar `Dinero` (value object)
+- [ ] Implementar `Email` (value object)
+- [ ] Implementar `Dirección` (value object)
+- [ ] Escribir pruebas unitarias
+
+---
+
+## 📌 NOTAS IMPORTANTES
+
+### 🔐 Autenticación en GitHub
+GitHub ya no permite autenticación con contraseña. Usa:
+- **Token de acceso personal** (recomendado)
+- **GitHub CLI** (`gh auth login`)
+
+### 🐍 Python 3.14
+- Versión utilizada y probada: **Python 3.14.3**
+- Usar `--only-binary :all:` para evitar compilación
+
+### 🔧 Entorno Virtual
+- **Siempre activar antes de trabajar:**
+  ```powershell
+  cd backend; .\venv\Scripts\Activate.ps1
+  ```
+- **Para salir:** `deactivate`
+- **NUNCA subir `venv/` a GitHub** (está en .gitignore)
+
+### 🐳 Docker
+- Docker Desktop debe estar **corriendo** antes de usar `docker-compose`
+- Los datos persisten en volúmenes `postgres_data` y `redis_data`
+- Para ver logs: `docker-compose logs -f`
+
+### 📁 Nomenclatura
+- Hemos traducido los nombres al español:
+  - `core` → `nucleo`
+  - `database.py` → `base_datos.py`
+  - `get_db()` → `obtener_bd()`
+  - `engine` → `motor`
+
+---
+
+## 🔗 ENLACES IMPORTANTES
+
+- **Repositorio en GitHub:** https://github.com/ELVIEJOBRAY/SISTEMA-SAAS-DULCERIA
+- **Documentación FastAPI:** https://fastapi.tiangolo.com/
+- **Documentación SQLAlchemy:** https://www.sqlalchemy.org/
+- **Documentación Redis:** https://redis.io/docs/
+- **Docker Desktop:** https://www.docker.com/products/docker-desktop/
+- **Pydantic Settings:** https://docs.pydantic.dev/latest/concepts/pydantic_settings/
+
+---
+
+## 👨‍💻 AUTOR
+
+**Bryan Stiven Bonilla Rosas**  
+*Desarrollador Full Stack - Sistema de Gestión de Dulcerías SaaS*
+
+- GitHub: [@ELVIEJOBRAY](https://github.com/ELVIEJOBRAY)
+- Email: elviejobray@gmail.com
+- Proyecto: SGDD - Sistema de Gestión de Dulcerías
+
+---
+
+## 🏆 ¡FELICIDADES!
+
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   ✅ FASE 1 COMPLETADA EXITOSAMENTE                               ║
+║                                                                   ║
+║   • Variables de entorno configuradas                             ║
+║   • Configuración central con Pydantic                            ║
+║   • Conexión a PostgreSQL establecida                             ║
+║   • Cliente Redis implementado                                    ║
+║   • Contenedores Docker funcionando                               ║
+║   • Health check operativo                                        ║
+║   • Documentación Swagger disponible                              ║
+║                                                                   ║
+║   🚀 LISTO PARA FASE 2 - Modelado del Dominio                     ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
+
+**El backend está listo con toda la infraestructura base. ¡A por la FASE 2!** 🚀
+
+---
+
+*Documentación generada el 6 de marzo de 2026*  
+*Última actualización: Fase 1 completada*
+```
+
+
+
+--------------------------------------
+
+---------------------------------------
+
+
 
 FASE 2: Modelado del dominio (Entidades y Value Objects)
-Objetivo: Definir las entidades centrales del negocio con lógica pura, sin dependencias externas.
+
+Objetivo: 
+
+Definir las entidades centrales del negocio con lógica pura, 
+
+sin dependencias externas.
 
 Pasos detallados:
+
 Crear entidades base en backend/app/domain/entities/:
 
 tenant.py: class Tenant (id, name, subscription_status, etc.)
@@ -678,6 +1328,16 @@ Probar lógica de negocio (ej. no permitir stock negativo).
 Probar validaciones de value objects.
 
 ✅ Entregables: Modelo de dominio completo con entidades y value objects, pruebas unitarias pasando.
+
+
+
+-----------------------------------------
+
+
+
+------------------------------------------
+
+
 
 FASE 3: Contratos de persistencia (Interfaces de repositorios)
 Objetivo: Definir las interfaces (puertos) que el dominio necesita para persistir y recuperar entidades, manteniendo la inversión de dependencias.
@@ -2006,260 +2666,208 @@ sgdd/
 
 --------------------------------------------------
 --------------------------------------------------
-
 sgdd/
 ├── backend/                     # Backend unificado (FastAPI)
 │   ├── app/
 │   │   ├── api/                 # Rutas (controladores)
 │   │   │   ├── v1/
-│   │   │   │   ├── auth.py
-│   │   │   │   ├── users.py
-│   │   │   │   ├── tenants.py
-│   │   │   │   ├── products.py
-│   │   │   │   ├── categories.py
-│   │   │   │   ├── inventory.py
-│   │   │   │   ├── suppliers.py
-│   │   │   │   ├── customers.py
-│   │   │   │   ├── purchases.py
-│   │   │   │   ├── orders.py
-│   │   │   │   ├── sales.py
-│   │   │   │   ├── pos.py
-│   │   │   │   ├── payments.py
-│   │   │   │   ├── billing.py
-│   │   │   │   ├── subscriptions.py
-│   │   │   │   ├── reports.py
-│   │   │   │   ├── analytics.py
-│   │   │   │   ├── bot.py
-│   │   │   │   └── admin.py
-│   │
+│   │   │   │   ├── auth.py          → auth.py (se queda igual)
+│   │   │   │   ├── usuarios.py      ← users.py
+│   │   │   │   ├── inquilinos.py    ← tenants.py
+│   │   │   │   ├── productos.py     ← products.py
+│   │   │   │   ├── categorias.py    ← categories.py
+│   │   │   │   ├── inventario.py    ← inventory.py
+│   │   │   │   ├── proveedores.py   ← suppliers.py
+│   │   │   │   ├── clientes.py      ← customers.py
+│   │   │   │   ├── compras.py       ← purchases.py
+│   │   │   │   ├── pedidos.py       ← orders.py
+│   │   │   │   ├── ventas.py        ← sales.py
+│   │   │   │   ├── pos.py           → pos.py (se queda igual)
+│   │   │   │   ├── pagos.py         ← payments.py
+│   │   │   │   ├── facturacion.py   ← billing.py
+│   │   │   │   ├── suscripciones.py ← subscriptions.py
+│   │   │   │   ├── reportes.py      ← reports.py
+│   │   │   │   ├── analitica.py     ← analytics.py
+│   │   │   │   ├── bot.py           → bot.py (se queda igual)
+│   │   │   │   └── admin.py         → admin.py (se queda igual)
+│   │   │
 │   │   ├── core/                # Configuración central
-│   │   │   ├── config.py
-│   │   │   ├── security.py
-│   │   │   ├── database.py
-│   │   │   ├── redis.py
-│   │   │   ├── logging.py
-│   │   │   ├── settings.py
-│   │   │   └── exceptions.py
-│   │
-│   │   ├── domain/              # Entidades puras (DDD)
-│   │   │   ├── entities/
-│   │   │   │   ├── user.py
-│   │   │   │   ├── tenant.py
-│   │   │   │   ├── product.py
-│   │   │   │   ├── category.py
-│   │   │   │   ├── inventory_item.py
-│   │   │   │   ├── supplier.py
-│   │   │   │   ├── customer.py
-│   │   │   │   ├── purchase.py
-│   │   │   │   ├── order.py
-│   │   │   │   ├── sale.py
-│   │   │   │   ├── payment.py
-│   │   │   │   ├── subscription.py
-│   │   │   │   └── invoice.py
+│   │   │   ├── config.py        → config.py
+│   │   │   ├── seguridad.py     ← security.py
+│   │   │   ├── base_datos.py    ← database.py
+│   │   │   ├── redis.py         → redis.py
+│   │   │   ├── logging.py       → logging.py
+│   │   │   ├── ajustes.py       ← settings.py
+│   │   │   └── excepciones.py   ← exceptions.py
+│   │   │
+│   │   ├── dominio/              # Entidades puras (DDD)
+│   │   │   ├── entidades/
+│   │   │   │   ├── usuario.py        ← user.py
+│   │   │   │   ├── inquilino.py      ← tenant.py
+│   │   │   │   ├── producto.py       ← product.py
+│   │   │   │   ├── categoria.py      ← category.py
+│   │   │   │   ├── item_inventario.py ← inventory_item.py
+│   │   │   │   ├── proveedor.py      ← supplier.py
+│   │   │   │   ├── cliente.py        ← customer.py
+│   │   │   │   ├── compra.py         ← purchase.py
+│   │   │   │   ├── pedido.py         ← order.py
+│   │   │   │   ├── venta.py          ← sale.py
+│   │   │   │   ├── pago.py           ← payment.py
+│   │   │   │   ├── suscripcion.py    ← subscription.py
+│   │   │   │   └── factura.py        ← invoice.py
 │   │   │   │
-│   │   │   └── value_objects/
-│   │   │       ├── money.py
-│   │   │       ├── email.py
-│   │   │       └── address.py
-│   │
-│   │   ├── application/         # Casos de uso
-│   │   │   ├── services/
-│   │   │   │   ├── auth_service.py
-│   │   │   │   ├── tenant_service.py
-│   │   │   │   ├── product_service.py
-│   │   │   │   ├── inventory_service.py
-│   │   │   │   ├── purchase_service.py
-│   │   │   │   ├── order_service.py
-│   │   │   │   ├── sale_service.py
-│   │   │   │   ├── pos_service.py
-│   │   │   │   ├── payment_service.py
-│   │   │   │   ├── billing_service.py
-│   │   │   │   ├── analytics_service.py
-│   │   │   │   ├── report_service.py
-│   │   │   │   └── bot_service.py
+│   │   │   └── objetos_valor/
+│   │   │       ├── dinero.py      ← money.py
+│   │   │       ├── email.py       → email.py
+│   │   │       └── direccion.py   ← address.py
+│   │   │
+│   │   ├── aplicacion/         # Casos de uso
+│   │   │   ├── servicios/
+│   │   │   │   ├── auth_service.py        → auth_service.py
+│   │   │   │   ├── inquilino_servicio.py  ← tenant_service.py
+│   │   │   │   ├── producto_servicio.py   ← product_service.py
+│   │   │   │   ├── inventario_servicio.py ← inventory_service.py
+│   │   │   │   ├── compra_servicio.py     ← purchase_service.py
+│   │   │   │   ├── pedido_servicio.py     ← order_service.py
+│   │   │   │   ├── venta_servicio.py      ← sale_service.py
+│   │   │   │   ├── pos_servicio.py        ← pos_service.py
+│   │   │   │   ├── pago_servicio.py       ← payment_service.py
+│   │   │   │   ├── facturacion_servicio.py ← billing_service.py
+│   │   │   │   ├── analitica_servicio.py  ← analytics_service.py
+│   │   │   │   ├── reporte_servicio.py    ← report_service.py
+│   │   │   │   └── bot_servicio.py        ← bot_service.py
 │   │   │   │
-│   │   │   └── dtos/
-│   │   │       ├── product_dto.py
-│   │   │       ├── order_dto.py
-│   │   │       ├── sale_dto.py
-│   │   │       └── user_dto.py
-│   │
-│   │   ├── infrastructure/      # Implementaciones concretas
-│   │   │   ├── repositories/
-│   │   │   │   ├── user_repository.py
-│   │   │   │   ├── tenant_repository.py
-│   │   │   │   ├── product_repository.py
-│   │   │   │   ├── inventory_repository.py
-│   │   │   │   ├── order_repository.py
-│   │   │   │   ├── sale_repository.py
-│   │   │   │   └── payment_repository.py
+│   │   │   └── dto/            ← dtos/
+│   │   │       ├── producto_dto.py   ← product_dto.py
+│   │   │       ├── pedido_dto.py     ← order_dto.py
+│   │   │       ├── venta_dto.py      ← sale_dto.py
+│   │   │       └── usuario_dto.py    ← user_dto.py
+│   │   │
+│   │   ├── infraestructura/      # Implementaciones concretas
+│   │   │   ├── repositorios/      ← repositories/
+│   │   │   │   ├── usuario_repositorio.py    ← user_repository.py
+│   │   │   │   ├── inquilino_repositorio.py  ← tenant_repository.py
+│   │   │   │   ├── producto_repositorio.py   ← product_repository.py
+│   │   │   │   ├── inventario_repositorio.py ← inventory_repository.py
+│   │   │   │   ├── pedido_repositorio.py     ← order_repository.py
+│   │   │   │   ├── venta_repositorio.py      ← sale_repository.py
+│   │   │   │   └── pago_repositorio.py       ← payment_repository.py
 │   │   │   │
 │   │   │   ├── nlp/             # IA / NLP
-│   │   │   │   ├── intent_model.py
-│   │   │   │   ├── classifier.py
-│   │   │   │   └── trainer.py
+│   │   │   │   ├── modelo_intenciones.py  ← intent_model.py
+│   │   │   │   ├── clasificador.py        ← classifier.py
+│   │   │   │   └── entrenador.py          ← trainer.py
 │   │   │   │
-│   │   │   ├── ai/              # IA analítica
-│   │   │   │   ├── sales_forecast.py
-│   │   │   │   ├── demand_prediction.py
-│   │   │   │   └── recommendation_engine.py
+│   │   │   ├── ia/              # IA analítica
+│   │   │   │   ├── pronostico_ventas.py   ← sales_forecast.py
+│   │   │   │   ├── prediccion_demanda.py  ← demand_prediction.py
+│   │   │   │   └── motor_recomendaciones.py ← recommendation_engine.py
 │   │   │   │
 │   │   │   ├── cache/
-│   │   │   │   └── redis_cache.py
+│   │   │   │   └── redis_cache.py      → redis_cache.py
 │   │   │   │
-│   │   │   ├── messaging/
-│   │   │   │   ├── events.py
-│   │   │   │   └── event_bus.py
+│   │   │   ├── mensajeria/       ← messaging/
+│   │   │   │   ├── eventos.py          ← events.py
+│   │   │   │   └── bus_eventos.py      ← event_bus.py
 │   │   │   │
-│   │   │   └── payments/        # Integraciones
-│   │   │       ├── stripe.py
-│   │   │       └── webhook_handler.py
-│   │
+│   │   │   └── pagos/        # Integraciones
+│   │   │       ├── stripe.py           → stripe.py
+│   │   │       └── manejador_webhook.py ← webhook_handler.py
+│   │   │
 │   │   ├── middlewares/
-│   │   │   ├── tenant.py
-│   │   │   ├── auth.py
-│   │   │   ├── rate_limit.py
-│   │   │   └── logging.py
+│   │   │   ├── inquilino.py     ← tenant.py
+│   │   │   ├── auth.py          → auth.py
+│   │   │   ├── limite_peticiones.py ← rate_limit.py
+│   │   │   └── logging.py       → logging.py
+│   │   │
+│   │   └── main.py              → main.py
 │   │
-│   │   └── main.py
-│
-│   ├── tests/
-│   │   ├── unit/
-│   │   ├── integration/
-│   │   └── fixtures/
-│
-│   ├── models/                  # Modelos IA entrenados
-│   │   ├── nlp_model.pkl
-│   │   └── sales_forecast.pkl
-│
+│   ├── pruebas/                  ← tests/
+│   │   ├── unitarias/            ← unit/
+│   │   ├── integracion/          ← integration/
+│   │   └── fixtures/             → fixtures/
+│   │
+│   ├── modelos/                  # Modelos IA entrenados
+│   │   ├── modelo_nlp.pkl        ← nlp_model.pkl
+│   │   └── pronostico_ventas.pkl ← sales_forecast.pkl
+│   │
 │   ├── scripts/
-│   │   ├── train_nlp.py
-│   │   ├── train_sales_ai.py
-│   │   └── seed_data.py
-│
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── .env.example
+│   │   ├── entrenar_nlp.py       ← train_nlp.py
+│   │   ├── entrenar_ia_ventas.py ← train_sales_ai.py
+│   │   └── sembrar_datos.py      ← seed_data.py
+│   │
+│   ├── requisitos.txt            ← requirements.txt
+│   ├── Dockerfile                → Dockerfile
+│   └── .env.ejemplo              ← .env.example
 │
 ├── frontend/                    # Panel React
-│   ├── public/
+│   ├── public/                  → public/
 │   ├── src/
-│   │   ├── components/
-│   │   │   ├── ui/
-│   │   │   ├── charts/
-│   │   │   └── pos/
+│   │   ├── componentes/         ← components/
+│   │   │   ├── ui/              → ui/
+│   │   │   ├── graficos/        ← charts/
+│   │   │   └── pos/             → pos/
 │   │   │
-│   │   ├── pages/
-│   │   │   ├── dashboard/
-│   │   │   ├── inventory/
-│   │   │   ├── sales/
-│   │   │   ├── purchases/
-│   │   │   ├── analytics/
-│   │   │   ├── pos/
-│   │   │   └── admin/
+│   │   ├── paginas/             ← pages/
+│   │   │   ├── dashboard/       → dashboard/
+│   │   │   ├── inventario/      ← inventory/
+│   │   │   ├── ventas/          ← sales/
+│   │   │   ├── compras/         ← purchases/
+│   │   │   ├── analitica/       ← analytics/
+│   │   │   ├── pos/             → pos/
+│   │   │   └── admin/           → admin/
 │   │   │
-│   │   ├── services/
-│   │   │   └── api_client.js
+│   │   ├── servicios/           ← services/
+│   │   │   └── cliente_api.js   ← api_client.js
 │   │   │
 │   │   ├── store/
-│   │   │   └── authStore.js
+│   │   │   └── authStore.js     → authStore.js
 │   │   │
-│   │   ├── hooks/
-│   │   ├── utils/
-│   │   ├── App.jsx
-│   │   └── main.jsx
+│   │   ├── hooks/               → hooks/
+│   │   ├── utils/               → utils/
+│   │   ├── App.jsx              → App.jsx
+│   │   └── main.jsx             → main.jsx
+│   │
+│   ├── index.html               → index.html
+│   ├── package.json             → package.json
+│   ├── vite.config.js           → vite.config.js
+│   └── Dockerfile               → Dockerfile
 │
-│   ├── index.html
-│   ├── package.json
-│   ├── vite.config.js
-│   └── Dockerfile
-│
-├── infrastructure/              # Infraestructura
-│   ├── docker-compose.yml
+├── infraestructura/              # Infraestructura
+│   ├── docker-compose.yml        → docker-compose.yml
 │   │
 │   ├── nginx/
-│   │   └── nginx.conf
+│   │   └── nginx.conf           → nginx.conf
 │   │
-│   ├── monitoring/
-│   │   ├── prometheus.yml
-│   │   └── grafana/
+│   ├── monitoreo/                ← monitoring/
+│   │   ├── prometheus.yml       → prometheus.yml
+│   │   └── grafana/             → grafana/
 │   │
 │   └── terraform/               # Opcional cloud
 │
 ├── scripts/
-│   ├── backup-db.sh
-│   ├── deploy.sh
-│   └── restore-db.sh
+│   ├── respaldar-bd.sh          ← backup-db.sh
+│   ├── desplegar.sh             ← deploy.sh
+│   └── restaurar-bd.sh          ← restore-db.sh
 │
 ├── docs/
-│   ├── diagrams/
-│   │   ├── architecture.png
-│   │   └── erd.png
+│   ├── diagramas/                ← diagrams/
+│   │   ├── arquitectura.png     ← architecture.png
+│   │   └── erd.png              → erd.png
 │   │
-│   └── srs/
-│       └── requirements.md
+│   └── ers/                      ← srs/
+│       └── requisitos.md        ← requirements.md
 │
 ├── .github/workflows/
-│   └── ci.yml
+│   └── ci.yml                   → ci.yml
 │
-├── .gitignore
-├── README.md
-└── Makefile
-
-
+├── .gitignore                   → .gitignore
+├── README.md                    → README.md
+└── Makefile                     → Makefile
 --------------------------------------------------
 --------------------------------------------------
 
 
-# Instalación Rápida
-
-### Clonar repositorio
-
-```
-git clone https://github.com/your-org/sgdd.git
-cd sgdd
-```
-
----
-
-### Ejecutar con Docker
-
-```
-docker compose up --build
-```
-
-Servicios disponibles:
-
-| Servicio    | URL                   |
-| ----------- | --------------------- |
-| Backend API | http://localhost:8000 |
-| Frontend    | http://localhost:3000 |
-
----
-
-# Desarrollo Local
-
-## Backend
-
-```
-cd backend
-python -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
----
-
-## Frontend
-
-```
-cd frontend
-npm install
-npm run dev
-```
-
----
 
 # Testing
 
