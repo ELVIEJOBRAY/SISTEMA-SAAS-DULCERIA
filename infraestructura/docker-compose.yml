@@ -1,0 +1,157 @@
+﻿# ======================================================
+# DOCKER COMPOSE - INFRAESTRUCTURA DEL SISTEMA SGDD
+# ======================================================
+# ESTE ARCHIVO DEFINE LOS SERVICIOS NECESARIOS PARA
+# EJECUTAR EL BACKEND LOCALMENTE MEDIANTE CONTENEDORES.
+#
+# DOCKER COMPOSE PERMITE LEVANTAR MÚLTIPLES SERVICIOS
+# CON UN SOLO COMANDO:
+#
+# docker-compose up -d
+#
+# EN ESTE CASO SE DEFINEN DOS SERVICIOS PRINCIPALES:
+#
+# 1️⃣ POSTGRESQL → BASE DE DATOS RELACIONAL
+# 2️⃣ REDIS → SISTEMA DE CACHÉ EN MEMORIA
+#
+# AMBOS SERVICIOS SE EJECUTAN EN UNA RED PRIVADA
+# PARA QUE PUEDAN COMUNICARSE ENTRE ELLOS.
+#
+# ======================================================
+
+version: '3.8'
+
+services:
+
+  # ======================================================
+  # POSTGRESQL - BASE DE DATOS PRINCIPAL
+  # ======================================================
+  # POSTGRESQL ES UNA BASE DE DATOS RELACIONAL
+  # MUY UTILIZADA EN SISTEMAS PROFESIONALES SaaS.
+  #
+  # ALMACENA:
+  #
+  # - USUARIOS
+  # - PRODUCTOS
+  # - PEDIDOS
+  # - FACTURAS
+  # - INVENTARIO
+  #
+  # LA IMAGEN UTILIZADA ES:
+  #
+  # postgres:15-alpine
+  #
+  # QUE ES:
+  # - MÁS LIGERA
+  # - MÁS SEGURA
+  # - MÁS RÁPIDA PARA CONTENEDORES
+  #
+  postgres:
+    image: postgres:15-alpine
+    container_name: sgdd_postgres
+
+    environment:
+      # USUARIO PRINCIPAL DE LA BASE DE DATOS
+      POSTGRES_USER: sgdd_usuario
+
+      # CONTRASEÑA DEL USUARIO
+      POSTGRES_PASSWORD: sgdd_contraseña
+
+      # NOMBRE DE LA BASE DE DATOS
+      POSTGRES_DB: sgdd_bd
+
+    ports:
+      # PUERTO LOCAL → PUERTO DEL CONTENEDOR
+      # PERMITE CONECTARSE DESDE EL HOST
+      - "5432:5432"
+
+    volumes:
+      # VOLUMEN PERSISTENTE
+      # PERMITE QUE LOS DATOS NO SE PIERDAN
+      # AL REINICIAR EL CONTENEDOR
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      # VERIFICA QUE POSTGRES ESTÉ LISTO
+      test: ["CMD-SHELL", "pg_isready -U sgdd_usuario"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - sgdd_network
+
+
+  # ======================================================
+  # REDIS - SISTEMA DE CACHÉ EN MEMORIA
+  # ======================================================
+  # REDIS ES UNA BASE DE DATOS EN MEMORIA
+  # ULTRA RÁPIDA UTILIZADA PARA:
+  #
+  # - CACHÉ DE CONSULTAS
+  # - SESIONES DE USUARIO
+  # - RATE LIMITING
+  # - COLAS DE TRABAJO
+  # - TOKENS TEMPORALES
+  #
+  # ALMACENA INFORMACIÓN TEMPORAL PARA
+  # MEJORAR EL RENDIMIENTO DEL SISTEMA.
+  #
+  redis:
+    image: redis:7-alpine
+    container_name: sgdd_redis
+
+    ports:
+      # PUERTO DE REDIS
+      - "6379:6379"
+
+    volumes:
+      # VOLUMEN PARA PERSISTENCIA DE DATOS
+      - redis_data:/data
+
+    healthcheck:
+      # VERIFICA QUE REDIS RESPONDA CORRECTAMENTE
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+    networks:
+      - sgdd_network
+
+
+# ======================================================
+# VOLUMENES PERSISTENTES
+# ======================================================
+# LOS VOLÚMENES PERMITEN QUE LOS DATOS
+# SOBREVIVAN A:
+#
+# - REINICIO DE CONTENEDORES
+# - ACTUALIZACIONES
+# - CAÍDAS DEL SISTEMA
+#
+volumes:
+  postgres_data:
+  redis_data:
+
+
+# ======================================================
+# RED PRIVADA DE CONTENEDORES
+# ======================================================
+# ESTA RED PERMITE QUE LOS CONTENEDORES
+# SE COMUNIQUEN ENTRE ELLOS.
+#
+# EJEMPLO:
+#
+# EL BACKEND PODRÁ CONECTARSE A POSTGRES USANDO:
+#
+# postgres:5432
+#
+# Y A REDIS USANDO:
+#
+# redis:6379
+#
+networks:
+  sgdd_network:
+    driver: bridge
+
