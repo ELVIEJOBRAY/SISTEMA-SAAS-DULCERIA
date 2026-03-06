@@ -1,0 +1,39 @@
+# ==========================================
+
+# DEPENDENCIAS DE DESARROLLO
+
+# ==========================================
+
+# ESTE ARCHIVO SE UTILIZA SOLO
+
+# DURANTE EL DESARROLLO DEL PROYECTO.
+
+-r base.txt
+
+# ==========================================
+
+# TESTING
+
+# ==========================================
+
+# FRAMEWORK DE TESTING.
+
+pytest==8.3.5
+
+# SOPORTE PARA TESTS ASÍNCRONOS.
+
+pytest-asyncio==0.23.6
+
+# ==========================================
+
+# HERRAMIENTAS DE DESARROLLO
+
+# ==========================================
+
+# FORMATEO AUTOMÁTICO DE CÓDIGO.
+
+black==24.4.2
+
+# LINTER PARA DETECTAR ERRORES.
+
+ruff==0.4.4

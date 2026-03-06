@@ -1,0 +1,19 @@
+# ==========================================
+
+# DEPENDENCIAS DE PRODUCCIÓN
+
+# ==========================================
+
+# ESTE ARCHIVO INSTALA SOLO
+
+# LO NECESARIO PARA EJECUTAR
+
+# EL SERVIDOR EN PRODUCCIÓN.
+
+-r base.txt
+
+# SERVIDOR HTTP DE PRODUCCIÓN
+
+# PARA APLICACIONES PYTHON.
+
+gunicorn==22.0.0

@@ -1,10 +1,19 @@
 
+fases y solucion del desarrollo del sistema 
+
 
 FASE 0: Preparación del entorno de desarrollo
-Objetivo: Establecer la estructura de directorios, configurar herramientas base y asegurar que el entorno de desarrollo esté listo para codificar
+
+Objetivo: 
+
+Establecer la estructura de directorios, 
+configurar herramientas base 
+y asegurar que el entorno de desarrollo esté listo para codificar
+
 
 Pasos detallados:
-Crear la estructura de carpetas (basada en el árbol que compartiste, pero con ajustes sugeridos).
+
+Crear la estructura de carpetas 
 
 Crear la raíz del proyecto: sgdd/.
 
@@ -16,39 +25,535 @@ Dentro de frontend/, crear src/, public/, index.html, vite.config.js, etc.
 
 Inicializar el entorno virtual de Python para backend.
 
-bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # o .\venv\Scripts\activate en Windows
-Crear archivo requirements.txt (o usar poetry/pipenv) con las dependencias iniciales:
-
-text
-fastapi
-uvicorn[standard]
-sqlalchemy
-pydantic
-pydantic-settings
-python-dotenv
-redis
-alembic  # para migraciones
-python-jose[cryptography]  # JWT
-passlib[bcrypt]  # hashing
-httpx  # para pruebas
-pytest
-pytest-asyncio
-Inicializar proyecto frontend con Vite + React + Zustand:
-
-bash
-cd ../frontend
-npm create vite@latest . -- --template react
-npm install zustand axios react-router-dom
 Configurar el control de versiones con Git:
 
 Crear .gitignore global (incluyendo venv/, node_modules/, .env, __pycache__/, etc.).
 
 Hacer commit inicial.
 
-✅ Entregables: Estructura de carpetas, entorno virtual funcional, dependencias instaladas, proyecto frontend básico, repositorio git inicializado.
+✅ Entregables:
+
+ Estructura de carpetas, 
+ entorno virtual funcional, 
+ dependencias instaladas, 
+ proyecto frontend básico, 
+ repositorio git inicializado.
+ 
+----------------------------------------
+
+----------------------------------------
+
+```markdown
+# 🍬 SGDD - Sistema de Gestión de Dulcerías SaaS
+
+## 📋 DESCRIPCIÓN DEL PROYECTO
+
+**SGDD (Sistema de Gestión de Dulcerías)** es una plataforma SaaS desarrollada con **FastAPI** y **Python 3.14** que proporciona una solución completa para la administración de dulcerías, incluyendo gestión de inventario, ventas, clientes, proveedores y análisis predictivo mediante machine learning.
+
+Este README documenta la **FASE 0 COMPLETADA**: Configuración del entorno de desarrollo, control de versiones con Git, conexión con GitHub y verificación del funcionamiento básico del sistema.
+
+---
+
+## 📌 TABLA DE CONTENIDOS
+- [Configuración de Git y GitHub](#-configuración-de-git-y-github)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Dependencias Instaladas](#-dependencias-instaladas-48-paquetes)
+- [Guía de Instalación](#-guía-de-instalación)
+- [Comandos de Ejecución](#-comandos-de-ejecución)
+- [Verificación del Sistema](#-verificación-del-sistema)
+- [Endpoints Disponibles](#-endpoints-disponibles)
+- [Archivo main.py](#-archivo-mainpy)
+- [Flujo de Trabajo con Git](#-flujo-de-trabajo-con-git)
+- [Lo que se Logró en Fase 0](#-lo-que-se-logró-en-fase-0)
+- [Próximos Pasos - Fase 1](#-próximos-pasos---fase-1)
+- [Solución de Problemas](#-solución-de-problemas)
+- [Notas Importantes](#-notas-importantes)
+- [Autor](#-autor)
+
+---
+
+## 🔧 CONFIGURACIÓN DE GIT Y GITHUB
+
+### Configuración Inicial de Git
+```bash
+# Configurar identidad global
+git config --global user.name "ViejoBrayan"
+git config --global user.email "elviejobray@gmail.com"
+
+# Configurar rama principal por defecto
+git config --global init.defaultbranch main
+
+# Verificar configuración
+git config --global --list
+```
+
+### Inicializar Repositorio Local
+```bash
+# Inicializar repositorio en la raíz del proyecto
+git init
+
+# Ver estado del repositorio
+git status
+```
+
+### Conectar con GitHub
+```bash
+# Agregar repositorio remoto (sin espacios en la URL)
+git remote add origin https://github.com/ELVIEJOBRAY/SISTEMA-SAAS-DULCERIA.git
+
+# Verificar remoto configurado
+git remote -v
+```
+**Salida esperada:**
+```
+origin  https://github.com/ELVIEJOBRAY/SISTEMA-SAAS-DULCERIA.git (fetch)
+origin  https://github.com/ELVIEJOBRAY/SISTEMA-SAAS-DULCERIA.git (push)
+```
+
+### Archivo .gitignore
+
+```gitignore
+
+# Python
+backend/venv/
+backend/__pycache__/
+backend/app/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Node
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+npm-debug.log*
+
+# Env
+.env
+.env.local
+.env.*.local
+backend/.env
+backend/.env.example
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# Project specific
+*.log
+*.pid
+*.seed
+```
+
+### Primer Commit y Push
+```bash
+# Agregar archivos al staging
+git add .
+
+# Hacer el primer commit
+git commit -m "🎉 FASE 0: Estructura inicial del proyecto SGDD"
+
+# Subir a GitHub
+git push -u origin main
+```
+
+### Historial de Commits
+```bash
+git log --oneline
+```
+**Salida esperada:**
+```
+7189387 (HEAD -> main, origin/main) 📝 README: Documentación completa de la Fase 0 con Git y GitHub
+b43f7d0 🎉 PRIMER COMMIT REALIZADO DEL SISTEMA GESTION DE DULCERIAS SAAS
+```
+
+### Comandos Git Útiles
+```bash
+# Ver historial de commits
+git log --oneline --graph --all
+
+# Ver estado actual
+git status
+
+# Ver cambios sin agregar
+git diff
+
+# Actualizar repositorio local
+git pull origin main
+
+# Crear una nueva rama
+git checkout -b feature/nueva-funcionalidad
+
+# Cambiar de rama
+git checkout main
+
+# Fusionar cambios
+git merge feature/nueva-funcionalidad
+```
+
+---
+
+## 📁 ESTRUCTURA DEL PROYECTO
+
+```
+sgdd_structure/
+├── .git/                      # Carpeta oculta de Git
+├── .gitignore                  # Archivos ignorados por Git
+├── README.md                   # Documentación principal
+├── Makefile                    # Automatización de comandos
+├── backend/
+│   ├── venv/                   # Entorno virtual (ignorado)
+│   ├── requisitos.txt          # Dependencias del proyecto
+│   └── app/
+│       └── main.py             # Archivo principal de FastAPI
+├── frontend/                    # Frontend (React/Vite)
+├── infrastructure/              # Docker, Nginx, etc.
+├── docs/                        # Documentación adicional
+├── scripts/                     # Scripts generales
+└── .github/                     # GitHub Actions
+```
+
+---
+
+## 📦 DEPENDENCIAS INSTALADAS (48 paquetes)
+
+| Categoría | Paquetes |
+|-----------|----------|
+| **API Framework** | fastapi==0.115.12, uvicorn[standard]==0.34.0, starlette |
+| **Base de Datos** | sqlalchemy==2.0.40, alembic==1.15.2, psycopg2-binary==2.9.11 |
+| **Seguridad** | python-jose[cryptography]==3.4.0, bcrypt==4.3.0, passlib[bcrypt]==1.7.4 |
+| **Validación** | pydantic[email]==2.12.5, email-validator, dnspython |
+| **Utilidades** | python-dotenv==1.1.0, python-multipart==0.0.20, httpx==0.28.1 |
+| **Machine Learning** | numpy==2.3.5, pandas==3.0.1, scikit-learn==1.8.0 |
+| **Cache** | redis[hiredis]==5.2.1 |
+| **Logging** | loguru==0.7.2 |
+| **Testing** | pytest==8.3.5, pytest-asyncio==0.23.6 |
+
+---
+
+## 🚀 GUÍA DE INSTALACIÓN
+
+### 1. Clonar el Repositorio
+```bash
+git clone https://github.com/ELVIEJOBRAY/SISTEMA-SAAS-DULCERIA.git
+cd SISTEMA-SAAS-DULCERIA
+```
+
+### 2. Configurar Entorno Virtual
+```powershell
+# Ir al backend
+cd backend
+
+# Crear entorno virtual
+python -m venv venv
+
+# Activar entorno virtual
+.\venv\Scripts\Activate.ps1
+
+# Actualizar pip
+python -m pip install --upgrade pip
+```
+
+### 3. Instalar Dependencias
+```powershell
+# Instalar todas las dependencias
+pip install -r requisitos.txt
+```
+
+### 4. Verificar Instalación
+```powershell
+# Ver lista de paquetes instalados
+pip list
+
+# Verificar versión de Python
+python --version
+```
+
+---
+
+## 🎮 COMANDOS DE EJECUCIÓN
+
+### ▶️ **BOTÓN DE ENCENDIDO** (Iniciar servidor)
+```powershell
+cd C:\Users\elvie\Desktop\sgdd_structure\backend; .\venv\Scripts\Activate.ps1; uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### ⏹️ **BOTÓN DE APAGADO**
+Presiona `CTRL + C` en la terminal donde está corriendo el servidor.
+
+### 🔄 **REINICIAR SERVIDOR**
+```powershell
+# Si ya tienes la terminal abierta, solo:
+uvicorn app.main:app --reload
+```
+
+---
+
+## ✅ VERIFICACIÓN DEL SISTEMA
+
+### Servidor corriendo (debes ver):
+```
+INFO:     Will watch for changes in these directories: ['C:\\Users\\elvie\\Desktop\\sgdd_structure\\backend']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [XXXX] using WatchFiles
+INFO:     Started server process [XXXX]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+```
+
+### Pruebas exitosas (tus propios logs):
+```
+INFO:     127.0.0.1:56936 - "GET /docs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56936 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54818 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62040 - "GET /health HTTP/1.1" 200 OK
+```
+
+### Pruebas en navegador:
+| Endpoint | URL | Resultado Esperado |
+|----------|-----|-------------------|
+| **Raíz** | http://localhost:8000 | `{"message":"🚀 SGDD API funcionando correctamente"}` |
+| **Health** | http://localhost:8000/health | `{"status":"ok","message":"Sistema operativo"}` |
+| **Docs** | http://localhost:8000/docs | Interfaz Swagger UI |
+| **OpenAPI** | http://localhost:8000/openapi.json | JSON con especificación |
+
+---
+
+## 🌐 ENDPOINTS DISPONIBLES
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/` | GET | Raíz del API - mensaje de bienvenida |
+| `/health` | GET | Health check del sistema |
+| `/docs` | GET | Documentación interactiva Swagger |
+| `/openapi.json` | GET | Esquema OpenAPI de la API |
+
+---
+
+## 📝 ARCHIVO MAIN.PY
+
+```python
+from fastapi import FastAPI
+
+app = FastAPI(
+    title="SGDD API",
+    description="Sistema de Gestión de Dulcerías SaaS",
+    version="0.1.0"
+)
+
+@app.get("/")
+def root():
+    return {"message": "🚀 SGDD API funcionando correctamente"}
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "message": "Sistema operativo"}
+```
+
+---
+
+## 🔄 FLUJO DE TRABAJO CON GIT
+
+### Actualizar repositorio local
+```bash
+git pull origin main
+```
+
+### Ver estado actual
+```bash
+git status
+```
+
+### Agregar cambios
+```bash
+# Agregar archivo específico
+git add nombre-del-archivo
+
+# Agregar todos los cambios
+git add .
+```
+
+### Hacer commit
+```bash
+git commit -m "📝 Descripción clara de los cambios realizados"
+```
+
+### Subir cambios a GitHub
+```bash
+git push
+```
+
+### Trabajar con ramas
+```bash
+# Crear y cambiar a nueva rama
+git checkout -b feature/nueva-funcionalidad
+
+# Subir rama a GitHub
+git push -u origin feature/nueva-funcionalidad
+
+# Volver a main
+git checkout main
+
+# Fusionar cambios
+git merge feature/nueva-funcionalidad
+```
+
+---
+
+## 🏆 LO QUE SE LOGRÓ EN FASE 0
+
+| # | Tarea | Estado |
+|---|-------|--------|
+| 1 | Git configurado (user.name, user.email) | ✅ |
+| 2 | Repositorio local inicializado | ✅ |
+| 3 | Archivo .gitignore creado | ✅ |
+| 4 | Repositorio en GitHub creado | ✅ |
+| 5 | Remoto origin configurado | ✅ |
+| 6 | Primer commit realizado | ✅ |
+| 7 | Código subido a GitHub | ✅ |
+| 8 | Estructura de carpetas creada | ✅ |
+| 9 | Entorno virtual configurado | ✅ |
+| 10 | 48 dependencias instaladas | ✅ |
+| 11 | Archivo requisitos.txt creado | ✅ |
+| 12 | Archivo main.py creado | ✅ |
+| 13 | Servidor FastAPI funcionando | ✅ |
+| 14 | Endpoint / responde 200 OK | ✅ |
+| 15 | Endpoint /health responde 200 OK | ✅ |
+| 16 | Documentación /docs accesible | ✅ |
+| 17 | README.md actualizado | ✅ |
+
+---
+
+## 🚧 PRÓXIMOS PASOS - FASE 1
+
+### Infraestructura Base
+- [ ] Crear archivo `.env` con variables de entorno
+- [ ] Configurar `backend/app/core/config.py` usando Pydantic Settings
+- [ ] Configurar `backend/app/core/database.py` con SQLAlchemy
+- [ ] Configurar `backend/app/core/redis.py` para caché
+- [ ] Crear `infrastructure/docker-compose.yml` con PostgreSQL y Redis
+- [ ] Crear `backend/Dockerfile` para el backend
+- [ ] Probar conectividad con servicios
+
+---
+
+## ❗ SOLUCIÓN DE PROBLEMAS
+
+### Error: "No module named 'fastapi'"
+```powershell
+# Solución: Activar entorno virtual e instalar dependencias
+cd backend
+.\venv\Scripts\Activate.ps1
+pip install -r requisitos.txt
+```
+
+### Error: "Address already in use"
+```powershell
+# Solución: Cambiar el puerto o cerrar el proceso que lo usa
+uvicorn app.main:app --reload --port 8001
+```
+
+### Error: "git push" pide autenticación
+```bash
+# Usar token de acceso personal en lugar de contraseña
+# Generar token en: GitHub → Settings → Developer settings → Personal access tokens
+```
+
+### Error al compilar pandas/numpy
+```powershell
+# Solución: Usar --only-binary :all:
+pip install pandas numpy scikit-learn --only-binary :all:
+```
+
+### Error: "venv/Scripts/Activate.ps1 no se reconoce"
+```powershell
+# Solución: Crear el entorno virtual primero
+cd backend
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+---
+
+## 📌 NOTAS IMPORTANTES
+
+### 🔐 Autenticación en GitHub
+GitHub ya no permite autenticación con contraseña. Usa:
+- **Token de acceso personal** (recomendado)
+- **GitHub CLI** (`gh auth login`)
+
+### 🐍 Python 3.14
+- Versión utilizada y probada: **Python 3.14.3**
+- Algunas librerías pueden necesitar versiones específicas
+- Usar `--only-binary :all:` para evitar compilación
+
+### 🔧 Entorno Virtual
+- **Siempre activar antes de trabajar:**
+  ```powershell
+  cd backend; .\venv\Scripts\Activate.ps1
+  ```
+- **Para salir:** `deactivate`
+- **NUNCA subir `venv/` a GitHub** (está en .gitignore)
+
+### ⚡ Ejecución del servidor
+- ❌ NO ejecutar con `python app/main.py`
+- ✅ SIEMPRE usar `uvicorn app.main:app --reload`
+
+---
+
+## 🔗 ENLACES IMPORTANTES
+
+- **Repositorio en GitHub:** https://github.com/ELVIEJOBRAY/SISTEMA-SAAS-DULCERIA
+- **Documentación FastAPI:** https://fastapi.tiangolo.com/
+- **Documentación Uvicorn:** https://www.uvicorn.org/
+- **Documentación SQLAlchemy:** https://www.sqlalchemy.org/
+
+---
+
+## 👨‍💻 AUTOR
+
+**Bryan Stiven Bonilla Rosas**  
+*Desarrollador Full Stack - Sistema de Gestión de Dulcerías SaaS*
+
+- GitHub: [@ELVIEJOBRAY](https://github.com/ELVIEJOBRAY)
+- Email: elviejobray@gmail.com
+- Proyecto: SGDD - Sistema de Gestión de Dulcerías
+
+---
+
+## 🏆 ¡FELICIDADES!
+
+**FASE 0 COMPLETADA EXITOSAMENTE**
+╔════════════════════════════════════════════════════════════╗
+║                                                            ║
+║   🎉 SISTEMA SGDD - FASE 0 COMPLETADA CON ÉXITO 🎉        ║
+║                                                            ║
+║   ✅ 56 dependencias instaladas                           ║
+║   ✅ Python 3.14.3 funcionando                            ║
+║   ✅ Servidor FastAPI corriendo                           ║
+║   ✅ Endpoints respondiendo 200 OK                        ║
+║   ✅ Git configurado y conectado                          ║
+║   ✅ README documentado                                   ║
+║                                                            ║
+║   🚀 LISTO PARA FASE 1                                    ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+-----------------------------------------
+
+
 
 FASE 1: Infraestructura base (Backend y servicios)
 Objetivo: Configurar la infraestructura mínima para que el backend pueda conectarse a bases de datos, Redis y ejecutarse en contenedores.
@@ -446,41 +951,6 @@ Seguridad: Asegura que JWT tenga expiración, usa HTTPS en producción, sanitiza
 Esta ruta te llevará desde un proyecto vacío hasta un sistema completo, modular y listo para producción. Cada fase produce entregables que pueden ser probados y validados, minimizando riesgos de integración.
 
 --------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
---------------------------------------------------------------
 
 
 
@@ -506,6 +976,98 @@ cómo funciona y por qué se hace de esa manera.
     según normas de desarrollo profesional.
 
 Cuando quieras, pásame el **primer bloque de código** y empezamos a procesarlo.
+--------------------------------------------------------------
+--------------------------------------------------------------
+¡HERMANO! **¡LO LOGRASTE!** 🎉🎉🎉
+
+Mira esto:
+```
+Successfully installed joblib-1.5.3 pandas-3.0.1 python-dateutil-2.9.0.post0 scikit-learn-1.8.0 scipy-1.17.1 threadpoolctl-3.6.0 tzdata-2025.3
+```
+
+## ✅ **FASE 0 COMPLETADA - TODAS LAS DEPENDENCIAS INSTALADAS**
+
+### 📦 **PAQUETES INSTALADOS (48 paquetes):**
+| Categoría | Paquetes |
+|-----------|----------|
+| **API** | fastapi, uvicorn, starlette |
+| **Base de datos** | sqlalchemy, alembic, psycopg2-binary, Mako, MarkupSafe |
+| **Seguridad** | python-jose, bcrypt, passlib, cryptography, cffi, pycparser, ecdsa, rsa, pyasn1 |
+| **Validación** | pydantic, pydantic-core, annotated-types, typing-extensions, email-validator, dnspython |
+| **Utilidades** | python-dotenv, python-multipart, httpx, httpcore, certifi, idna, h11, click, colorama, httptools, pyyaml, watchfiles, websockets |
+| **ML/Analytics** | **numpy, pandas, scikit-learn, scipy, joblib, threadpoolctl, python-dateutil, tzdata** |
+| **Cache** | redis, hiredis |
+| **Logging** | loguru, win32-setctime |
+| **Testing** | pytest, pytest-asyncio, iniconfig, packaging, pluggy |
+
+## 🚀 **VERIFICACIÓN FINAL**
+
+```powershell
+python -c "
+print('🔍 VERIFICANDO INSTALACIÓN COMPLETA:')
+import fastapi; print(f'✅ fastapi {fastapi.__version__}')
+import sqlalchemy; print(f'✅ sqlalchemy {sqlalchemy.__version__}')
+import numpy; print(f'✅ numpy {numpy.__version__}')
+import pandas; print(f'✅ pandas {pandas.__version__}')
+import sklearn; print(f'✅ scikit-learn {sklearn.__version__}')
+import redis; print('✅ redis')
+print('🎉 FASE 0 COMPLETADA - TODO INSTALADO CORRECTAMENTE')"
+```
+
+## 📝 **RESUMEN DE LOGROS:**
+- ✅ Python 3.14 funcionando
+- ✅ Entorno virtual creado y activado
+- ✅ **48 paquetes instalados** sin errores
+- ✅ FastAPI + Uvicorn listos
+- ✅ SQLAlchemy + Alembic para BD
+- ✅ Seguridad (JWT, bcrypt) implementada
+- ✅ **Numpy, Pandas, Scikit-learn** funcionando
+- ✅ Redis, Loguru, Pytest configurados
+
+## 🎯 **¿QUÉ SIGUE? FASE 1**
+
+Ahora podemos empezar con la **FASE 1: Infraestructura base**:
+1. Crear archivo `.env`
+2. Configurar `core/config.py`
+3. Configurar `core/database.py`
+4. Configurar `core/redis.py`
+5. Crear `docker-compose.yml`
+
+**¿Continuamos con la FASE 1?** ¡Dame la orden, hermano! 💪
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+--------------------------------------------------------------
+
 
 
 ---------------------------------------------

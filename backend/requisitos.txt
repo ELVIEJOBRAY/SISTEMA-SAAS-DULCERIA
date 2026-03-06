@@ -1,0 +1,140 @@
+﻿# ==========================================
+# SGDD BACKEND - DEPENDENCIAS PYTHON
+# COMPATIBLE CON PYTHON 3.14
+# ==========================================
+
+# ESTE ARCHIVO DEFINE TODAS LAS DEPENDENCIAS
+# NECESARIAS PARA EJECUTAR EL BACKEND DEL
+# SISTEMA SGDD BASADO EN FASTAPI.
+
+
+# ==========================================
+# API FRAMEWORK
+# ==========================================
+
+# FASTAPI ES EL FRAMEWORK PRINCIPAL PARA
+# CREAR APIS REST DE ALTO RENDIMIENTO
+# UTILIZANDO PYTHON Y ASYNCIO.
+fastapi==0.115.12
+
+# UVICORN ES EL SERVIDOR ASGI UTILIZADO
+# PARA EJECUTAR LA APLICACIÓN FASTAPI.
+# LA OPCIÓN [standard] AGREGA DEPENDENCIAS
+# ADICIONALES PARA MEJOR RENDIMIENTO.
+uvicorn[standard]==0.34.0
+
+
+# ==========================================
+# BASE DE DATOS
+# ==========================================
+
+# SQLALCHEMY ES EL ORM UTILIZADO PARA
+# MAPEAR TABLAS DE BASE DE DATOS A
+# OBJETOS PYTHON.
+sqlalchemy==2.0.40
+
+# DRIVER DE POSTGRESQL UTILIZADO PARA
+# CONECTAR PYTHON CON LA BASE DE DATOS.
+psycopg2-binary==2.9.11
+
+# ALEMBIC ES LA HERRAMIENTA DE MIGRACIONES
+# QUE PERMITE CONTROLAR CAMBIOS EN EL
+# ESQUEMA DE LA BASE DE DATOS.
+alembic==1.15.2
+
+
+# ==========================================
+# SEGURIDAD
+# ==========================================
+
+# IMPLEMENTACIÓN DE JSON WEB TOKENS (JWT)
+# UTILIZADO PARA AUTENTICACIÓN Y AUTORIZACIÓN.
+python-jose[cryptography]==3.4.0
+
+# BCRYPT SE UTILIZA PARA EL HASHING
+# SEGURO DE CONTRASEÑAS.
+bcrypt==4.3.0
+
+# PASSLIB PROPORCIONA UTILIDADES PARA
+# MANEJO DE HASHES DE CONTRASEÑAS.
+passlib[bcrypt]==1.7.4
+
+
+# ==========================================
+# VALIDACIÓN DE DATOS
+# ==========================================
+
+# PYDANTIC ES UTILIZADO POR FASTAPI
+# PARA VALIDAR Y SERIALIZAR DATOS.
+pydantic[email]==2.12.5
+
+
+# ==========================================
+# UTILIDADES
+# ==========================================
+
+# CARGA VARIABLES DE ENTORNO DESDE
+# ARCHIVOS .ENV PARA CONFIGURACIÓN
+# SEGURA DEL SISTEMA.
+python-dotenv==1.1.0
+
+# SOPORTE PARA ENVÍO DE ARCHIVOS
+# Y FORMULARIOS MULTIPART.
+python-multipart==0.0.20
+
+# CLIENTE HTTP ASÍNCRONO PARA
+# CONSUMIR APIS EXTERNAS.
+httpx==0.28.1
+
+
+# ==========================================
+# MACHINE LEARNING / ANALYTICS
+# ==========================================
+
+# LIBRERÍA PRINCIPAL DE CÁLCULO NUMÉRICO
+# UTILIZADA POR LIBRERÍAS DE CIENCIA DE DATOS.
+numpy==2.3.5
+
+# LIBRERÍA PARA MANIPULACIÓN DE DATOS
+# Y ANÁLISIS MEDIANTE DATAFRAMES.
+# VERSIÓN 3.0.1 COMPATIBLE CON PYTHON 3.14
+pandas==3.0.1
+
+# LIBRERÍA DE MACHINE LEARNING PARA
+# MODELOS DE CLASIFICACIÓN, REGRESIÓN
+# Y ANÁLISIS DE DATOS.
+# VERSIÓN 1.8.0 COMPATIBLE CON PYTHON 3.14
+scikit-learn==1.8.0
+
+
+# ==========================================
+# CACHE
+# ==========================================
+
+# CLIENTE REDIS UTILIZADO PARA
+# CACHE DE RESPUESTAS Y MEJORAR
+# EL RENDIMIENTO DEL BACKEND.
+redis[hiredis]==5.2.1
+
+
+# ==========================================
+# LOGGING
+# ==========================================
+
+# LOGURU ES UNA LIBRERÍA DE LOGS
+# AVANZADA PARA REGISTRO DE ERRORES,
+# EVENTOS Y DEPURACIÓN DEL SISTEMA.
+loguru==0.7.2
+
+
+# ==========================================
+# TESTING
+# ==========================================
+
+# FRAMEWORK DE PRUEBAS PARA
+# TESTING AUTOMATIZADO.
+pytest==8.3.5
+
+# SOPORTE PARA PRUEBAS ASÍNCRONAS
+# EN APLICACIONES FASTAPI.
+pytest-asyncio==0.23.6

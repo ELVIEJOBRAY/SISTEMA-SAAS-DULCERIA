@@ -1,0 +1,151 @@
+# ==========================================
+
+# SGDD BACKEND - DEPENDENCIAS BASE
+
+# COMPATIBLE CON PYTHON 3.14
+
+# ==========================================
+
+# ESTE ARCHIVO CONTIENE LAS DEPENDENCIAS
+
+# PRINCIPALES NECESARIAS PARA EJECUTAR
+
+# EL BACKEND DE LA APLICACIÓN.
+
+# ==========================================
+
+# API FRAMEWORK
+
+# ==========================================
+
+# FASTAPI ES EL FRAMEWORK PRINCIPAL PARA
+
+# CREAR APIS REST DE ALTO RENDIMIENTO.
+
+fastapi==0.115.12
+
+# SERVIDOR ASGI UTILIZADO PARA EJECUTAR
+
+# LA APLICACIÓN FASTAPI.
+
+uvicorn[standard]==0.34.0
+
+# ==========================================
+
+# BASE DE DATOS
+
+# ==========================================
+
+# ORM UTILIZADO PARA MAPEAR TABLAS
+
+# DE BASE DE DATOS A OBJETOS PYTHON.
+
+sqlalchemy==2.0.40
+
+# DRIVER DE POSTGRESQL COMPATIBLE
+
+# CON PYTHON 3.14.
+
+psycopg2-binary==2.9.11
+
+# SISTEMA DE MIGRACIONES
+
+# PARA CONTROLAR CAMBIOS EN LA BD.
+
+alembic==1.15.2
+
+# ==========================================
+
+# SEGURIDAD
+
+# ==========================================
+
+# IMPLEMENTACIÓN DE TOKENS JWT
+
+# PARA AUTENTICACIÓN SEGURA.
+
+python-jose[cryptography]==3.4.0
+
+# HASHING DE CONTRASEÑAS
+
+# CON ALGORITMO BCRYPT.
+
+bcrypt==4.3.0
+
+# MANEJO DE HASHES DE CONTRASEÑA.
+
+passlib[bcrypt]==1.7.4
+
+# ==========================================
+
+# VALIDACIÓN
+
+# ==========================================
+
+# VALIDACIÓN DE DATOS UTILIZADA
+
+# INTERNAMENTE POR FASTAPI.
+
+pydantic[email]==2.12.5
+
+# ==========================================
+
+# UTILIDADES
+
+# ==========================================
+
+# CARGA VARIABLES DE ENTORNO.
+
+python-dotenv==1.1.0
+
+# SOPORTE PARA FORMULARIOS
+
+# Y SUBIDA DE ARCHIVOS.
+
+python-multipart==0.0.20
+
+# CLIENTE HTTP PARA CONSUMIR
+
+# APIS EXTERNAS.
+
+httpx==0.28.1
+
+# ==========================================
+
+# ANALÍTICA Y MACHINE LEARNING
+
+# ==========================================
+
+# COMPUTACIÓN NUMÉRICA.
+
+numpy==2.3.5
+
+# MANIPULACIÓN DE DATAFRAMES.
+
+pandas==2.2.3
+
+# MACHINE LEARNING.
+
+scikit-learn==1.6.1
+
+# ==========================================
+
+# CACHE
+
+# ==========================================
+
+# CLIENTE REDIS PARA CACHE
+
+# Y MEJORAR RENDIMIENTO.
+
+redis[hiredis]==5.2.1
+
+# ==========================================
+
+# LOGGING
+
+# ==========================================
+
+# SISTEMA AVANZADO DE LOGS.
+
+loguru==0.7.2
