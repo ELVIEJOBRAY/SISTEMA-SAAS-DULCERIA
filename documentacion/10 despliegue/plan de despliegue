@@ -1,0 +1,915 @@
+Claro. Con esa estructura, te dejo un **plan de despliegue** y una **checklist de salida a producción** aterrizados para tu proyecto **SISTEMA-SAAS-DULCERIA**.
+
+---
+
+# Plan de despliegue a producción
+
+## 1. Objetivo
+
+Publicar en producción la plataforma SaaS de dulcería garantizando:
+
+* disponibilidad del frontend web y POS
+* exposición segura de la API
+* conectividad con PostgreSQL, Redis y RabbitMQ
+* trazabilidad mediante logs y monitoreo
+* capacidad de recuperación ante fallos mediante rollback y respaldos
+
+---
+
+## 2. Alcance del despliegue
+
+Componentes identificados en tu estructura:
+
+### Aplicación
+
+* `cliente/web`
+* `cliente/pos`
+* `nucleo/interfaz/api`
+* `nucleo/aplicacion`
+* `nucleo/dominio`
+* `nucleo/infraestructura`
+
+### Datos
+
+* `base_datos/esquemas`
+* `base_datos/migraciones`
+* `base_datos/semillas`
+* `infraestructura/base_datos/postgres`
+
+### Infraestructura y operación
+
+* `infraestructura/contenedores/docker`
+* `infraestructura/nginx`
+* `infraestructura/cache/redis`
+* `infraestructura/mensajeria/rabbitmq`
+* `infraestructura/monitoreo/prometheus`
+* `infraestructura/monitoreo/grafana`
+* `infraestructura/registros/loki`
+* `infraestructura/registros/promtail`
+* `infraestructura/seguridad/secrets`
+* `infraestructura/terraform/aws`
+* `.github/workflows`
+
+---
+
+## 3. Estrategia de despliegue recomendada
+
+Para tu caso, la mejor estrategia inicial es:
+
+**staging -> validación -> producción con rollback inmediato**
+
+Y operativamente:
+
+* despliegue por contenedores
+* migraciones controladas de base de datos
+* smoke tests después del release
+* rollback a versión anterior si falla salud, login, inventario o ventas
+
+Si más adelante maduras el pipeline, puedes pasar a:
+
+* **rolling update** para bajo impacto
+* **blue-green** para máxima seguridad
+
+---
+
+## 4. Entornos propuestos
+
+## Desarrollo
+
+Uso local del equipo para implementación y pruebas.
+
+## Staging
+
+Entorno espejo de producción para validar:
+
+* build final
+* variables reales no sensibles
+* migraciones
+* pruebas e2e
+* observabilidad
+
+## Producción
+
+Entorno expuesto al usuario final con:
+
+* dominio
+* SSL
+* monitoreo activo
+* respaldos automáticos
+* políticas de seguridad
+
+---
+
+## 5. Secuencia de despliegue
+
+## Fase 1. Congelamiento de release
+
+Antes de publicar:
+
+* cerrar cambios funcionales
+* definir versión
+* consolidar rama de release
+* actualizar documentación mínima de operación
+* validar que no existan migraciones incompletas
+
+**Salida esperada:** versión candidata estable.
+
+---
+
+## Fase 2. Preparación técnica
+
+### Backend
+
+Revisar:
+
+* configuración de `nucleo/interfaz/api`
+* dependencias y variables
+* compatibilidad con PostgreSQL, Redis, RabbitMQ
+* conexión con servicios externos si aplica
+
+### Frontend
+
+Revisar:
+
+* `cliente/web`
+* `cliente/pos`
+* URLs de API por entorno
+* modo producción
+* assets estáticos
+
+### Infraestructura
+
+Revisar:
+
+* `infraestructura/contenedores/docker`
+* `infraestructura/nginx`
+* `infraestructura/seguridad/secrets`
+* `infraestructura/terraform/aws`
+
+**Salida esperada:** artefactos listos para desplegar.
+
+---
+
+## Fase 3. Base de datos
+
+Pasos:
+
+1. generar respaldo previo
+2. validar scripts en `base_datos/migraciones`
+3. aplicar migraciones en staging
+4. probar integridad de datos
+5. definir orden exacto de ejecución en producción
+
+**Regla clave:** nunca desplegar aplicación nueva sin tener lista la estrategia de migración y reversión.
+
+---
+
+## Fase 4. Validación en staging
+
+Ejecutar:
+
+* pruebas unitarias
+* pruebas de integración
+* pruebas e2e críticas
+* login
+* catálogo
+* inventario
+* POS
+* ventas
+* reportes principales
+
+Rutas base según tu estructura de pruebas:
+
+* `pruebas/unitarias`
+* `pruebas/integracion`
+* `pruebas/e2e`
+
+**Salida esperada:** aprobación técnica para producción.
+
+---
+
+## Fase 5. Despliegue en producción
+
+Orden recomendado:
+
+1. activar ventana de despliegue
+2. tomar respaldo de base de datos
+3. desplegar infraestructura necesaria
+4. actualizar secretos y variables
+5. aplicar migraciones
+6. desplegar backend API
+7. desplegar frontend web
+8. desplegar frontend POS
+9. verificar Nginx y SSL
+10. validar monitoreo y logs
+11. ejecutar smoke tests
+
+---
+
+## Fase 6. Verificación post-despliegue
+
+Validar al menos:
+
+* acceso al dominio
+* login correcto
+* emisión de token/sesión
+* carga de dashboard
+* consulta de inventario
+* registro de venta
+* persistencia en base de datos
+* colas/mensajería operativas
+* caché sin errores
+* logs visibles en Loki
+* métricas visibles en Prometheus/Grafana
+
+---
+
+## Fase 7. Cierre
+
+* documentar versión desplegada
+* registrar incidentes
+* registrar tiempos del despliegue
+* registrar ajustes pendientes
+* formalizar aceptación de salida a producción
+
+---
+
+# Plan técnico por componente
+
+## A. Frontend web y POS
+
+Ubicación:
+
+* `cliente/web`
+* `cliente/pos`
+
+Validar:
+
+* build producción
+* variables públicas correctas
+* endpoint API correcto
+* manejo de rutas
+* autenticación
+* carga de recursos estáticos
+
+### Riesgos
+
+* apuntar a API incorrecta
+* variables vacías
+* errores CORS
+* rutas rotas tras Nginx
+
+---
+
+## B. API
+
+Ubicación:
+
+* `nucleo/interfaz/api`
+* `nucleo/aplicacion`
+* `nucleo/dominio`
+* `nucleo/infraestructura`
+
+Validar:
+
+* health check
+* conexión DB
+* conexión Redis
+* conexión RabbitMQ
+* autenticación/autorización
+* compatibilidad de esquemas
+
+### Riesgos
+
+* migraciones incompatibles
+* secretos mal cargados
+* errores de permisos
+* timeouts
+
+---
+
+## C. Base de datos
+
+Ubicación:
+
+* `base_datos/*`
+* `infraestructura/base_datos/postgres`
+
+Validar:
+
+* respaldo previo
+* migraciones ordenadas
+* índices
+* constraints
+* semillas necesarias para catálogo inicial o roles
+
+### Riesgos
+
+* pérdida de datos
+* migraciones no reversibles
+* tiempos largos de bloqueo
+
+---
+
+## D. Infraestructura
+
+Ubicación:
+
+* `infraestructura/*`
+
+Validar:
+
+* Docker/compose o manifiestos equivalentes
+* reverse proxy Nginx
+* SSL
+* monitoreo
+* logging centralizado
+* secretos
+* provisión AWS con Terraform si aplica
+
+### Riesgos
+
+* puertos mal expuestos
+* certificados vencidos
+* variables no montadas
+* storage no persistente
+
+---
+
+# Roles sugeridos
+
+## Responsable de aplicación
+
+Valida frontend, backend y smoke tests.
+
+## Responsable de base de datos
+
+Ejecuta respaldo, migraciones y verificación de integridad.
+
+## Responsable de infraestructura
+
+Despliega contenedores, proxy, secretos, monitoreo y rollback.
+
+## Responsable funcional
+
+Valida flujo de negocio crítico:
+
+* login
+* inventario
+* ventas
+* reportes
+
+---
+
+# Criterios de éxito
+
+El despliegue se considera exitoso si:
+
+* aplicación accesible por dominio productivo
+* API responde sin errores críticos
+* módulos críticos operan correctamente
+* no hay errores severos en logs
+* métricas y monitoreo están activos
+* base de datos consistente
+* usuarios pueden operar ventas e inventario
+
+---
+
+# Plan de rollback
+
+Si falla cualquier validación crítica:
+
+## Disparadores de rollback
+
+* API no inicia
+* login falla
+* error de conexión a base de datos
+* inventario o ventas no operativos
+* migración inconsistente
+* errores masivos 5xx
+* frontend inutilizable
+
+## Acciones
+
+1. retirar versión nueva
+2. redeploy de última versión estable
+3. restaurar configuración previa
+4. revertir migración si es segura y ya fue validada
+5. si no es reversible, restaurar respaldo
+6. revalidar health checks
+
+## Requisito
+
+Debe existir:
+
+* backup previo
+* versión estable etiquetada
+* procedimiento de restauración probado
+
+---
+
+# Checklist de salida a producción
+
+## 1. Gobierno del release
+
+* [ ] versión del release definida
+* [ ] rama de release creada o congelada
+* [ ] changelog preparado
+* [ ] alcance aprobado
+* [ ] responsables asignados
+* [ ] ventana de despliegue definida
+
+## 2. Código y calidad
+
+* [ ] código integrado sin conflictos
+* [ ] revisión técnica completada
+* [ ] pruebas unitarias aprobadas
+* [ ] pruebas de integración aprobadas
+* [ ] pruebas e2e críticas aprobadas
+* [ ] sin errores bloqueantes abiertos
+
+## 3. Frontend
+
+* [ ] build de `cliente/web` exitoso
+* [ ] build de `cliente/pos` exitoso
+* [ ] variables de entorno correctas
+* [ ] endpoint de API configurado a producción
+* [ ] assets estáticos generados
+* [ ] autenticación validada
+* [ ] navegación principal validada
+
+## 4. Backend / API
+
+* [ ] API compila/inicia correctamente
+* [ ] health check implementado y validado
+* [ ] variables de entorno configuradas
+* [ ] conexión a PostgreSQL correcta
+* [ ] conexión a Redis correcta
+* [ ] conexión a RabbitMQ correcta
+* [ ] permisos y seguridad validados
+* [ ] logs estructurados habilitados
+
+## 5. Base de datos
+
+* [ ] respaldo previo generado
+* [ ] migraciones revisadas
+* [ ] migraciones probadas en staging
+* [ ] plan de reversión definido
+* [ ] semillas necesarias identificadas
+* [ ] integridad de datos validada
+
+## 6. Infraestructura
+
+* [ ] imágenes o artefactos generados
+* [ ] contenedores configurados
+* [ ] Nginx configurado
+* [ ] certificados SSL instalados
+* [ ] secretos montados correctamente
+* [ ] volúmenes persistentes verificados
+* [ ] puertos y red validados
+* [ ] reglas de firewall o security groups revisadas
+
+## 7. Observabilidad
+
+* [ ] Prometheus recolectando métricas
+* [ ] Grafana con dashboards operativos
+* [ ] Loki recibiendo logs
+* [ ] Promtail enviando logs
+* [ ] alertas mínimas activas
+* [ ] logs de backend y proxy visibles
+
+## 8. Seguridad
+
+* [ ] secretos fuera del código fuente
+* [ ] credenciales de producción actualizadas
+* [ ] CORS configurado correctamente
+* [ ] headers de seguridad revisados
+* [ ] acceso administrativo restringido
+* [ ] respaldos protegidos
+* [ ] permisos mínimos aplicados
+
+## 9. Despliegue
+
+* [ ] orden de ejecución documentado
+* [ ] migraciones aplicadas
+* [ ] backend desplegado
+* [ ] frontend web desplegado
+* [ ] frontend POS desplegado
+* [ ] servicios auxiliares verificados
+* [ ] dominio resolviendo correctamente
+
+## 10. Validación post-producción
+
+* [ ] login exitoso
+* [ ] dashboard carga correctamente
+* [ ] catálogo visible
+* [ ] inventario funcional
+* [ ] venta de prueba ejecutada
+* [ ] reporte básico consultado
+* [ ] sesión y permisos correctos
+* [ ] respuesta de API estable
+* [ ] sin errores críticos en logs
+* [ ] monitoreo estable durante observación inicial
+
+## 11. Rollback
+
+* [ ] versión anterior disponible
+* [ ] backup accesible
+* [ ] procedimiento documentado
+* [ ] responsables conocen criterios de reversión
+
+## 12. Cierre
+
+* [ ] acta de despliegue registrada
+* [ ] versión publicada documentada
+* [ ] incidencias registradas
+* [ ] acciones de mejora listadas
+
+---
+
+# Recomendación específica para tu estructura
+
+Viendo tu árbol, tu salida a producción debería apoyarse en estos artefactos mínimos:
+
+* `.github/workflows` para CI/CD
+* `infraestructura/contenedores/docker` para empaquetado
+* `infraestructura/nginx` para publicación
+* `infraestructura/seguridad/secrets` para secretos
+* `infraestructura/monitoreo` y `infraestructura/registros` para observabilidad
+* `base_datos/migraciones` y `base_datos/respaldos` para control de datos
+* `pruebas/e2e`, `pruebas/integracion`, `pruebas/unitarias` para gate de calidad
+
+---
+
+# Orden operativo recomendado el día del release
+
+1. respaldo de base de datos
+2. validación de secretos y variables
+3. build de backend y frontends
+4. despliegue de servicios base
+5. migraciones
+6. despliegue API
+7. despliegue web/POS
+8. smoke tests
+9. monitoreo intensivo
+10. cierre o rollback
+
+---
+
+Puedo darte el siguiente paso ya armado como **documento operativo listo para pegar en `documentacion/06-operacion/plan_despliegue_produccion.md`**.
+
+
+
+
+
+
+
+
+Listo: **despliegue aprobado con observaciones menores**.
+
+## Dictamen final
+
+**Estado:** Aprobado para salida controlada.
+
+### Validaciones superadas
+
+* Frontend responde en `http://localhost:5173` con **200 OK**
+* Backend expone documentación en `http://localhost:8000/docs` con **200 OK**
+* Contenedores activos:
+
+  * `dulceria_frontend`
+  * `dulceria_backend`
+  * `dulceria_postgres`
+  * `dulceria_redis`
+* PostgreSQL y Redis están **healthy**
+* `docker compose ps` muestra todos los servicios arriba
+* Logs del backend sin errores críticos de arranque
+* Logs del frontend/Nginx normales
+* Rutas SPA del frontend responden:
+
+  * `/login`
+  * `/dashboard`
+  * `/productos`
+  * `/inventario`
+  * `/pos`
+  * `/clientes`
+  * `/proveedores`
+  * `/reportes`
+* Tests automatizados aprobados
+* Build frontend aprobado
+* Migraciones detectadas
+* Respaldos presentes
+
+## Observaciones
+
+La única alerta real es esta:
+
+* `GET /` en backend devuelve **404 Not Found**
+
+Eso **no bloquea** el despliegue, porque en FastAPI puede ser totalmente válido si la raíz no está definida y el acceso oficial es por `/docs` o por rutas `/api/...`.
+
+## Conclusión técnica
+
+Tu sistema ya no está solo “listo para pruebas”; está en un estado de:
+
+**despliegue técnico exitoso en entorno dockerizado, estable y verificable**.
+
+## Acta breve de aprobación
+
+Puedes registrar esto en tu documentación:
+
+```txt
+ACTA DE VALIDACION DE DESPLIEGUE
+
+Proyecto: SISTEMA-SAAS-DULCERIA
+Fecha: 15-03-2026
+Resultado: APROBADO CON OBSERVACIONES MENORES
+
+Resumen:
+- El frontend respondió correctamente con código 200.
+- El backend respondió correctamente en /docs con código 200.
+- Los servicios backend, frontend, PostgreSQL y Redis permanecieron activos durante la validación.
+- PostgreSQL y Redis reportaron estado healthy.
+- Las pruebas unitarias, de integración y e2e fueron satisfactorias.
+- Se detectaron migraciones y carpeta de respaldos.
+- No se observaron errores críticos en logs de arranque.
+
+Observaciones:
+- La ruta raíz del backend (/) responde 404 Not Found. Esto no bloquea la operación mientras las rutas funcionales y /docs permanezcan accesibles.
+
+Decision:
+- Se aprueba el sistema para salida controlada a producción o staging productivo.
+```
+
+## Recomendación final antes de producción real
+
+Haz estas tres mejoras de cierre:
+
+1. crear endpoint de salud en backend, por ejemplo `/health`
+2. formalizar dependencias backend con `requirements.txt` o `pyproject.toml`
+3. integrar esta validación al pipeline de `.github/workflows`
+
+## Comando final de evidencia
+
+Para guardar la evidencia del estado final:
+
+```powershell
+docker compose ps
+docker logs dulceria_backend --tail 100
+docker logs dulceria_frontend --tail 100
+```
+
+## Veredicto final
+
+**Sí: puedes pasar a la fase de despliegue formal.**
+
+Si quieres, te redacto ahora mismo el **documento final `plan_despliegue_produccion.md`** con estado “aprobado” listo para pegar en tu carpeta `documentacion/06-operacion/`.
+
+
+
+
+------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+Claro. Te dejo ambas piezas listas para usar: **el acta final** y una **tesis base** sobre la validación y despliegue del sistema.
+
+# Acta final de validación y despliegue
+
+**Proyecto:** SISTEMA-SAAS-DULCERIA
+**Fecha:** 15 de marzo de 2026
+**Lugar:** Entorno local dockerizado / preproducción técnica
+**Responsable:** Bryan Stiven B
+**Resultado:** **APROBADO CON OBSERVACIÓN MENOR**
+
+## 1. Objeto del acta
+
+Dejar constancia de la validación técnica final del sistema **SISTEMA-SAAS-DULCERIA**, incluyendo pruebas funcionales, disponibilidad de servicios, estado de contenedores, verificación de logs y preparación para despliegue formal.
+
+## 2. Componentes verificados
+
+Se validaron los siguientes componentes del sistema:
+
+* Frontend web
+* Backend API
+* Base de datos PostgreSQL
+* Servicio de caché Redis
+* Contenedores Docker
+* Orquestación con Docker Compose
+* Migraciones de base de datos
+* Carpeta de respaldos
+* Pruebas unitarias
+* Pruebas de integración
+* Pruebas e2e
+
+## 3. Evidencia de validación
+
+Durante la ejecución de la validación se obtuvo el siguiente resultado:
+
+### 3.1 Frontend
+
+* Build de producción ejecutado correctamente.
+* Respuesta satisfactoria en `http://localhost:5173`.
+* Código HTTP obtenido: **200 OK**.
+* Las rutas principales del sistema fueron servidas correctamente por Nginx:
+
+  * `/`
+  * `/login`
+  * `/dashboard`
+  * `/productos`
+  * `/inventario`
+  * `/pos`
+  * `/clientes`
+  * `/proveedores`
+  * `/reportes`
+
+### 3.2 Backend
+
+* El backend inició correctamente con Uvicorn.
+* La documentación técnica de la API estuvo disponible en `http://localhost:8000/docs`.
+* Código HTTP obtenido en `/docs`: **200 OK**.
+* No se detectaron errores críticos de arranque en los logs.
+
+### 3.3 Base de datos y caché
+
+* PostgreSQL se encontró activo y en estado **healthy**.
+* Redis se encontró activo y en estado **healthy**.
+
+### 3.4 Docker Compose
+
+Se confirmó la ejecución correcta de los siguientes servicios:
+
+* `dulceria_backend`
+* `dulceria_frontend`
+* `dulceria_postgres`
+* `dulceria_redis`
+
+Todos los servicios se encontraron en estado **Up**, y los servicios de datos en estado **healthy** cuando aplicó.
+
+### 3.5 Pruebas automatizadas
+
+Se registró ejecución satisfactoria de:
+
+* Pruebas unitarias: aprobadas
+* Pruebas de integración: aprobadas
+* Pruebas e2e: aprobadas
+
+### 3.6 Migraciones y respaldos
+
+* Se detectaron migraciones de base de datos disponibles.
+* Se verificó la existencia de la carpeta de respaldos.
+
+## 4. Observación registrada
+
+Se identificó la siguiente observación menor:
+
+* La ruta raíz del backend (`/`) respondió con **404 Not Found**.
+
+Esta observación no bloquea la aprobación del sistema debido a que:
+
+* la API se encuentra operativa,
+* la documentación `/docs` responde correctamente,
+* y los servicios funcionales principales están disponibles.
+
+## 5. Conclusión
+
+Con base en la evidencia recolectada, se concluye que el sistema **SISTEMA-SAAS-DULCERIA** cumple con las condiciones técnicas mínimas necesarias para su **despliegue formal en un entorno controlado**, ya sea en staging productivo o en producción supervisada.
+
+## 6. Decisión
+
+**Se aprueba el despliegue técnico del sistema con observación menor no bloqueante.**
+
+## 7. Recomendaciones
+
+Antes del paso definitivo a producción, se recomienda:
+
+1. Implementar un endpoint de salud del backend, por ejemplo `/health`.
+2. Formalizar las dependencias del backend en `requirements.txt` o `pyproject.toml`.
+3. Integrar estas validaciones en el pipeline CI/CD.
+4. Mantener evidencia de logs, estado de contenedores y pruebas ejecutadas.
+5. Documentar el procedimiento de rollback.
+
+**Firma responsable:**
+Bryan Stiven B
+
+---
+
+# Tesis base del proyecto
+
+## Título
+
+**Diseño, validación y despliegue de un sistema SaaS para la gestión operativa de una dulcería mediante arquitectura modular, contenedores Docker y pruebas automatizadas**
+
+## Resumen
+
+La presente tesis expone el diseño, construcción, validación y despliegue de un sistema SaaS orientado a la gestión integral de una dulcería. El sistema fue concebido para atender procesos críticos del negocio, incluyendo inventario, catálogo, clientes, proveedores, punto de venta y reportes, mediante una arquitectura modular que separa dominio, aplicación, infraestructura e interfaz.
+
+La solución implementada integra un frontend web, un backend API, una base de datos PostgreSQL, Redis como servicio de soporte y una estrategia de despliegue basada en contenedores Docker y Docker Compose. Para asegurar la calidad del sistema, se aplicaron pruebas unitarias, pruebas de integración y pruebas end-to-end, además de validaciones de build, disponibilidad de servicios y revisión de logs de ejecución.
+
+Los resultados obtenidos muestran que el sistema compila correctamente, mantiene disponibilidad estable de sus componentes principales, supera satisfactoriamente las pruebas automatizadas definidas y se encuentra apto para un despliegue controlado en un entorno de producción. El trabajo concluye que la adopción de una arquitectura desacoplada, junto con pruebas automatizadas y despliegue containerizado, mejora la confiabilidad, escalabilidad y mantenibilidad de soluciones SaaS para pequeñas y medianas operaciones comerciales.
+
+## Planteamiento del problema
+
+Muchas pequeñas empresas del sector comercial aún operan con procesos manuales o con herramientas desconectadas entre sí para controlar inventario, ventas, clientes y proveedores. Esta fragmentación provoca errores en el registro de productos, dificultades para conocer existencias reales, poca trazabilidad de movimientos y escasa capacidad para generar reportes oportunos para la toma de decisiones.
+
+En el contexto de una dulcería, estos problemas afectan directamente la operación diaria, ya que el control del stock, la rotación de productos, la atención en punto de venta y la consulta de reportes son procesos permanentes. La ausencia de una plataforma centralizada limita la eficiencia operativa y dificulta la evolución del negocio hacia un modelo digital más ordenado y escalable.
+
+## Justificación
+
+El desarrollo de un sistema SaaS para la gestión de una dulcería se justifica por la necesidad de disponer de una solución centralizada, accesible y mantenible que permita automatizar procesos operativos clave. Una plataforma con módulos especializados reduce errores humanos, mejora la visibilidad del estado del negocio y facilita la administración de la información en tiempo real.
+
+Además, desde una perspectiva técnica, el proyecto demuestra el valor de combinar arquitectura de software por capas, prácticas de dominio, pruebas automatizadas y despliegue con contenedores. Esta combinación no solo resuelve necesidades funcionales inmediatas, sino que también establece una base sólida para la evolución futura del sistema.
+
+## Objetivo general
+
+Desarrollar y validar un sistema SaaS para la gestión integral de una dulcería, capaz de administrar inventario, ventas, catálogo, clientes, proveedores y reportes, mediante una arquitectura modular y un despliegue containerizado confiable.
+
+## Objetivos específicos
+
+* Diseñar una arquitectura organizada por dominios y capas para separar responsabilidades del sistema.
+* Implementar módulos funcionales para inventario, ventas, catálogo, organización e identidad y acceso.
+* Desarrollar un frontend web orientado a la operación administrativa y comercial.
+* Construir una API backend para exponer los servicios del sistema.
+* Integrar servicios de persistencia y soporte como PostgreSQL y Redis.
+* Aplicar pruebas unitarias, de integración y e2e para validar el comportamiento del sistema.
+* Ejecutar una validación técnica de despliegue utilizando Docker y Docker Compose.
+* Determinar el nivel de preparación del sistema para su salida a producción.
+
+## Hipótesis
+
+Si se implementa un sistema SaaS basado en arquitectura modular, respaldado por pruebas automatizadas y desplegado mediante contenedores Docker, entonces será posible mejorar la confiabilidad operativa, la mantenibilidad del software y la preparación para producción de la gestión de una dulcería.
+
+## Marco metodológico
+
+El desarrollo del proyecto se apoyó en una metodología incremental, en la que se definieron módulos funcionales del dominio y se validaron progresivamente a través de pruebas automatizadas y despliegues controlados. La organización del código siguió una estructura separada entre cliente, núcleo de negocio, infraestructura, pruebas y documentación.
+
+La validación técnica incluyó:
+
+* compilación del frontend,
+* ejecución de pruebas unitarias,
+* ejecución de pruebas de integración,
+* ejecución de pruebas e2e,
+* verificación de variables de entorno,
+* revisión de migraciones y respaldos,
+* arranque de servicios en Docker,
+* comprobación de disponibilidad HTTP,
+* análisis de logs de backend y frontend.
+
+## Desarrollo
+
+El sistema fue estructurado en varios niveles. En el cliente se definieron componentes para web y POS. En el núcleo se organizaron módulos de aplicación, dominio, infraestructura e interfaz API, distribuidos por contextos como catálogo, inventario, ventas, organización e identidad y acceso. Esta separación favoreció la mantenibilidad y la claridad en la evolución del sistema.
+
+La infraestructura se complementó con recursos para PostgreSQL, Redis, Nginx, monitoreo, registros y secretos. El uso de Docker permitió encapsular cada servicio y hacer reproducible el entorno de ejecución. Docker Compose facilitó la coordinación de los servicios principales del sistema, simplificando tanto el levantamiento local como la validación del despliegue.
+
+## Resultados
+
+Durante la validación final del sistema se obtuvieron los siguientes resultados:
+
+* El frontend respondió correctamente con código HTTP 200.
+* El backend expuso su documentación técnica con código HTTP 200.
+* PostgreSQL y Redis se mantuvieron activos y saludables.
+* Los contenedores principales permanecieron arriba de forma estable.
+* Las pruebas unitarias, de integración y e2e fueron aprobadas.
+* Se verificó la presencia de migraciones y respaldos.
+* No se encontraron errores críticos de arranque en los logs.
+
+Estos resultados permiten concluir que la solución alcanzó un estado de madurez técnica suficiente para una liberación controlada.
+
+## Conclusiones
+
+Primera, la arquitectura modular adoptada permitió organizar adecuadamente la lógica del negocio y separar responsabilidades entre capas, facilitando la comprensión y evolución del sistema.
+
+Segunda, la incorporación de pruebas automatizadas aportó confianza sobre el comportamiento del módulo validado, especialmente en el dominio de inventario, y constituyó una base sólida para futuras ampliaciones del sistema.
+
+Tercera, el despliegue con Docker y Docker Compose demostró ser una estrategia eficaz para validar el entorno de ejecución de manera reproducible, rápida y controlada.
+
+Cuarta, la evidencia técnica obtenida indica que el sistema está en condiciones de pasar a un entorno de producción controlado, aunque aún existen mejoras recomendadas, como la incorporación de un endpoint de salud y la formalización de dependencias del backend.
+
+## Recomendaciones
+
+* Implementar un endpoint `/health` para supervisión operativa.
+* Completar la formalización del backend con gestión explícita de dependencias.
+* Incorporar validación automática en el pipeline de integración continua.
+* Extender la cobertura de pruebas a más módulos funcionales.
+* Fortalecer la documentación operativa y de rollback.
+* Preparar métricas y alertas para producción.
+
+## Aporte del proyecto
+
+Este trabajo aporta una solución funcional y una base metodológica para la digitalización operativa de negocios minoristas, demostrando que una arquitectura bien organizada, acompañada de automatización y despliegue controlado, puede elevar de manera significativa la calidad y confiabilidad de sistemas orientados a operaciones comerciales reales.
+
+---
+
+Si quieres, te lo convierto en una **versión más académica, tipo tesis universitaria completa con introducción, capítulos y bibliografía simulada**, o en una **versión ejecutiva lista para entregar al jurado**.
+
+

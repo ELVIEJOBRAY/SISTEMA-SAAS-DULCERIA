@@ -1,0 +1,18 @@
+﻿INFO:     172.24.0.1:41092 - "GET /docs HTTP/1.1" 200 OK
+docker : INFO:     Started server process [1]
+En línea: 2 Carácter: 1
++ docker logs dulceria_backend --tail 100 2>&1 | Out-File 
+.\documentaci ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (INFO:     Star 
+   ted server process [1]:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+INFO:     172.24.0.1:41092 - "GET /openapi.json HTTP/1.1" 200 OK
+INFO:     172.24.0.1:60702 - "GET / HTTP/1.1" 404 Not Found
+INFO:     172.24.0.1:40926 - "GET /docs HTTP/1.1" 200 OK
+INFO:     172.24.0.1:34828 - "GET /docs HTTP/1.1" 200 OK
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press 
+CTRL+C to quit)

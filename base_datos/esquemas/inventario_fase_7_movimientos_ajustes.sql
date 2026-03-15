@@ -1,0 +1,2 @@
+﻿-- Esquema base de referencia para la Fase 7
+-- Mantener sincronizado con la migracion oficial

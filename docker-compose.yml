@@ -1,0 +1,79 @@
+﻿# COMPOSE CANONICO DEL PROYECTO
+# Uso principal:
+#   docker compose up --build -d
+# Variables requeridas por entorno:
+#   POSTGRES_PASSWORD
+#   JWT_SECRET
+#   DATABASE_URL
+# Este es el archivo principal de arranque local.
+services:
+  postgres:
+    image: postgres:15
+    container_name: dulceria_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app_user -d app_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7
+    container_name: dulceria_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: dulceria_backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      REDIS_URL: ${REDIS_URL}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_ALGORITHM: ${JWT_ALGORITHM}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS}
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+
+  frontend:
+    build:
+      context: ./cliente/web
+      dockerfile: Dockerfile
+    container_name: dulceria_frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "5173:80"
+
+volumes:
+  postgres_data:
+
+
+
+

@@ -1,0 +1,429 @@
+ERP-SAAS-DULCERIA
+│
+├── .github
+│   └── workflows
+│       # [CI/CD] AUTOMATIZACIÓN DE PIPELINES DE INTEGRACIÓN Y ENTREGA CONTINUA
+│       # RESPONSABILIDAD: Garantizar la reproducibilidad, calidad y trazabilidad
+│       # de cada cambio desplegado al sistema.
+│       # CONTROLES:
+│       #   · Pipeline de build con validación de dependencias
+│       #   · Ejecución automatizada de suite de pruebas (unit, integration, e2e)
+│       #   · Análisis estático de código (linting, cobertura mínima requerida)
+│       #   · Aprobación obligatoria antes de despliegue a producción
+│       # EVIDENCIA DE AUDITORÍA: Logs de ejecución, artefactos generados por run
+│
+├── .vscode
+│   # [DEV-ENV] CONFIGURACIÓN ESTANDARIZADA DEL ENTORNO DE DESARROLLO
+│   # RESPONSABILIDAD: Asegurar homogeneidad en el entorno de todos los
+│   # desarrolladores, reduciendo el riesgo de errores por inconsistencias locales.
+│   # CONTROLES:
+│   #   · Extensiones requeridas definidas (extensions.json)
+│   #   · Reglas de formateo y linting unificadas
+│   #   · Configuraciones no deben contener secretos ni credenciales
+│
+├── api
+│   └── v1
+│       # [API-GATEWAY] CAPA DE EXPOSICIÓN PÚBLICA DE SERVICIOS DEL ERP — VERSIÓN 1
+│       # RESPONSABILIDAD: Proveer contratos estables y versionados para la
+│       # comunicación entre el frontend, integraciones externas y microservicios.
+│       # CONTROLES:
+│       #   · Versionado explícito para garantizar compatibilidad hacia atrás
+│       #   · Validación de esquemas de entrada y salida (request/response)
+│       #   · Autenticación y autorización verificada en cada endpoint
+│       #   · Rate limiting aplicado para prevenir abuso de la API
+│       # RIESGO: Exposición de datos sensibles si los controles de acceso fallan
+│
+├── backups
+│   # [BACKUP] DIRECTORIO DE RESPALDOS OPERACIONALES DEL SISTEMA
+│   # RESPONSABILIDAD: Garantizar la disponibilidad de copias de seguridad
+│   # válidas y recuperables ante fallos, incidentes o pérdida de datos.
+│   # CONTROLES:
+│   #   · Frecuencia de respaldo definida y documentada (diario/semanal/mensual)
+│   #   · Verificación periódica de integridad de los respaldos generados
+│   #   · Retención y rotación de backups conforme a política de datos
+│   #   · Respaldos cifrados en reposo; acceso restringido por rol
+│   # CRITICIDAD: ALTA — La ausencia de respaldos válidos constituye un riesgo
+│   # operativo y de cumplimiento normativo
+│
+├── base_datos
+│   ├── esquemas
+│   │   # [DB-SCHEMA] DEFINICIÓN ESTRUCTURAL DEL MODELO RELACIONAL DEL ERP
+│   │   # RESPONSABILIDAD: Representar formalmente las entidades del negocio
+│   │   # y sus relaciones, asegurando integridad referencial y consistencia.
+│   │   # CONTROLES:
+│   │   #   · Esquemas revisados y aprobados antes de aplicar en producción
+│   │   #   · Normalización validada para evitar redundancia e inconsistencias
+│   │   #   · Restricciones de integridad (PK, FK, NOT NULL, UNIQUE) definidas
+│
+│   ├── migraciones
+│   │   # [DB-MIGRATIONS] CONTROL DE VERSIONES DEL ESQUEMA DE BASE DE DATOS
+│   │   # RESPONSABILIDAD: Permitir la evolución controlada y auditada de la
+│   │   # estructura de datos sin pérdida de información ni interrupción del servicio.
+│   │   # CONTROLES:
+│   │   #   · Toda migración debe ser reversible (up/down definidos)
+│   │   #   · Historial de migraciones aplicadas registrado y trazable
+│   │   #   · Probadas en entorno de staging antes de ejecutarse en producción
+│   │   #   · Aprobación requerida para migraciones destructivas (DROP, ALTER)
+│
+│   ├── respaldos
+│   │   # [DB-BACKUP] ALMACENAMIENTO DE COPIAS DE SEGURIDAD DE LA BASE DE DATOS
+│   │   # Ver controles en /backups — aplican los mismos lineamientos de
+│   │   # retención, cifrado y verificación de integridad
+│
+│   └── semillas
+│       # [DB-SEED] DATOS INICIALES Y DE CONFIGURACIÓN BASE DEL SISTEMA
+│       # RESPONSABILIDAD: Proveer el estado mínimo requerido para la operación
+│       # del sistema en entornos nuevos o restaurados.
+│       # CONTENIDO CONTROLADO:
+│       #   · Roles y permisos base del sistema
+│       #   · Usuario administrador inicial (credenciales temporales documentadas)
+│       #   · Parámetros de configuración por defecto
+│       # ADVERTENCIA: Los datos de semilla NO deben contener información real
+│       # de clientes, empleados ni credenciales de producción
+│
+├── cliente
+│   │
+│   ├── dist
+│   │   # [FRONTEND-BUILD] ARTEFACTOS COMPILADOS LISTOS PARA DESPLIEGUE EN PRODUCCIÓN
+│   │   # RESPONSABILIDAD: Contener únicamente la versión aprobada y firmada
+│   │   # del frontend, generada por el pipeline de CI/CD.
+│   │   # CONTROL: Este directorio NO debe modificarse manualmente;
+│   │   # toda actualización debe pasar por el proceso de build automatizado
+│
+│   ├── mobile
+│   │   # [MOBILE-APP] MÓDULO DE APLICACIÓN MÓVIL DEL ERP (EN DESARROLLO)
+│   │   # RESPONSABILIDAD FUTURA: Extender las capacidades operativas del sistema
+│   │   # a dispositivos móviles con controles de seguridad equivalentes al cliente web.
+│   │   # ESTADO: Pendiente de desarrollo — no operativo en producción
+│
+│   ├── pos
+│   │   # [POS] INTERFAZ DEL PUNTO DE VENTA — MÓDULO CRÍTICO DE OPERACIÓN
+│   │   # RESPONSABILIDAD: Registrar transacciones de venta en tiempo real
+│   │   # con trazabilidad completa por cajero, turno y terminal.
+│   │   # CRITICIDAD: ALTA — Punto de captura de ingresos; errores aquí
+│   │   # impactan directamente los registros contables y de inventario
+│   │
+│   │   ├── componentes
+│   │   │   # [POS-UI] COMPONENTES VISUALES REUTILIZABLES DEL PUNTO DE VENTA
+│   │   │   # Deben cumplir estándares de accesibilidad y usabilidad operativa
+│   │
+│   │   ├── paginas
+│   │   │   # [POS-VIEWS] VISTAS PRINCIPALES DEL SISTEMA POS
+│   │   │   # Incluye: pantalla de cobro, selección de productos,
+│   │   │   # apertura/cierre de caja, resumen de turno
+│   │
+│   │   └── servicios
+│   │       # [POS-SERVICES] CAPA DE COMUNICACIÓN DEL POS CON LA API DEL ERP
+│   │       # Gestiona sincronización de ventas, productos y estado de caja
+│
+│   └── web
+│       │
+│       ├── public
+│       │   # [WEB-STATIC] ACTIVOS ESTÁTICOS PÚBLICOS DEL FRONTEND WEB
+│       │   # Contenido: íconos, favicon, manifest de la aplicación
+│       │   # CONTROL: No debe contener información sensible ni credenciales
+│
+│       └── src
+│           │
+│           ├── componentes
+│           │   # [WEB-COMPONENTS] BIBLIOTECA DE COMPONENTES UI REUTILIZABLES
+│           │   # Deben seguir el sistema de diseño definido para consistencia visual
+│
+│           ├── hooks
+│           │   # [WEB-HOOKS] HOOKS PERSONALIZADOS DE REACT
+│           │   # Encapsulan lógica de negocio reutilizable en el lado del cliente
+│
+│           ├── paginas
+│           │   # [WEB-PAGES] VISTAS PRINCIPALES DEL SISTEMA ERP
+│           │   # Módulos: Dashboard, Inventario, Clientes, Ventas,
+│           │   # Reportes, Configuración del sistema
+│
+│           ├── servicios
+│           │   # [WEB-SERVICES] CAPA DE COMUNICACIÓN FRONTEND ↔ BACKEND
+│           │   # Centraliza todas las llamadas HTTP a la API del ERP;
+│           │   # maneja autenticación, errores y reintentos de forma uniforme
+│
+│           ├── store
+│           │   # [WEB-STATE] GESTIÓN DE ESTADO GLOBAL DEL FRONTEND
+│           │   # Controla el estado compartido entre módulos:
+│           │   # sesión de usuario, permisos activos, datos en caché local
+│
+│           ├── styles
+│           │   # [WEB-STYLES] ESTILOS GLOBALES Y SISTEMA DE DISEÑO
+│           │   # Define tokens de diseño, temas y variables CSS del sistema
+│
+│           └── utils
+│               # [WEB-UTILS] FUNCIONES AUXILIARES Y UTILITARIAS
+│               # Helpers de formato, validación, fechas y transformación de datos
+│
+├── configuracion
+│   └── entornos
+│       # [CONFIG] CONFIGURACIONES PARAMETRIZADAS POR ENTORNO DE EJECUCIÓN
+│       # RESPONSABILIDAD: Separar la configuración del código, siguiendo el
+│       # principio de aplicación de doce factores (12-Factor App).
+│       # ENTORNOS GESTIONADOS:
+│       #   · development  — uso exclusivo del equipo de desarrollo
+│       #   · staging/testing — validación previa a producción
+│       #   · production   — acceso restringido; cambios requieren aprobación formal
+│       # CONTROL CRÍTICO: Ningún archivo de este directorio debe contener
+│       # secretos, contraseñas o tokens en texto plano; usar variables de entorno
+│       # o gestor de secretos (Vault / AWS Secrets Manager)
+│
+├── documentacion
+│   │
+│   ├── 01-investigacion
+│   │   # [DOC] FASE 1 — INVESTIGACIÓN Y ANÁLISIS DE CONTEXTO
+│   │   # Registra el análisis previo del dominio de negocio, benchmarks
+│   │   # de soluciones existentes y justificación de decisiones tecnológicas
+│
+│   ├── 02-requisitos
+│   │   # [DOC] FASE 2 — ESPECIFICACIÓN DE REQUISITOS DEL SISTEMA
+│   │   # Contiene requisitos funcionales (RF) y no funcionales (RNF)
+│   │   # Base contractual y técnica para el desarrollo y las pruebas de aceptación
+│
+│   ├── 03-arquitectura
+│   │   ├── diagramas
+│   │   │   # [DOC-ARCH] DIAGRAMAS DE ARQUITECTURA DEL SISTEMA
+│   │   │   # Incluye: diagrama de contexto (C4-L1), contenedores (C4-L2),
+│   │   │   # componentes (C4-L3), flujos de datos y modelo de despliegue
+│   │   │
+│   │   └── SAD
+│   │       # [DOC-SAD] SOFTWARE ARCHITECTURE DOCUMENT
+│   │       # Documento formal que registra decisiones arquitectónicas (ADRs),
+│   │       # atributos de calidad priorizados y justificación de patrones elegidos
+│
+│   ├── 04-diseno
+│   │   # [DOC] FASE 4 — DISEÑO DETALLADO DEL SISTEMA
+│   │   # Especificaciones de módulos, contratos de API, modelos de datos
+│   │   # y prototipos de interfaz aprobados
+│
+│   ├── 05-pruebas
+│   │   # [DOC] FASE 5 — PLAN Y EVIDENCIAS DE PRUEBAS DEL SISTEMA
+│   │   # Incluye: plan de pruebas, casos de prueba, resultados de ejecución
+│   │   # y certificación de calidad por entorno
+│
+│   ├── 06-operacion
+│   │   # [DOC] FASE 6 — MANUALES DE OPERACIÓN Y PROCEDIMIENTOS
+│   │   # Procedimientos de despliegue, runbooks de incidentes,
+│   │   # guías de administración del sistema en producción
+│
+│   └── 07-auditoria
+│       # [DOC-AUDIT] FASE 7 — DOCUMENTACIÓN PARA AUDITORÍA Y CUMPLIMIENTO
+│       # Registros de control, evidencias de pruebas de seguridad,
+│       # matrices de riesgo, logs de acceso a datos sensibles y
+│       # trazabilidad de cambios en producción
+│
+├── infraestructura
+│   │
+│   ├── api-gateway
+│   │   # [INFRA] PUNTO DE ENTRADA CENTRALIZADO DEL SISTEMA
+│   │   # RESPONSABILIDAD: Gestionar el tráfico entrante con control y visibilidad.
+│   │   # CONTROLES:
+│   │   #   · Autenticación JWT/OAuth2 validada en cada solicitud
+│   │   #   · Enrutamiento seguro hacia microservicios internos
+│   │   #   · Registro de todas las solicitudes para auditoría y trazabilidad
+│   │   #   · Protección contra ataques comunes (DDoS, injection, CORS)
+│
+│   ├── base_datos
+│   │   └── postgres
+│   │       # [INFRA-DB] CONFIGURACIÓN DEL MOTOR DE BASE DE DATOS POSTGRESQL
+│   │       # Incluye: parámetros de conexión, pool, replicación y configuración
+│   │       # de seguridad (roles, permisos, conexiones cifradas con TLS)
+│
+│   ├── cache
+│   │   └── redis
+│   │       # [INFRA-CACHE] SISTEMA DE CACHÉ EN MEMORIA — REDIS
+│   │       # Reduce latencia en consultas frecuentes y gestiona sesiones activas.
+│   │       # CONTROL: Los datos en caché deben tener TTL definido;
+│   │       # datos sensibles en caché deben estar cifrados
+│
+│   ├── contenedores
+│   │   └── docker
+│   │       # [INFRA-CONTAINERS] DEFINICIÓN Y ORQUESTACIÓN DE CONTENEDORES
+│   │       # Imágenes base deben ser oficiales, con versión fijada (no :latest)
+│   │       # Escaneo de vulnerabilidades aplicado en el pipeline de CI/CD
+│
+│   ├── logging
+│   │   ├── loki
+│   │   └── promtail
+│   │       # [INFRA-LOGGING] SISTEMA CENTRALIZADO DE GESTIÓN DE REGISTROS
+│   │       # RESPONSABILIDAD: Capturar, centralizar y retener logs del sistema
+│   │       # para soporte operativo, diagnóstico y evidencia de auditoría.
+│   │       # CONTROL: Retención mínima definida por política; acceso restringido
+│
+│   ├── mensajeria
+│   │   └── rabbitmq
+│   │       # [INFRA-MSG] SISTEMA DE MENSAJERÍA ASÍNCRONA ENTRE MICROSERVICIOS
+│   │       # Desacopla servicios y garantiza entrega de eventos críticos.
+│   │       # CONTROL: Colas con dead-letter definidas; mensajes con TTL configurado
+│
+│   ├── monitoreo
+│   │   ├── grafana
+│   │   ├── loki
+│   │   └── prometheus
+│       # [INFRA-MONITORING] PLATAFORMA DE OBSERVABILIDAD DEL SISTEMA
+│       # Cubre: métricas de rendimiento, alertas por umbrales críticos,
+│       # dashboards operacionales y correlación de logs con trazas.
+│       # CONTROL: Alertas configuradas para SLOs definidos; acceso a dashboards
+│       # restringido por rol
+│
+│   ├── nginx
+│   │   └── ssl
+│       # [INFRA-WEB] SERVIDOR WEB Y TERMINACIÓN TLS/SSL
+│       # CONTROLES:
+│       #   · Certificados SSL/TLS válidos y con renovación automatizada
+│       #   · Redirección forzada HTTP → HTTPS
+│       #   · Cabeceras de seguridad configuradas (HSTS, CSP, X-Frame-Options)
+│       #   · Versiones vulnerables de TLS (1.0, 1.1) deshabilitadas
+│
+│   ├── scripts
+│       # [INFRA-SCRIPTS] SCRIPTS DE AUTOMATIZACIÓN DE INFRAESTRUCTURA
+│       # Incluye: aprovisionamiento, healthchecks, rotación de secretos
+│       # CONTROL: Scripts versionados; ejecución en producción requiere aprobación
+│
+│   ├── seguridad
+│   │   ├── policies
+│   │   └── secrets
+│       # [INFRA-SECURITY] POLÍTICAS DE SEGURIDAD Y GESTIÓN DE SECRETOS
+│       # RESPONSABILIDAD: Definir y aplicar los controles de acceso,
+│       # políticas de red y manejo seguro de credenciales del sistema.
+│       # CONTROL CRÍTICO: El directorio /secrets NO debe contener valores reales;
+│       # usar referencias a gestor de secretos externo (Vault / AWS SM)
+│       # Acceso auditado y restringido exclusivamente a roles autorizados
+│
+│   └── terraform
+│       └── aws
+│       # [INFRA-IaC] INFRAESTRUCTURA COMO CÓDIGO — AWS CON TERRAFORM
+│       # RESPONSABILIDAD: Garantizar que toda la infraestructura en nube
+│       # esté definida, versionada y sea reproducible.
+│       # CONTROLES:
+│       #   · Estado de Terraform almacenado remotamente con locking habilitado
+│       #   · Plan revisado y aprobado antes de aplicar cambios en producción
+│       #   · Módulos con versiones fijadas para evitar cambios no controlados
+│
+├── nucleo
+│   # [CORE] CAPA CENTRAL — LÓGICA DE NEGOCIO DEL ERP (DOMINIO PURO)
+│   # RESPONSABILIDAD: Contener las reglas de negocio de la dulcería,
+│   # independientes de frameworks, bases de datos o interfaces externas.
+│   # PRINCIPIO: Esta capa no debe depender de ninguna capa externa;
+│   # las dependencias fluyen hacia adentro (Clean Architecture / DDD)
+│
+│   ├── aplicacion
+│   │   # [CORE-APP] CASOS DE USO DEL SISTEMA
+│   │   # Orquestan las entidades del dominio para ejecutar operaciones
+│   │   # de negocio específicas (ej: registrar venta, ajustar inventario)
+│
+│   ├── dominio
+│   │   # [CORE-DOMAIN] ENTIDADES Y REGLAS DE NEGOCIO
+│   │   # Modelos que representan conceptos del negocio con su comportamiento:
+│   │   # Producto, Venta, Cliente, Proveedor, Empleado, etc.
+│
+│   ├── eventos
+│   │   # [CORE-EVENTS] EVENTOS DE DOMINIO DEL SISTEMA
+│   │   # Notificaciones de cambios de estado significativos en el negocio
+│   │   # (ej: VentaRegistrada, StockAgotado, PedidoCreado)
+│   │   # Permiten desacoplamiento entre módulos mediante arquitectura orientada a eventos
+│
+│   └── interfaz
+│       # [CORE-INTERFACES] CONTRATOS Y PUERTOS DE INTERACCIÓN EXTERNA
+│       # Define las interfaces (ports) que los adaptadores deben implementar:
+│       # repositorios, servicios externos, notificaciones, etc.
+│
+├── pruebas
+│   │
+│   ├── datos_prueba
+│   │   # [TEST-DATA] CONJUNTO DE DATOS CONTROLADOS PARA PRUEBAS
+│   │   # CONTROL: Datos anonimizados — prohibido usar datos reales de producción
+│   │   # Deben cubrir escenarios positivos, negativos y casos borde
+│
+│   ├── e2e
+│   │   # [TEST-E2E] PRUEBAS END-TO-END DEL SISTEMA COMPLETO
+│   │   # Validan flujos críticos de negocio desde la interfaz hasta la base de datos.
+│   │   # Ejecutadas en entorno de staging; requeridas para aprobación de release
+│
+│   ├── integracion
+│   │   # [TEST-INTEGRATION] PRUEBAS DE INTEGRACIÓN ENTRE MÓDULOS Y SERVICIOS
+│   │   # Verifican la correcta comunicación y contrato entre microservicios,
+│   │   # base de datos, caché y sistemas externos
+│
+│   └── unitarias
+│       # [TEST-UNIT] PRUEBAS UNITARIAS DE COMPONENTES AISLADOS
+│       # Cobertura mínima requerida definida en pipeline de CI/CD.
+│       # Ejecutadas automáticamente en cada pull request
+│
+├── scripts
+│   # [SCRIPTS] SCRIPTS AUXILIARES DE AUTOMATIZACIÓN OPERATIVA
+│   # Incluye: inicialización de entorno, generación de datos de prueba,
+│   # tareas de mantenimiento y utilitarios de desarrollo
+│   # CONTROL: Todo script con efecto en producción debe estar documentado
+│   # y su ejecución debe quedar registrada en el log de operaciones
+│
+└── servicios
+    │
+    ├── analitica-service
+    │   # [SVC] SERVICIO DE ANALÍTICA Y PROCESAMIENTO DE DATOS
+    │   # Consolida y procesa datos operacionales para inteligencia de negocio.
+    │   # Fuente de datos para reportes gerenciales y toma de decisiones
+    │
+    ├── auth-service
+    │   # [SVC-CRÍTICO] SERVICIO DE AUTENTICACIÓN Y AUTORIZACIÓN
+    │   # RESPONSABILIDAD: Gestionar identidades, sesiones y control de acceso
+    │   # basado en roles (RBAC) para todos los módulos del ERP.
+    │   # CRITICIDAD: ALTA — Punto central de seguridad del sistema;
+    │   # toda falla aquí compromete la integridad de acceso al ERP
+    │   # CONTROLES: MFA, expiración de tokens, bloqueo por intentos fallidos
+    │
+    ├── clientes-service
+    │   # [SVC] SERVICIO DE GESTIÓN DE CLIENTES
+    │   # Administra el ciclo de vida del cliente: registro, historial de compras,
+    │   # datos de contacto y segmentación para fidelización
+    │   # CONTROL: Datos personales gestionados conforme a política de privacidad
+    │
+    ├── compras-service
+    │   # [SVC] SERVICIO DE GESTIÓN DE COMPRAS A PROVEEDORES
+    │   # Controla el proceso de adquisición: solicitudes, órdenes de compra,
+    │   # recepción de mercancía y conciliación con facturación de proveedores
+    │
+    ├── empleados-service
+    │   # [SVC] SERVICIO DE GESTIÓN DE PERSONAL
+    │   # Administra información del personal: altas, bajas, roles,
+    │   # asignación de permisos y registro de accesos al sistema
+    │   # CONTROL: Acceso a datos de empleados restringido por rol; datos sensibles cifrados
+    │
+    ├── facturacion-service
+    │   # [SVC-CRÍTICO] SERVICIO DE EMISIÓN Y GESTIÓN DE FACTURAS
+    │   # RESPONSABILIDAD: Generar, almacenar y gestionar documentos fiscales
+    │   # con validez legal, garantizando integridad y no repudio.
+    │   # CRITICIDAD: ALTA — Impacto directo en cumplimiento fiscal y contable
+    │   # CONTROLES: Folios correlativosl; registros inmutables post-emisión
+    │
+    ├── inventario-service
+    │   # [SVC-CRÍTICO] SERVICIO DE CONTROL DE INVENTARIO
+    │   # RESPONSABILIDAD: Mantener el registro exacto y en tiempo real
+    │   # de existencias, movimientos y alertas de reabastecimiento.
+    │   # CRITICIDAD: ALTA — Discrepancias afectan rentabilidad y operación del negocio
+    │   # CONTROLES: Trazabilidad de cada movimiento (entrada/salida/ajuste) con usuario y timestamp
+    │
+    ├── productos-service
+    │   # [SVC] SERVICIO DE GESTIÓN DEL CATÁLOGO DE PRODUCTOS
+    │   # Administra el ciclo de vida de productos: creación, categorización,
+    │   # precios, unidades de medida y estado (activo/descontinuado)
+    │
+    ├── proveedores-service
+    │   # [SVC] SERVICIO DE GESTIÓN DE PROVEEDORES
+    │   # Mantiene el directorio de proveedores, condiciones comerciales,
+    │   # historial de transacciones y evaluación de desempeño
+    │
+    ├── reportes-service
+    │   # [SVC] SERVICIO DE GENERACIÓN DE REPORTES OPERACIONALES Y GERENCIALES
+    │   # Produce informes bajo demanda y programados sobre ventas, inventario,
+    │   # compras y desempeño financiero del negocio
+    │   # CONTROL: Acceso a reportes sensibles restringido por perfil de usuario
+    │
+    └── ventas-service
+        # [SVC-CRÍTICO] SERVICIO DE REGISTRO Y PROCESAMIENTO DE VENTAS
+        # RESPONSABILIDAD: Capturar, validar y persistir cada transacción comercial
+        # con trazabilidad completa: vendedor, productos, precios, descuentos y pago.
+        # CRITICIDAD: ALTA — Núcleo transaccional del negocio; integra con inventario,
+        # facturación y analítica en tiempo real
+        # CONTROLES: Transacciones atómicas; registro de auditoría por operación

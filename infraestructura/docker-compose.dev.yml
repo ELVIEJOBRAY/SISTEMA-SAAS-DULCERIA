@@ -1,0 +1,23 @@
+﻿# VARIANTE NO CANONICA
+# Este archivo no es el compose principal del proyecto.
+# Usar preferentemente el docker-compose.yml de la raiz.
+# Mantener este archivo solo para escenarios alternos, legado o soporte.
+# SISTEMA-SAAS-DULCERIA - DOCKER COMPOSE DESARROLLO
+name: sistema-saas-dulceria-dev
+
+services:
+  frontend:
+    build:
+      context: ../cliente
+      dockerfile: Dockerfile.dev
+    container_name: sgdd-frontend-dev
+    restart: unless-stopped
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../cliente:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+

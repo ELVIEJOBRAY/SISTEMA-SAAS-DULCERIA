@@ -1,0 +1,171 @@
+﻿# VARIANTE NO CANONICA
+# Este archivo no es el compose principal del proyecto.
+# Usar preferentemente el docker-compose.yml de la raiz.
+# Mantener este archivo solo para escenarios alternos, legado o soporte.
+version: "3.9"  # VERSION DEL ESQUEMA DE DOCKER COMPOSE UTILIZADA PARA DEFINIR SERVICIOS, REDES Y VOLUMENES EN ENTORNOS MODERNOS.
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: SISTEMA-SAAS-DULCERIA
+    restart: always
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app_db}
+      POSTGRES_USER: ${POSTGRES_USER:-app_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-__SET_IN_ENV__}
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # VOLUMEN PERSISTENTE DONDE SE ALMACENAN LOS DATOS DE LA BASE DE DATOS.
+
+    networks:
+      - red_backend  # RED PRIVADA INTERNA PARA SERVICIOS DE BACKEND.
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]  # VERIFICACION DE DISPONIBILIDAD DE POSTGRESQL.
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+  redis:
+    image: redis:7
+    container_name: dulceria_redis
+    restart: always
+
+    networks:
+      - red_backend  # RED COMPARTIDA CON EL BACKEND.
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]  # VERIFICACION DE ESTADO DEL SERVICIO REDIS.
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+
+  backend:
+    build:
+      context: ../servidor
+    container_name: SISTEMA-SAAS-DULCERIA_backend
+    restart: always
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://app_user:__SET_IN_ENV__@postgres:5432/app_db}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+
+    ports:
+      - "${BACKEND_PORT}:8000"
+
+    networks:
+      - red_backend
+      - red_frontend
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]  # ENDPOINT DE SALUD DE LA API.
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+
+
+  frontend:
+    build:
+      context: ../cliente
+    container_name: SISTEMA-SAAS-DULCERIA_frontend
+    restart: always
+
+    depends_on:
+      - backend
+
+    ports:
+      - "${FRONTEND_PORT}:3000"
+
+    networks:
+      - red_frontend
+
+
+
+  nginx:
+    image: nginx:stable
+    container_name: dulceria_nginx
+    restart: always
+
+    ports:
+      - "80:80"  # PUNTO DE ENTRADA PRINCIPAL DEL SISTEMA.
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
+    depends_on:
+      - frontend
+      - backend
+
+    networks:
+      - red_frontend
+
+
+
+  # ===============================
+  # MONITOREO DEL SISTEMA
+  # ===============================
+
+  prometheus:
+    image: prom/prometheus
+    container_name: dulceria_prometheus
+    restart: always
+
+    volumes:
+      - ./monitoreo/prometheus.yml:/etc/prometheus/prometheus.yml  # ARCHIVO DE CONFIGURACION DE METRICAS.
+
+    ports:
+      - "9090:9090"  # PANEL DE PROMETHEUS PARA CONSULTAS Y METRICAS.
+
+    networks:
+      - red_backend
+
+
+
+  grafana:
+    image: grafana/grafana
+    container_name: dulceria_grafana
+    restart: always
+
+    ports:
+      - "3001:3000"  # PANEL DE VISUALIZACION DE METRICAS.
+
+    volumes:
+      - grafana_data:/var/lib/grafana  # PERSISTENCIA DE DASHBOARDS Y CONFIGURACION.
+
+    depends_on:
+      - prometheus
+
+    networks:
+      - red_backend
+
+
+
+networks:
+
+  red_backend:
+    driver: bridge  # RED INTERNA PARA SERVICIOS DE BASE DE DATOS, CACHE Y MONITOREO.
+
+  red_frontend:
+    driver: bridge  # RED PARA SERVICIOS EXPUESTOS A USUARIOS.
+
+
+
+volumes:
+
+  postgres_data:  # ALMACENAMIENTO PERSISTENTE DE POSTGRES.
+  grafana_data:  # ALMACENAMIENTO PERSISTENTE DE GRAFANA.
+
+

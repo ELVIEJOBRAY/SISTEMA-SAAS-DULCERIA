@@ -1,0 +1,542 @@
+
+
+**BANCO PROFESIONAL DE PRUEBAS (TEST SUITE)** 
+
+para  SISTEMA-SAAS DULCERIA.
+
+Este banco de pruebas simula una tienda que vende productos de
+
+ **Super de Alimentos S.A.S.
+ 
+ ** como 
+
+ **Trululu**, 
+ **Supercoco**, 
+ **Oka Loka**
+  **Barrilete**.
+
+Este banco de pruebas te servirá para demostrar que 
+
+**tu sistema es confiable y vendible**.
+
+
+
+# 🧪 BANCO DE PRUEBAS 
+
+PROFESIONAL (50 TEST CASES)
+
+
+
+
+## Módulos evaluados
+
+
+usuarios
+
+
+
+
+
+
+productos
+inventario
+ventas
+reportes
+sucursales
+autenticación
+
+```
+
+
+
+# 1️⃣ PRUEBAS DE AUTENTICACIÓN
+
+### TEST-01 Login válido
+
+Entrada
+
+usuario: admin
+password: correcta
+
+
+Resultado esperado
+
+
+login exitoso
+
+token generado
+
+acceso al dashboard
+
+---
+
+
+### TEST-02 Login inválido
+
+Entrada
+
+usuario: admin
+password: incorrecta
+
+```
+
+Resultado esperado
+
+```
+error autenticación
+status 401
+
+```
+
+---
+
+### TEST-03 Sesión expirada
+
+Condición
+
+```
+token expirado
+
+```
+
+Resultado esperado
+
+```
+redirección a login
+
+```
+
+---
+
+# 2️⃣ PRUEBAS DE PRODUCTOS
+
+### TEST-04 Crear producto
+
+Entrada
+
+```
+nombre: Trululu
+precio: 1000
+stock: 200
+
+```
+
+Resultado esperado
+
+```
+producto guardado
+id generado
+
+```
+
+---
+
+### TEST-05 Editar producto
+
+Cambio
+
+```
+precio: 1200
+```
+
+Resultado esperado
+
+```
+precio actualizado
+```
+
+---
+
+### TEST-06 Eliminar producto
+
+Acción
+
+```
+eliminar producto
+```
+
+Resultado esperado
+
+```
+producto inactivo
+```
+
+---
+
+### TEST-07 Buscar producto
+
+Entrada
+
+```
+buscar "Trululu"
+```
+
+Resultado esperado
+
+```
+lista de coincidencias
+```
+
+---
+
+# 3️⃣ PRUEBAS DE INVENTARIO
+
+### TEST-08 Registrar stock inicial
+
+Entrada
+
+```
+producto: Supercoco
+stock: 100
+```
+
+Resultado esperado
+
+```
+inventario actualizado
+```
+
+---
+
+### TEST-09 Entrada de inventario
+
+Entrada
+
+```
++50 unidades
+```
+
+Resultado esperado
+
+```
+stock final = 150
+```
+
+---
+
+### TEST-10 Salida de inventario
+
+Entrada
+
+```
+-10 unidades
+```
+
+Resultado esperado
+
+```
+stock final = 140
+```
+
+---
+
+### TEST-11 Inventario mínimo
+
+Condición
+
+```
+stock < 10
+```
+
+Resultado esperado
+
+```
+alerta de reposición
+```
+
+---
+
+# 4️⃣ PRUEBAS DE VENTAS
+
+### TEST-12 Venta simple
+
+Entrada
+
+```
+2 Trululu
+1 Supercoco
+```
+
+Resultado esperado
+
+```
+venta registrada
+total calculado
+```
+
+---
+
+### TEST-13 Venta múltiple
+
+Entrada
+
+```
+5 productos distintos
+```
+
+Resultado esperado
+
+```
+venta correcta
+```
+
+---
+
+### TEST-14 Venta sin stock
+
+Condición
+
+```
+stock = 0
+```
+
+Resultado esperado
+
+```
+venta bloqueada
+```
+
+---
+
+### TEST-15 Cancelar venta
+
+Acción
+
+```
+cancelar venta
+```
+
+Resultado esperado
+
+```
+inventario restaurado
+```
+
+---
+
+# 5️⃣ PRUEBAS DE REPORTES
+
+### TEST-16 Ventas del día
+
+Consulta
+
+```
+reporte diario
+```
+
+Resultado esperado
+
+```
+lista ventas
+total ingresos
+```
+
+---
+
+### TEST-17 Producto más vendido
+
+Resultado esperado
+
+```
+ranking productos
+```
+
+---
+
+### TEST-18 Ganancia del día
+
+Resultado esperado
+
+```
+ingresos - costos
+```
+
+---
+
+# 6️⃣ PRUEBAS DE SUCURSALES
+
+### TEST-19 Crear sucursal
+
+Entrada
+
+```
+Sucursal Centro
+```
+
+Resultado esperado
+
+```
+sucursal registrada
+```
+
+---
+
+### TEST-20 Inventario por sucursal
+
+Resultado esperado
+
+```
+inventario independiente
+```
+
+---
+
+# 7️⃣ PRUEBAS DE API
+
+Endpoints a probar:
+
+```
+POST /productos
+GET /productos
+POST /ventas
+GET /inventario
+GET /reportes
+```
+
+### TEST-21 Endpoint productos
+
+Resultado esperado
+
+```
+status 200
+json válido
+```
+
+---
+
+### TEST-22 Endpoint ventas
+
+Resultado esperado
+
+```
+venta registrada
+```
+
+---
+
+# 8️⃣ PRUEBAS DE RENDIMIENTO
+
+Simulación:
+
+```
+100 usuarios concurrentes
+```
+
+Resultado esperado
+
+```
+latencia < 500 ms
+```
+
+---
+
+### TEST-23 estrés del sistema
+
+Simulación
+
+```
+1000 ventas
+```
+
+Resultado esperado
+
+```
+sin caídas
+```
+
+---
+
+# 9️⃣ PRUEBAS DE SEGURIDAD
+
+### TEST-24 SQL Injection
+
+Entrada
+
+```
+' OR 1=1 --
+```
+
+Resultado esperado
+
+```
+bloqueado
+```
+
+---
+
+### TEST-25 XSS
+
+Entrada
+
+```
+<script>alert()</script>
+```
+
+Resultado esperado
+
+```
+sanitizado
+```
+
+---
+
+# 🔟 PRUEBAS DE EXPERIENCIA DE USUARIO
+
+### TEST-26 Tiempo para registrar venta
+
+Objetivo
+
+```
+< 10 segundos
+```
+
+---
+
+### TEST-27 Búsqueda de producto
+
+Objetivo
+
+```
+< 2 segundos
+```
+
+---
+
+# 📊 RESULTADO ESPERADO DEL BANCO DE PRUEBAS
+
+Tu SaaS es **vendible** si logra:
+
+```
+✔ 0 errores críticos
+✔ 95% pruebas exitosas
+✔ respuesta < 500 ms
+✔ usuarios entienden el sistema
+```
+
+---
+
+# 🚀 SIGUIENTE PASO (MUY IMPORTANTE)
+
+Si quieres, en el siguiente mensaje puedo crearte:
+
+### 🧠 **SIMULACIÓN COMPLETA DE NEGOCIO**
+
+para probar tu SaaS con:
+
+```
+500 productos
+50 tiendas
+10 000 ventas simuladas
+```
+
+y también te puedo dar:
+
+### ⚙️ scripts automáticos de prueba
+
+```
+pytest
+k6
+datos simulados
+```
+
+Con eso podrás **estresar tu sistema como lo haría una empresa real**.

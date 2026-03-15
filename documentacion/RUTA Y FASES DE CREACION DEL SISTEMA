@@ -1,0 +1,2110 @@
+Sí, bro. Te lo dejo ya **en formato profesional, en español y pensado como documento base oficial** de esta primera versión del proyecto.
+
+Te voy a entregar 3 cosas:
+
+1. **Ruta de desarrollo del proyecto**
+2. **Fases de desarrollo**
+3. **README oficial de la primera versión**
+
+---
+
+# 1. Ruta de desarrollo oficial del proyecto
+
+Esta sería la **ruta correcta de evolución** para tu ERP SaaS multiempresa, sin saltarte fundamentos importantes.
+
+## Etapa 0 — Fundación arquitectónica
+
+**Estado:** completada
+
+### Objetivo
+
+Dejar una base limpia, modular y escalable para construir el sistema.
+
+### Ya logrado
+
+* reestructuración del monorepo
+* arquitectura limpia
+* separación por módulos
+* contexto SaaS
+* cliente web / pos / móvil
+* infraestructura desacoplada
+* base de datos separada
+* preparación de catálogo, organización e identidad
+
+### Resultado
+
+Ya tienes una **base arquitectónica v1 limpia**.
+
+---
+
+
+
+## Etapa 1 — Modelo base multiempresa
+
+**Estado:** siguiente paso inmediato
+
+### Objetivo
+
+Construir el modelo principal del SaaS multiempresa.
+
+### Dominios a aterrizar
+
+* tenant
+* empresa
+* sucursal
+* bodega
+* usuario
+* rol
+* permiso
+* membresías
+
+### Resultado esperado
+
+El sistema ya entiende:
+
+* quién es el cliente SaaS
+* qué empresas tiene
+* qué usuarios pertenecen a qué contexto
+* cómo aislar datos entre tenants
+
+---
+
+## Etapa 2 — Identidad y acceso
+
+### Objetivo
+
+Construir autenticación y autorización multi-contexto.
+
+### Alcance
+
+* login
+* hash de contraseñas
+* JWT
+* roles
+* permisos
+* acceso por tenant
+* acceso por empresa
+* acceso por sucursal
+
+### Resultado esperado
+
+Usuarios autenticados con permisos reales según contexto operativo.
+
+---
+
+## Etapa 3 — Catálogo comercial
+
+### Objetivo
+
+Construir el módulo catálogo.
+
+### Alcance
+
+* marcas
+* categorías
+* productos
+* presentaciones
+* listas de precios
+* impuestos base
+* códigos internos / SKU
+
+### Resultado esperado
+
+Base comercial lista para operar ventas e inventario.
+
+---
+
+## Etapa 4 — Inventario
+
+### Objetivo
+
+Construir el control de existencias.
+
+### Alcance
+
+* existencias por bodega
+* movimientos de inventario
+* ajustes
+* entradas
+* salidas
+* transferencias
+* stock mínimo
+* kardex básico
+
+### Resultado esperado
+
+Control real del inventario por tenant / empresa / sucursal / bodega.
+
+---
+
+## Etapa 5 — Ventas y POS
+
+### Objetivo
+
+Construir la operación comercial del ERP.
+
+### Alcance
+
+* clientes
+* ventas
+* detalle de ventas
+* cajas
+* medios de pago
+* devoluciones
+* descuentos
+* integración con POS
+
+### Resultado esperado
+
+La dulcería ya puede vender con trazabilidad real.
+
+---
+
+## Etapa 6 — Compras y proveedores
+
+### Objetivo
+
+Completar el flujo de abastecimiento.
+
+### Alcance
+
+* proveedores
+* órdenes de compra
+* recepción
+* cuentas por pagar base
+* entradas por compra
+
+### Resultado esperado
+
+Flujo completo de abastecimiento e impacto en inventario.
+
+---
+
+## Etapa 7 — Reportes y analítica
+
+### Objetivo
+
+Entregar información operativa y gerencial.
+
+### Alcance
+
+* ventas por período
+* productos más vendidos
+* stock crítico
+* rentabilidad básica
+* comparativo por sucursal
+* tablero inicial
+
+### Resultado esperado
+
+El sistema deja de ser solo operativo y empieza a ser gerencial.
+
+---
+
+## Etapa 8 — Plataforma SaaS
+
+### Objetivo
+
+Habilitar la operación comercial del producto como SaaS.
+
+### Alcance
+
+* planes
+* suscripciones
+* límites por plan
+* activación / suspensión
+* facturación SaaS
+* configuración por tenant
+
+### Resultado esperado
+
+Tu ERP ya no es solo software interno, sino un producto comercializable.
+
+---
+
+## Etapa 9 — Calidad, seguridad y despliegue
+
+### Objetivo
+
+Endurecer el producto antes de piloto real.
+
+### Alcance
+
+* pruebas unitarias
+* integración
+* e2e
+* observabilidad
+* logs
+* backups
+* hardening
+* documentación operativa
+* CI/CD
+
+### Resultado esperado
+
+Sistema listo para entornos reales.
+
+---
+
+## Etapa 10 — Piloto y validación de negocio
+
+### Objetivo
+
+Probar el ERP con una operación real.
+
+### Alcance
+
+* tenant piloto
+* carga inicial de datos
+* pruebas en sucursal real
+* validación de procesos
+* corrección de flujos
+* feedback operativo
+
+### Resultado esperado
+
+Primera validación de mercado y base para v2.
+
+---
+
+# 2. Fases de desarrollo recomendadas
+
+Te lo dejo ahora como **plan oficial por fases**, más compacto y accionable.
+
+---
+
+## Fase 1 — Arquitectura base
+
+**Estado:** terminada
+
+### Entregables
+
+* estructura limpia del proyecto
+* separación por capas
+* estructura multiempresa inicial
+* módulos base creados
+* commit oficial de arquitectura
+
+### Criterio de cierre
+
+La arquitectura está estable y ya no requiere reestructuración mayor.
+
+---
+
+## Fase 2 — Modelo relacional multiempresa
+
+**Estado:** siguiente
+
+### Entregables
+
+* tablas de tenants
+* empresas
+* sucursales
+* bodegas
+* usuarios
+* roles
+* permisos
+* membresías
+* índices y restricciones
+
+### Criterio de cierre
+
+La base de datos soporta multiempresa y aislamiento de tenants.
+
+---
+
+## Fase 3 — Implementación del núcleo organizacional
+
+### Entregables
+
+* entidades de organización
+* repositorios
+* casos de uso
+* endpoints de organización
+
+### Criterio de cierre
+
+Se puede crear tenant, empresa, sucursal y bodega desde API.
+
+---
+
+## Fase 4 — Implementación de identidad y acceso
+
+### Entregables
+
+* usuarios
+* login
+* JWT
+* roles y permisos
+* membresías
+
+### Criterio de cierre
+
+Un usuario puede autenticarse y operar según su alcance.
+
+---
+
+## Fase 5 — Catálogo
+
+### Entregables
+
+* marcas
+* categorías
+* productos
+* presentaciones
+* precios
+
+### Criterio de cierre
+
+La plataforma ya puede registrar y consultar catálogo comercial.
+
+---
+
+## Fase 6 — Inventario
+
+### Entregables
+
+* existencias
+* movimientos
+* ajustes
+* transferencias
+
+### Criterio de cierre
+
+La plataforma controla stock por bodega.
+
+---
+
+## Fase 7 — Ventas y POS
+
+### Entregables
+
+* ventas
+* detalle
+* clientes
+* pagos
+* caja
+
+### Criterio de cierre
+
+Se puede vender de forma real desde el sistema.
+
+---
+
+## Fase 8 — Compras
+
+### Entregables
+
+* proveedores
+* compras
+* recepción
+* actualización de stock
+
+### Criterio de cierre
+
+Se puede abastecer el inventario desde el sistema.
+
+---
+
+## Fase 9 — Reportes
+
+### Entregables
+
+* reportes operativos
+* reportes gerenciales
+* indicadores clave
+
+### Criterio de cierre
+
+La gerencia obtiene visibilidad operativa mínima.
+
+---
+
+## Fase 10 — SaaS productivo
+
+### Entregables
+
+* planes
+* suscripciones
+* límites
+* monitoreo
+* seguridad
+* piloto real
+
+### Criterio de cierre
+
+Sistema listo para operar como producto SaaS.
+
+---
+
+# 3. README oficial de la primera versión
+
+Este es el README que te recomiendo poner en la raíz del proyecto como:
+
+```text
+README.md
+```
+
+Te lo dejo listo para copiar y pegar.
+
+````markdown
+# SISTEMA-SAAS-DULCERIA
+
+ERP SaaS multiempresa para dulcerías, diseñado para gestionar operaciones comerciales, inventario, organización empresarial, identidad y acceso, ventas, compras y crecimiento escalable en una sola plataforma.
+
+---
+
+## Estado del proyecto
+
+**Versión actual:** v1 - base arquitectónica limpia  
+**Estado:** en desarrollo  
+**Enfoque actual:** construcción del núcleo multiempresa y modelo relacional base
+
+---
+
+## Propósito
+
+Este proyecto tiene como objetivo construir un **ERP SaaS multiempresa** orientado inicialmente al sector de dulcerías, permitiendo que múltiples clientes utilicen la misma plataforma con aislamiento de datos por tenant y con soporte para múltiples empresas, sucursales y bodegas dentro de un mismo entorno SaaS.
+
+El sistema está siendo diseñado para evolucionar desde una base modular limpia hacia un producto empresarial escalable, mantenible y comercializable.
+
+---
+
+## Objetivos principales
+
+- soportar múltiples tenants en un mismo sistema SaaS
+- permitir múltiples empresas por tenant
+- gestionar sucursales y bodegas
+- controlar usuarios, roles y permisos por contexto
+- administrar catálogo, inventario, ventas y compras
+- habilitar reportes operativos y gerenciales
+- preparar la plataforma para facturación SaaS, planes y suscripciones
+
+---
+
+## Enfoque arquitectónico
+
+La solución está construida bajo principios de:
+
+- arquitectura limpia
+- diseño guiado por dominio (DDD)
+- monolito modular preparado para evolución futura
+- separación clara entre dominio, aplicación, infraestructura e interfaz
+- soporte multiempresa y multi-tenant desde la base
+
+---
+
+## Estructura principal del proyecto
+
+```text
+SISTEMA-SAAS-DULCERIA
+├── base_datos
+├── cliente
+├── configuracion
+├── documentacion
+├── infraestructura
+├── nucleo
+├── plataforma
+├── pruebas
+├── scripts
+└── servicios
+````
+
+---
+
+## Estructura del núcleo
+
+El núcleo del sistema está organizado por módulos funcionales:
+
+### Módulos actuales
+
+* organizacion
+* identidad_acceso
+* catalogo
+
+### Capas del núcleo
+
+* `dominio` → reglas del negocio
+* `aplicacion` → casos de uso
+* `infraestructura` → persistencia, seguridad y adaptadores
+* `interfaz` → API HTTP
+
+---
+
+## Contextos principales
+
+### Organización
+
+Gestiona la estructura multiempresa del sistema:
+
+* tenant
+* empresa
+* sucursal
+* bodega
+
+### Identidad y acceso
+
+Gestiona seguridad y permisos:
+
+* usuario
+* rol
+* permiso
+* membresías por tenant y empresa
+
+### Catálogo
+
+Gestiona la base comercial:
+
+* productos
+* categorías
+* marcas
+* listas de precios
+* presentaciones
+
+---
+
+## Tecnologías base
+
+### Backend
+
+* Python
+* FastAPI
+* SQLAlchemy
+* PostgreSQL
+* Uvicorn
+
+### Configuración
+
+* variables de entorno `.env`
+
+### Infraestructura prevista
+
+* Docker
+* Redis
+* RabbitMQ
+* Nginx
+* Grafana
+* Prometheus
+* Loki
+* Terraform
+* AWS
+
+---
+
+## Estado funcional actual
+
+Actualmente el proyecto se encuentra en la fase de consolidación del núcleo arquitectónico y preparación del modelo relacional multiempresa.
+
+### Ya completado
+
+* estructura del monorepo reorganizada
+* arquitectura limpia base
+* separación por módulos
+* base SaaS multiempresa definida a nivel estructural
+* rutas principales del núcleo organizadas
+* infraestructura desacoplada del negocio
+
+### En curso
+
+* diseño relacional multiempresa
+* aterrizaje de entidades principales
+* construcción de identidad y acceso
+* consolidación del módulo organización
+
+---
+
+## Principios del modelo SaaS
+
+El sistema se diseñará bajo estas reglas:
+
+* la raíz del sistema es el **tenant**
+* un tenant puede tener múltiples empresas
+* una empresa puede tener múltiples sucursales
+* una sucursal puede tener múltiples bodegas
+* los usuarios operan dentro de uno o varios contextos autorizados
+* toda operación de negocio debe respetar aislamiento por tenant
+
+---
+
+## Hoja de ruta de desarrollo
+
+### Fase 1
+
+Arquitectura base limpia
+
+### Fase 2
+
+Modelo relacional multiempresa
+
+### Fase 3
+
+Implementación del módulo organización
+
+### Fase 4
+
+Implementación de identidad y acceso
+
+### Fase 5
+
+Implementación de catálogo
+
+### Fase 6
+
+Implementación de inventario
+
+### Fase 7
+
+Implementación de ventas y POS
+
+### Fase 8
+
+Implementación de compras
+
+### Fase 9
+
+Reportes y analítica
+
+### Fase 10
+
+Plataforma SaaS productiva
+
+---
+
+## Convenciones generales
+
+* nombres de carpetas y módulos en español
+* separación modular por contexto de negocio
+* estructura orientada a crecimiento ordenado
+* prioridad al núcleo multiempresa antes de módulos operativos avanzados
+
+---
+
+## Próximo objetivo inmediato
+
+Diseñar e implementar el modelo relacional base para:
+
+* tenants
+* empresas
+* sucursales
+* bodegas
+* usuarios
+* roles
+* permisos
+* membresías
+
+---
+
+## Autor
+
+Proyecto en construcción por Bryan Stiven B.
+
+---
+
+## Licencia
+
+Pendiente de definición.
+
+````
+
+---
+
+# 4. Dónde guardar cada cosa
+
+Te recomiendo dejarlo así:
+
+## README oficial
+```text
+README.md
+````
+
+## Hoja de ruta detallada
+
+```text
+documentacion/03-arquitectura/hoja_ruta_v1.md
+```
+
+## Fases del producto
+
+```text
+documentacion/03-arquitectura/fases_desarrollo_v1.md
+```
+
+---
+
+# 5. Comando PowerShell para crear esos archivos base
+
+Te dejo el comando para crear los archivos vacíos de una vez:
+
+```powershell
+New-Item -ItemType File -Path .\README.md -Force
+New-Item -ItemType File -Path .\documentacion\03-arquitectura\hoja_ruta_v1.md -Force
+New-Item -ItemType File -Path .\documentacion\03-arquitectura\fases_desarrollo_v1.md -Force
+```
+
+Y si quieres dejar además un archivo para visión del producto:
+
+```powershell
+New-Item -ItemType File -Path .\documentacion\02-requisitos\vision_producto_v1.md -Force
+```
+
+---
+
+# 6. Siguiente paso correcto
+
+Ya con esto, el siguiente bloque serio del proyecto es:
+
+**modelo de base de datos multiempresa**.
+
+Ese ya debe incluir:
+
+* tablas
+* claves foráneas
+* restricciones
+* índices
+* criterio de aislamiento por tenant
+
+Si quieres, en el siguiente paso te entrego eso ya en formato **oficial de diseño relacional v1**, también en español.
+
+
+
+
+---------------------------------
+
+
+Claro, bro. Te dejo dos entregables en español y ya aterrizados a tu estado actual:
+
+1. **README oficial completo de la v1**
+2. **Análisis real de las fases del proyecto: qué ya tienes y qué hace falta**
+
+---
+
+# README oficial v1
+
+Guárdalo como:
+
+```text
+README.md
+```
+
+````markdown
+# SISTEMA-SAAS-DULCERIA
+
+ERP SaaS multiempresa orientado inicialmente al sector de dulcerías, diseñado para operar múltiples clientes dentro de una misma plataforma, con aislamiento de datos por tenant y soporte para múltiples empresas, sucursales y bodegas.
+
+---
+
+## Estado del proyecto
+
+**Versión actual:** v1  
+**Estado:** en desarrollo  
+**Fase actual:** base arquitectónica limpia + modelo relacional multiempresa en PostgreSQL
+
+---
+
+## Propósito
+
+Construir una plataforma ERP SaaS multiempresa que permita administrar operaciones comerciales y organizacionales de forma escalable, empezando por el sector de dulcerías y dejando una base preparada para crecimiento futuro.
+
+El sistema está diseñado para soportar:
+
+- múltiples tenants en una sola plataforma
+- múltiples empresas por tenant
+- múltiples sucursales por empresa
+- múltiples bodegas por sucursal
+- usuarios, roles y permisos por contexto
+- evolución progresiva hacia inventario, ventas, compras, reportes y operación SaaS completa
+
+---
+
+## Objetivos principales
+
+- centralizar la operación de varias empresas dentro de un mismo sistema
+- aislar datos por tenant
+- soportar estructura organizacional multiempresa
+- controlar acceso por usuario, rol y permiso
+- preparar una base sólida para catálogo, inventario y ventas
+- evolucionar hacia un producto SaaS comercializable
+
+---
+
+## Enfoque arquitectónico
+
+El proyecto sigue estos principios:
+
+- arquitectura limpia
+- diseño guiado por dominio (DDD)
+- monolito modular
+- separación clara entre dominio, aplicación, infraestructura e interfaz
+- base multiempresa y multi-tenant desde el inicio
+- evolución controlada hacia módulos más operativos
+
+---
+
+## Estructura principal del proyecto
+
+```text
+SISTEMA-SAAS-DULCERIA
+├── base_datos
+├── cliente
+├── configuracion
+├── documentacion
+├── infraestructura
+├── nucleo
+├── plataforma
+├── pruebas
+├── scripts
+└── servicios
+````
+
+---
+
+## Estructura actual del núcleo
+
+El núcleo del sistema está organizado por módulos y capas.
+
+### Módulos del núcleo
+
+* organizacion
+* identidad_acceso
+* catalogo
+
+### Capas del núcleo
+
+* `nucleo/dominio` → entidades, objetos de valor, repositorios, eventos y reglas del negocio
+* `nucleo/aplicacion` → casos de uso, DTO, comandos, consultas y servicios de aplicación
+* `nucleo/infraestructura` → persistencia, seguridad y adaptadores técnicos
+* `nucleo/interfaz/api` → rutas, esquemas y dependencias HTTP
+
+---
+
+## Contextos funcionales actuales
+
+### Organización
+
+Gestiona la estructura multiempresa del sistema:
+
+* tenant
+* empresa
+* sucursal
+* bodega
+
+### Identidad y acceso
+
+Gestiona la seguridad y el alcance operativo:
+
+* usuario
+* rol
+* permiso
+* membresía por tenant
+* membresía por empresa
+
+### Catálogo
+
+Preparado para el contexto comercial:
+
+* productos
+* categorías
+* marcas
+* listas de precios
+* presentaciones
+
+---
+
+## Plataforma SaaS
+
+La carpeta `plataforma` concentra la base transversal del producto SaaS.
+
+### SaaS
+
+* cuentas
+* planes
+* suscripciones
+* facturación
+
+### Identidad
+
+* usuarios
+* roles
+* permisos
+
+---
+
+## Cliente
+
+La solución contempla varios canales de operación:
+
+* `cliente/web`
+* `cliente/pos`
+* `cliente/movil`
+
+Esto permite pensar el producto desde el inicio como una plataforma empresarial con múltiples interfaces.
+
+---
+
+## Base de datos
+
+### Motor
+
+* PostgreSQL
+
+### Herramienta de administración actual
+
+* pgAdmin 4
+
+### Estado de la base de datos
+
+Ya existe un modelo relacional base multiempresa con estas tablas:
+
+* `tenants`
+* `empresas`
+* `sucursales`
+* `bodegas`
+* `usuarios`
+* `roles`
+* `permisos`
+* `roles_permisos`
+* `membresias_tenant`
+* `membresias_empresa`
+
+### Principios del modelo
+
+* la raíz del sistema es el `tenant`
+* un tenant puede tener múltiples empresas
+* una empresa puede tener múltiples sucursales
+* una sucursal puede tener múltiples bodegas
+* los usuarios operan en uno o varios contextos autorizados
+* toda operación de negocio debe respetar el aislamiento por tenant
+
+---
+
+## Tecnologías base
+
+### Backend
+
+* Python
+* FastAPI
+* SQLAlchemy
+* PostgreSQL
+* Uvicorn
+
+### Configuración
+
+* `.env`
+
+### Infraestructura prevista
+
+* Docker
+* Redis
+* RabbitMQ
+* Nginx
+* Grafana
+* Prometheus
+* Loki
+* Terraform
+* AWS
+
+---
+
+## Estructura de base de datos en el repositorio
+
+```text
+base_datos
+├── esquemas
+├── migraciones
+├── respaldos
+└── semillas
+```
+
+### Archivos clave actuales
+
+* `base_datos/esquemas/01_modelo_base_multiempresa.sql`
+* `base_datos/esquemas/02_indices_base_multiempresa.sql`
+* `base_datos/semillas/01_semillas_base.sql`
+
+---
+
+## Preparación del entorno
+
+### 1. Crear y activar entorno virtual
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+### 2. Instalar dependencias base
+
+```bash
+pip install fastapi uvicorn sqlalchemy python-dotenv psycopg[binary]
+```
+
+### 3. Configurar variables de entorno
+
+Crear archivo `.env` en la raíz del proyecto con una conexión válida a PostgreSQL.
+
+Ejemplo:
+
+```env
+DATABASE_URL=postgresql+psycopg://postgres:TU_PASSWORD@localhost:5432/sistema_saas_dulceria
+```
+
+### 4. Crear la base de datos
+
+En PostgreSQL / pgAdmin 4, crear la base:
+
+```sql
+CREATE DATABASE sistema_saas_dulceria;
+```
+
+### 5. Ejecutar scripts base
+
+Ejecutar en pgAdmin 4, en este orden:
+
+1. `base_datos/esquemas/01_modelo_base_multiempresa.sql`
+2. `base_datos/esquemas/02_indices_base_multiempresa.sql`
+3. `base_datos/semillas/01_semillas_base.sql`
+
+---
+
+## Ejecución del backend
+
+Con el entorno listo, ejecutar:
+
+```bash
+uvicorn nucleo.interfaz.api.app:app --reload
+```
+
+Si la aplicación está bien configurada, la API debería iniciar en:
+
+```text
+http://127.0.0.1:8000
+```
+
+---
+
+## Endpoints base actuales
+
+### Verificación de servicio
+
+```http
+GET /
+```
+
+### Verificación de conexión a base de datos
+
+```http
+GET /test-db
+```
+
+---
+
+## Convenciones del proyecto
+
+* nombres de carpetas y módulos en español
+* arquitectura por contexto funcional
+* separación clara entre negocio e infraestructura
+* diseño orientado a crecimiento ordenado
+* prioridad al núcleo multiempresa antes de módulos operativos
+
+---
+
+## Estado funcional actual
+
+### Ya completado
+
+* reestructuración del monorepo
+* arquitectura limpia base
+* organización modular del núcleo
+* separación entre plataforma, núcleo, cliente e infraestructura
+* base PostgreSQL creada
+* modelo relacional multiempresa inicial implementado
+* índices base creados
+* permisos semilla insertados
+* commit oficial de arquitectura realizado
+
+### En construcción
+
+* implementación real de modelos SQLAlchemy
+* repositorios funcionales
+* casos de uso ejecutables
+* endpoints reales de organización
+* autenticación y autorización
+* consolidación del módulo catálogo
+
+### Pendiente
+
+* inventario
+* ventas
+* compras
+* reportes
+* suscripciones SaaS funcionales
+* pruebas automatizadas completas
+* despliegue funcional
+* piloto real
+
+---
+
+## Hoja de ruta resumida
+
+### Fase 1
+
+Base arquitectónica limpia
+
+### Fase 2
+
+Modelo relacional multiempresa
+
+### Fase 3
+
+Implementación del módulo organización
+
+### Fase 4
+
+Implementación de identidad y acceso
+
+### Fase 5
+
+Implementación de catálogo
+
+### Fase 6
+
+Implementación de inventario
+
+### Fase 7
+
+Implementación de ventas y POS
+
+### Fase 8
+
+Implementación de compras
+
+### Fase 9
+
+Reportes y analítica
+
+### Fase 10
+
+Plataforma SaaS productiva
+
+---
+
+## Próximo objetivo inmediato
+
+Implementar la conexión entre:
+
+* PostgreSQL
+* modelos SQLAlchemy
+* repositorios de organización
+* casos de uso
+* endpoints FastAPI
+
+El siguiente hito funcional es poder crear y consultar:
+
+* tenant
+* empresa
+* sucursal
+* bodega
+
+desde la API.
+
+---
+
+## Autor
+
+Bryan Stiven B.
+
+---
+
+## Licencia
+
+Pendiente de definición.
+
+```
+
+---
+
+# Análisis de fases del proyecto
+
+Te lo doy de forma honesta, no idealizada.
+
+## Fase 0 — Visión y dirección del producto
+**Estado:** bastante clara
+
+Ya tienes definido que no estás construyendo un ERP simple, sino un **SaaS multiempresa**.  
+Eso es importantísimo porque ya cambió la raíz del diseño: ahora la raíz es `tenant`, no `empresa`.
+
+### Ya tienes
+- objetivo del producto
+- enfoque multiempresa
+- orientación SaaS
+- separación entre plataforma y núcleo
+
+### Hace falta
+- definir con más precisión el alcance de la v1 funcional
+- dejar por escrito qué entra y qué no entra en la primera entrega operativa
+
+---
+
+## Fase 1 — Arquitectura base
+**Estado:** completada
+
+Esta fase ya está bien lograda.
+
+### Ya tienes
+- monorepo reorganizado
+- estructura limpia en español
+- núcleo por contextos
+- capas de dominio, aplicación, infraestructura e interfaz
+- cliente, infraestructura y plataforma separados
+- base lista para crecer
+
+### Valor real
+Esto te ahorró desorden temprano y te dejó una estructura profesional.
+
+### Hace falta
+- casi nada estructural grande
+- solo mantener disciplina para no volver a mezclar responsabilidades
+
+---
+
+## Fase 2 — Modelo relacional multiempresa en PostgreSQL
+**Estado:** completada en base inicial
+
+Esta fase también ya quedó bien encaminada.
+
+### Ya tienes
+- base `sistema_saas_dulceria`
+- scripts ejecutados en PostgreSQL
+- tablas base creadas
+- índices base
+- permisos semilla
+
+### Valor real
+Ya no estás en teoría: ya tienes una base de datos real con soporte inicial para multiempresa.
+
+### Hace falta
+- revisar si el modelo actual debe integrarse con tus SQL viejos
+- normalizar mejor la evolución entre `esquemas` viejos y el nuevo modelo oficial
+- preparar migraciones formales a futuro
+
+---
+
+## Fase 3 — Implementación del módulo organización
+**Estado:** estructurado, no implementado
+
+Aquí empieza la parte verdaderamente importante.
+
+### Ya tienes
+- carpetas
+- nombres de entidades
+- repositorios definidos
+- casos de uso planteados
+- rutas previstas
+
+### Hace falta
+- modelos SQLAlchemy reales para:
+  - `tenant`
+  - `empresa`
+  - `sucursal`
+  - `bodega`
+- mapeadores reales
+- repositorios funcionales
+- casos de uso ejecutables
+- endpoints que creen y consulten datos
+
+### Diagnóstico
+Esta fase es la **prioridad inmediata**.
+
+---
+
+## Fase 4 — Identidad y acceso
+**Estado:** diseñada, no implementada
+
+También está bien planteada, pero aún está en esqueletos.
+
+### Ya tienes
+- estructura del módulo
+- tablas base
+- idea clara de roles, permisos y membresías
+
+### Hace falta
+- hash de contraseñas
+- login real
+- JWT
+- verificación de permisos
+- asignación de roles
+- membresías por tenant y empresa
+- dependencias de seguridad en FastAPI
+
+### Diagnóstico
+Sin esto no tendrás operación multiusuario real.
+
+---
+
+## Fase 5 — Catálogo
+**Estado:** preparado estructuralmente
+
+Tienes el contexto `catalogo`, pero todavía no está desarrollado.
+
+### Ya tienes
+- módulo reservado
+- interfaz API modularizada
+- base conceptual correcta
+
+### Hace falta
+- categorías
+- marcas
+- productos
+- presentaciones
+- precios
+- impuestos base
+- validaciones de SKU/códigos
+
+### Diagnóstico
+Todavía no es prioridad por encima de organización e identidad, pero es el siguiente contexto natural.
+
+---
+
+## Fase 6 — Inventario
+**Estado:** pendiente funcional
+
+Todavía no está implementado en la nueva arquitectura.
+
+### Hará falta
+- existencias por bodega
+- movimientos
+- ajustes
+- entradas
+- salidas
+- transferencias
+- stock mínimo
+- kardex
+
+### Diagnóstico
+No conviene construirlo antes de cerrar organización y catálogo.
+
+---
+
+## Fase 7 — Ventas y POS
+**Estado:** pendiente funcional
+
+La estructura del cliente POS existe, pero el dominio no está resuelto todavía.
+
+### Hará falta
+- clientes
+- ventas
+- detalle de ventas
+- caja
+- pagos
+- descuentos
+- devoluciones
+- conexión con inventario
+
+### Diagnóstico
+Es una fase crítica para valor de negocio, pero todavía no toca.
+
+---
+
+## Fase 8 — Compras y proveedores
+**Estado:** pendiente
+
+### Hará falta
+- proveedores
+- órdenes de compra
+- recepción
+- actualización de inventario
+- cuentas por pagar base
+
+### Diagnóstico
+Debe entrar después de inventario y ventas base.
+
+---
+
+## Fase 9 — Reportes y analítica
+**Estado:** pendiente
+
+Aunque tienes `servicio-analitica` y `reportes`, aún no hay base funcional para explotarlos.
+
+### Hará falta
+- reportes de ventas
+- stock crítico
+- movimientos de inventario
+- consolidado por empresa/sucursal
+- indicadores gerenciales
+
+### Diagnóstico
+No es fase inicial; depende de que existan datos operativos reales.
+
+---
+
+## Fase 10 — Plataforma SaaS comercial
+**Estado:** estructurada, no implementada
+
+La carpeta `plataforma` existe, pero todavía no opera como producto SaaS real.
+
+### Ya tienes
+- la intención correcta
+- carpetas para planes, cuentas y suscripciones
+
+### Hace falta
+- suscripciones reales
+- límites por plan
+- activación y suspensión
+- facturación SaaS
+- configuración por tenant
+- onboarding del cliente
+
+### Diagnóstico
+Todavía no es inmediato. Primero debes probar que el ERP base funcione.
+
+---
+
+## Fase 11 — Calidad, pruebas y operación
+**Estado:** parcialmente preparado, no ejecutado a fondo
+
+Tienes carpetas, pero eso no equivale a tener cobertura real.
+
+### Ya tienes
+- `pruebas/`
+- documentación
+- infraestructura
+- monitoreo previsto
+- seguridad prevista
+
+### Hace falta
+- pruebas unitarias reales
+- pruebas de integración
+- pruebas e2e
+- CI ejecutando tests
+- manejo de errores
+- logs funcionales
+- respaldo operativo
+- endurecimiento de seguridad
+
+### Diagnóstico
+Buena base, pero todavía más estructural que funcional.
+
+---
+
+# Qué tienes realmente hoy
+
+Hoy tienes 4 cosas muy valiosas:
+
+## 1. Dirección correcta del producto
+Sabes qué estás construyendo.
+
+## 2. Arquitectura correcta
+Tu estructura ya no te estorba.
+
+## 3. Base PostgreSQL real
+Ya hay un modelo multiempresa ejecutado.
+
+## 4. Hoja de ruta natural
+Está claro qué módulo debe venir primero.
+
+---
+
+# Qué te hace falta realmente hoy
+
+Lo que más te hace falta no es más arquitectura, sino **ejecución funcional**.
+
+## Prioridad máxima
+Implementar el flujo completo de `organizacion`:
+
+- modelo SQLAlchemy
+- repositorios
+- casos de uso
+- endpoints
+
+## Segunda prioridad
+Implementar `identidad_acceso`:
+
+- usuarios
+- login
+- JWT
+- roles y permisos
+
+## Tercera prioridad
+Entrar a `catalogo`.
+
+---
+
+# Orden recomendado desde este punto
+
+## Sprint 1
+Cerrar `organizacion`
+
+Resultado esperado:
+- crear tenant
+- crear empresa
+- crear sucursal
+- crear bodega
+- consultar todo desde API
+
+## Sprint 2
+Cerrar `identidad_acceso`
+
+Resultado esperado:
+- crear usuario
+- iniciar sesión
+- asignar rol
+- validar permisos
+
+## Sprint 3
+Cerrar `catalogo`
+
+Resultado esperado:
+- categorías
+- marcas
+- productos
+- precios base
+
+## Sprint 4
+Entrar a `inventario`
+
+---
+
+# Conclusión real del proyecto hoy
+
+Tu proyecto **ya dejó de ser una idea desordenada**.  
+Hoy ya es una **plataforma en construcción con base arquitectónica válida y base de datos inicial operativa**.
+
+Lo que falta ya no es “ordenar carpetas”, sino convertir la arquitectura en comportamiento real.
+
+El siguiente paso más inteligente es que te entregue el paquete completo de la **Fase 3: implementación del módulo `organizacion`**, incluyendo:
+
+- modelos SQLAlchemy
+- repositorios
+- casos de uso
+- rutas FastAPI
+- orden de integración con PostgreSQL
+
+Si quieres, te lo doy ya listo en español y archivo por archivo.
+```
+
+
+------------------
+
+--------------------------
+
+
+
+Perfecto. Tomando como base que la **Fase 6 dejó operativo el kardex y la trazabilidad de consulta**, la siguiente fase lógica es construir la **capa transaccional que alimenta ese kardex**.
+
+## Plan técnico de desarrollo de la siguiente fase
+
+# Fase 7 – Movimientos y Ajustes de Inventario
+
+## 1. Objetivo técnico
+
+Construir la capa de negocio que permita **registrar, validar y auditar movimientos de inventario**, de modo que el kardex no dependa de datos dispersos sino de una fuente transaccional consistente.
+
+La meta es que cualquier cambio de stock quede soportado por:
+
+* un movimiento formal
+* una referencia de origen
+* reglas de validación
+* impacto trazable sobre existencias
+* compatibilidad total con el kardex ya implementado
+
+---
+
+## 2. Resultado esperado de la fase
+
+Al cerrar esta fase, el sistema debería permitir:
+
+* registrar entradas de inventario
+* registrar salidas de inventario
+* registrar ajustes manuales
+* registrar motivo y referencia del movimiento
+* recalcular stock de manera confiable
+* dejar trazabilidad completa por producto y presentación
+* alimentar automáticamente los endpoints de kardex
+
+En otras palabras: el sistema ya no solo **consulta** historial, sino que empieza a **construirlo correctamente**.
+
+---
+
+## 3. Alcance funcional sugerido
+
+## Dentro del alcance
+
+### A. Movimientos base
+
+* entrada
+* salida
+* ajuste positivo
+* ajuste negativo
+
+### B. Validaciones críticas
+
+* no permitir salidas que dejen stock inválido, si esa es tu regla
+* exigir empresa válida
+* exigir producto o presentación válidos
+* exigir cantidad mayor que cero
+* exigir tipo de movimiento válido
+* exigir referencia o motivo cuando aplique
+
+### C. Persistencia de trazabilidad
+
+Cada movimiento debe guardar:
+
+* empresa_id
+* producto_id
+* presentacion_id
+* tipo_movimiento
+* subtipo o motivo
+* cantidad
+* saldo_anterior
+* saldo_resultante
+* fecha
+* usuario
+* referencia_tipo
+* referencia_id
+* observación
+
+### D. Consulta complementaria
+
+* stock actual por producto
+* stock actual por presentación
+* detalle del último movimiento
+* historial filtrable por fechas o tipo
+
+---
+
+## 4. Fuera de alcance por ahora
+
+Para no agrandar demasiado la fase, dejaría fuera inicialmente:
+
+* valorización de inventario
+* costo promedio ponderado
+* importación masiva
+* reportes PDF/Excel
+* multi-bodega avanzada, salvo que ya exista
+* reservas de stock
+* lotes/series/fechas de vencimiento, salvo que sean críticas hoy
+
+---
+
+## 5. Diseño técnico recomendado
+
+## A. Modelo de datos
+
+La pieza central debe ser una tabla de movimientos, algo como:
+
+### `inventario_movimientos`
+
+Campos recomendados:
+
+* `id`
+* `empresa_id`
+* `producto_id`
+* `presentacion_id`
+* `tipo_movimiento`
+* `subtipo_movimiento`
+* `cantidad`
+* `signo`
+* `stock_anterior`
+* `stock_resultante`
+* `referencia_tipo`
+* `referencia_id`
+* `descripcion`
+* `fecha_movimiento`
+* `creado_por`
+* `created_at`
+* `updated_at`
+* `activo`
+
+Si manejas existencias materializadas, agrega otra tabla o estructura de saldo:
+
+### `inventario_existencias`
+
+* `id`
+* `empresa_id`
+* `producto_id`
+* `presentacion_id`
+* `stock_actual`
+* `updated_at`
+
+Esto te da dos niveles:
+
+* **ledger**: historial inmutable de movimientos
+* **snapshot**: saldo actual rápido de consultar
+
+---
+
+## 6. Regla de arquitectura
+
+Te recomiendo esta separación:
+
+### Controladores / routers
+
+Solo reciben request, validan formato y delegan.
+
+### Servicios
+
+Aplican reglas de negocio:
+
+* validación de stock
+* cálculo de saldo
+* creación de movimiento
+* actualización de existencias
+* relación con trazabilidad
+
+### Repositorios o capa de acceso a datos
+
+Encapsulan queries e inserciones.
+
+### Serializadores / schemas
+
+Estandarizan request y response.
+
+---
+
+## 7. Estructura sugerida de backend
+
+Si tu proyecto está en Python API tipo FastAPI, una estructura sana sería:
+
+```text
+app/
+  api/
+    inventario.py
+  services/
+    inventario_movimientos_service.py
+    inventario_stock_service.py
+    inventario_trazabilidad_service.py
+  repositories/
+    inventario_movimientos_repository.py
+    inventario_existencias_repository.py
+  schemas/
+    inventario_movimientos.py
+  models/
+    inventario_movimientos.py
+    inventario_existencias.py
+  tests/
+    test_inventario_movimientos.py
+    test_inventario_ajustes.py
+    test_inventario_stock.py
+```
+
+---
+
+## 8. Endpoints de la siguiente fase
+
+## A. Registrar movimiento
+
+`POST /inventario/movimientos`
+
+Body sugerido:
+
+```json
+{
+  "empresa_id": "uuid",
+  "producto_id": "uuid",
+  "presentacion_id": "uuid",
+  "tipo_movimiento": "entrada",
+  "subtipo_movimiento": "ajuste_manual",
+  "cantidad": 10,
+  "referencia_tipo": "ajuste",
+  "referencia_id": "uuid-opcional",
+  "descripcion": "Ajuste por conteo físico"
+}
+```
+
+## B. Registrar ajuste
+
+`POST /inventario/ajustes`
+
+Este endpoint puede encapsular la lógica de ajuste y llamar internamente al servicio de movimientos.
+
+## C. Consultar stock actual
+
+`GET /inventario/stock/productos/{producto_id}`
+`GET /inventario/stock/presentaciones/{presentacion_id}`
+
+## D. Historial de movimientos
+
+`GET /inventario/movimientos`
+Con filtros por:
+
+* empresa
+* producto
+* presentación
+* fecha
+* tipo
+
+---
+
+## 9. Reglas de negocio que debes fijar ya
+
+Estas decisiones son clave antes de codificar mucho:
+
+## Regla 1: ¿Se permite stock negativo?
+
+Debes definir una sola política:
+
+* **No permitido**: más seguro para negocio
+* **Permitido controlado**: más flexible, pero más riesgoso
+
+Mi recomendación: **no permitirlo por defecto**.
+
+## Regla 2: ¿El kardex se calcula desde movimientos o desde un saldo persistido?
+
+Recomendación:
+
+* el historial sale de `inventario_movimientos`
+* el saldo rápido sale de `inventario_existencias`
+
+## Regla 3: ¿Los movimientos son editables?
+
+Recomendación:
+
+* no editar movimientos históricos
+* corregir con un nuevo ajuste
+  Eso protege auditoría y trazabilidad.
+
+## Regla 4: ¿Qué campos son obligatorios?
+
+Mínimo:
+
+* empresa
+* producto o presentación
+* tipo
+* cantidad
+* usuario
+* fecha
+* referencia o motivo
+
+---
+
+## 10. Secuencia de desarrollo recomendada
+
+## Bloque 1 – Base de datos
+
+Construir:
+
+* tabla de movimientos
+* tabla de existencias
+* índices por empresa, producto, presentación y fecha
+* migraciones
+
+Índices útiles:
+
+* `(empresa_id, producto_id, fecha_movimiento)`
+* `(empresa_id, presentacion_id, fecha_movimiento)`
+* `(empresa_id, producto_id, presentacion_id)`
+
+## Bloque 2 – Servicio de stock
+
+Crear un servicio central que:
+
+* obtenga stock actual
+* valide disponibilidad
+* calcule nuevo saldo
+* actualice existencia
+
+## Bloque 3 – Servicio de movimientos
+
+Crear la lógica para:
+
+* registrar entrada
+* registrar salida
+* registrar ajuste
+* persistir referencia
+* devolver response uniforme
+
+## Bloque 4 – Integración con kardex
+
+Revisar los endpoints de Fase 6 para que lean desde la tabla transaccional nueva o desde la fuente consolidada.
+
+## Bloque 5 – Pruebas
+
+Cubrir:
+
+* unitarias
+* integración
+* E2E
+
+---
+
+## 11. Casos de prueba obligatorios
+
+## Unitarios
+
+* entrada suma correctamente
+* salida resta correctamente
+* ajuste positivo incrementa
+* ajuste negativo reduce
+* no permite cantidad cero o negativa
+* no permite salida sin stock suficiente, si aplica regla
+* calcula saldo anterior y saldo resultante correctamente
+
+## Integración
+
+* crear movimiento genera registro
+* crear movimiento actualiza existencias
+* kardex refleja el movimiento recién creado
+* consulta de stock coincide con último saldo
+
+## Negativos
+
+* token inválido
+* empresa inválida
+* producto inexistente
+* presentación inexistente
+* tipo de movimiento inválido
+* cantidad inválida
+* referencia inválida
+
+---
+
+## 12. Riesgos técnicos a controlar
+
+### Riesgo 1: desalineación entre stock actual y kardex
+
+Mitigación:
+
+* una sola función de escritura de movimientos
+* no actualizar stock por fuera del servicio central
+
+### Riesgo 2: duplicación de movimientos
+
+Mitigación:
+
+* idempotencia o control por referencia externa
+* validación de duplicados cuando venga de compras o ventas
+
+### Riesgo 3: concurrencia
+
+Si dos procesos descuentan stock al mismo tiempo, puedes romper saldos.
+
+Mitigación:
+
+* transacciones
+* bloqueo de fila o estrategia atómica
+* recalcular saldo dentro de la transacción
+
+### Riesgo 4: trazabilidad incompleta
+
+Mitigación:
+
+* hacer obligatorios `referencia_tipo` y `descripcion` para ajustes manuales
+* persistir `creado_por`
+
+---
+
+## 13. Contrato de respuesta recomendado
+
+Unifica las respuestas desde ya:
+
+```json
+{
+  "ok": true,
+  "message": "Movimiento registrado correctamente",
+  "data": {
+    "id": "uuid",
+    "empresa_id": "uuid",
+    "producto_id": "uuid",
+    "presentacion_id": "uuid",
+    "tipo_movimiento": "salida",
+    "cantidad": 3,
+    "stock_anterior": 10,
+    "stock_resultante": 7,
+    "referencia_tipo": "venta",
+    "referencia_id": "uuid",
+    "fecha_movimiento": "2026-03-14T14:30:00"
+  }
+}
+```
+
+Eso te simplifica:
+
+* frontend
+* QA
+* depuración
+* auditoría
+
+---
+
+## 14. Criterios de aceptación de la fase
+
+La fase queda lista cuando se cumpla esto:
+
+### Técnico
+
+* existe tabla o estructura formal de movimientos
+* existe cálculo consistente de saldo
+* existe actualización de stock actual
+* existen endpoints para registrar movimientos
+* existen validaciones de integridad
+
+### Funcional
+
+* una entrada impacta stock y kardex
+* una salida impacta stock y kardex
+* un ajuste impacta stock y kardex
+* cada movimiento queda trazable
+* no hay saldos inconsistentes
+
+### QA
+
+* pruebas unitarias aprobadas
+* pruebas de integración aprobadas
+* E2E básico aprobado
+* evidencias registradas
+
+---
+
+## 15. Definición de terminado
+
+Puedes considerar la fase terminada cuando:
+
+* registrar movimientos ya no requiere intervención manual en base de datos
+* el kardex refleja movimientos reales
+* el stock actual coincide con el histórico
+* las reglas críticas están cubiertas por pruebas
+* los errores funcionales devuelven respuestas controladas
+
+---
+
+## 16. Recomendación de orden después de esta fase
+
+Después de Fase 7, el camino natural sería:
+
+### Fase 8
+
+Integración con documentos origen:
+
+* compras
+* ventas
+* devoluciones
+* transferencias
+
+### Fase 9
+
+Reportes:
+
+* existencias
+* movimientos
+* kardex filtrado
+* auditoría de ajustes
+
+### Fase 10
+
+Valorización y control avanzado:
+
+* costo promedio
+* lotes
+* vencimientos
+* cierres
+
+---
+
+## 17. Versión ejecutiva del plan
+
+**Siguiente fase propuesta:** Movimientos y Ajustes de Inventario.
+**Objetivo:** convertir el módulo de inventario en un sistema transaccional auditable, donde cada cambio de stock quede registrado, validado y trazable.
+**Componentes a construir:** tabla de movimientos, tabla de existencias, servicios de stock y movimiento, endpoints de registro, validaciones de negocio, pruebas unitarias/integración y adaptación del kardex actual para consumir la nueva fuente transaccional.
+**Resultado esperado:** stock confiable, kardex consistente y base lista para integrar compras, ventas y reportes.
+
+Si quieres, el siguiente paso te lo bajo a un formato todavía más práctico: **backlog técnico por tareas y archivos**.

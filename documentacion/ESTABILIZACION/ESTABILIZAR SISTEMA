@@ -1,0 +1,525 @@
+Perfecto. Aquí tienes el backlog en formato **tipo Trello/Jira**, listo para ejecutar.
+
+# Backlog maestro
+
+| ID    | Prioridad | Tarea                                                          | Archivos principales                                                                                                                                                                                                                                                                                                                                                                                                                           | Estimación | Dependencias                             | Criterio de aceptación                                                                                             |
+| ----- | --------- | -------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------: | ---------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| P0-01 | P0        | Limpiar secretos y artefactos sensibles                        | `.gitignore`, `.env`, `.env.example`, `servicios/.env`, `servicios/.env.ejemplo`, `servicios/dulceria.db`, `servicios/.coverage`, `.dockerignore`                                                                                                                                                                                                                                                                                              |         4h | Ninguna                                  | No hay `.env`, `.db`, `.coverage`, `.git` en entregables; existe `.env.example`; git no vuelve a trackear secretos |
+| P0-02 | P0        | Definir backend oficial único                                  | `nucleo/interfaz/api/app.py`, `servicios/main.py`, `servicios/Dockerfile`                                                                                                                                                                                                                                                                                                                                                                      |         5h | P0-01                                    | Solo existe una entrada oficial de backend; `uvicorn nucleo.interfaz.api.app:app` levanta correctamente            |
+| P0-03 | P0        | Corregir Docker y Compose                                      | `infraestructura/docker-compose.yml`, `infraestructura/docker-compose.sin-dependencia.yml`, `infraestructura/docker-compose.dev.yml`, `infraestructura/contenedores/docker/docker-compose.yml`, `infraestructura/contenedores/docker/docker-compose.dev.yml`, `infraestructura/contenedores/docker/docker-compose.prod.yml`, `infraestructura/contenedores/docker/docker-compose.monitoring.yml`, `docker-compose.yml`, `scripts/desplegar.sh` |         8h | P0-02                                    | Un solo comando levanta entorno; no quedan referencias a `servidor/`; dev y prod usan el backend real              |
+| P0-04 | P0        | Endurecer CORS por ambiente                                    | `nucleo/interfaz/api/app.py`                                                                                                                                                                                                                                                                                                                                                                                                                   |         2h | P0-02                                    | En prod solo acepta dominios definidos; localhost solo en dev; no existe wildcard global                           |
+| P0-05 | P0        | Proteger endpoints sin autenticación                           | `nucleo/interfaz/api/v1/catalogo/rutas/rutas_categorias.py`, `rutas_marcas.py`, `rutas_presentaciones.py`, `nucleo/interfaz/api/v1/organizacion/rutas/rutas_tenants.py`, `nucleo/interfaz/api/v1/inventario/rutas/rutas_movimientos_inventario.py`, `rutas_kardex_inventario.py`, `nucleo/interfaz/api/dependencias/seguridad.py`                                                                                                              |         8h | P0-02, P0-04                             | Sin token válido responden 401/403; con token válido operan dentro del contexto permitido                          |
+| P0-06 | P0        | Corregir aislamiento multi-tenant en ventas                    | `nucleo/interfaz/api/v1/ventas/rutas/rutas_ventas.py`, `nucleo/aplicacion/ventas/casos_uso/obtener_venta.py`, `nucleo/dominio/ventas/repositorios/repositorio_venta.py`, `nucleo/infraestructura/db/repositorios/ventas/repositorio_venta_sqlalchemy.py`                                                                                                                                                                                       |         6h | P0-05                                    | Ningún tenant puede leer ventas ajenas por `venta_id`; prueba de integración pasa                                  |
+| P0-07 | P0        | Eliminar confianza en `tenant_id` y `usuario_id` desde cliente | esquemas de catálogo, organización, inventario, login                                                                                                                                                                                                                                                                                                                                                                                          |        10h | P0-05                                    | Rutas autenticadas derivan contexto del token; frontend no puede suplantar tenant o usuario                        |
+| P1-01 | P1        | Validar jerarquía real tenant→empresa→sucursal→bodega          | `nucleo/aplicacion/inventario/servicios/servicio_aplicacion_inventario.py`, `nucleo/aplicacion/catalogo/servicios/servicio_aplicacion_catalogo.py`, `nucleo/aplicacion/organizacion/servicios/servicio_aplicacion_organizacion.py`                                                                                                                                                                                                             |        10h | P0-07                                    | El backend rechaza relaciones inconsistentes aunque los IDs existan                                                |
+| P1-02 | P1        | Reemplazar/endurecer JWT                                       | `nucleo/infraestructura/seguridad/autenticacion/gestor_jwt.py`, `nucleo/interfaz/api/dependencias/seguridad.py`                                                                                                                                                                                                                                                                                                                                |         6h | P0-07                                    | Sin secreto real la app falla al arrancar; tokens inválidos/expirados se rechazan                                  |
+| P1-03 | P1        | Unificar rutas y flujo de inventario                           | `rutas_movimientos_inventario.py`, `rutas_kardex_inventario.py`, `rutas_entradas_inventario.py`, `rutas_salidas_inventario.py`, `rutas_ajustes_inventario.py`, `rutas_consultas_inventario.py`                                                                                                                                                                                                                                                 |         8h | P1-01, P1-02                             | Todas las rutas de inventario usan el mismo modelo de autenticación y validación                                   |
+| P1-04 | P1        | Corregir dependencias backend                                  | `requisitos.txt`, `nucleo/infraestructura/db/conexion.py`                                                                                                                                                                                                                                                                                                                                                                                      |         3h | P0-02                                    | `pip install -r requisitos.txt` funciona en limpio; backend inicia                                                 |
+| P1-05 | P1        | Reparar estructura frontend para compilación                   | `cliente/index.html`, `cliente/vite.config.js`, `cliente/package.json`, `cliente/Dockerfile`, `cliente/nginx.conf`, mover `cliente/web/src/*` a `cliente/src/*`                                                                                                                                                                                                                                                                                |        10h | P0-03                                    | `npm run build` pasa; entrypoint y estructura Vite quedan alineados                                                |
+| P1-06 | P1        | Crear páginas faltantes del frontend                           | `cliente/src/paginas/auth/LoginPage.jsx`, `dashboard/DashboardPage.jsx`, `productos/ProductosPage.jsx`, `pos/POSPage.jsx`, `inventario/InventarioPage.jsx`, `reportes/ReportesPage.jsx`, `clientes/ClientesPage.jsx`, `proveedores/ProveedoresPage.jsx`                                                                                                                                                                                        |        16h | P1-05                                    | La app renderiza rutas importadas sin romper build                                                                 |
+| P1-07 | P1        | Corregir CI/CD                                                 | `.github/workflows/ci.yml`, `cliente/package.json`                                                                                                                                                                                                                                                                                                                                                                                             |         6h | P1-04, P1-05                             | CI corre backend + build frontend sin referencias inexistentes                                                     |
+| P1-08 | P1        | Reemplazar pruebas placeholder                                 | `pruebas/e2e/inventario/test_fase_7_movimientos_ajustes.py`, `pruebas/integracion/inventario/test_kardex_inventario.py`, `pruebas/integracion/inventario/test_registrar_movimiento_inventario.py`, `pruebas/conftest.py`, nuevas pruebas integración/e2e                                                                                                                                                                                       |        14h | P0-06, P1-01, P1-02                      | No quedan `assert True`; las pruebas detectan fallos reales de auth y aislamiento                                  |
+| P2-01 | P2        | Estructura frontend core reusable                              | `cliente/src/componentes/Layout.jsx`, `Sidebar.jsx`, `Header.jsx`, `cliente/src/rutas/PrivateRoute.jsx`, `cliente/src/servicios/api.js`, `cliente/src/estado/auth.js`                                                                                                                                                                                                                                                                          |        10h | P1-06                                    | Navegación protegida y consumo centralizado de API                                                                 |
+| P2-02 | P2        | Terminar módulo clientes                                       | nuevos archivos en `nucleo/aplicacion/clientes`, `nucleo/dominio/clientes`, `nucleo/infraestructura/db/modelos/clientes`, `repositorios/clientes`, `interfaz/api/v1/clientes`                                                                                                                                                                                                                                                                  |        18h | P1-02, P1-01                             | CRUD de clientes operativo y aislado por tenant                                                                    |
+| P2-03 | P2        | Terminar módulo proveedores                                    | nuevos archivos en `nucleo/aplicacion/proveedores`, `nucleo/dominio/proveedores`, `nucleo/infraestructura/db/modelos/proveedores`, `repositorios/proveedores`, `interfaz/api/v1/proveedores`                                                                                                                                                                                                                                                   |        18h | P1-02, P1-01                             | CRUD de proveedores operativo y aislado por tenant                                                                 |
+| P2-04 | P2        | Terminar módulo reportes                                       | nuevos archivos en `nucleo/aplicacion/reportes`, `interfaz/api/v1/reportes`                                                                                                                                                                                                                                                                                                                                                                    |        16h | P2-02, P2-03, ventas/inventario estables | Reportes de ventas e inventario consumibles desde frontend                                                         |
+| P2-05 | P2        | Cerrar flujo POS real                                          | `cliente/src/paginas/pos/POSPage.jsx`, rutas y casos de uso de ventas/inventario                                                                                                                                                                                                                                                                                                                                                               |        12h | P1-03, P1-06                             | El POS registra venta real y descuenta inventario                                                                  |
+| P2-06 | P2        | Dashboard mínimo operativo                                     | `cliente/src/paginas/dashboard/DashboardPage.jsx`, endpoints de métricas                                                                                                                                                                                                                                                                                                                                                                       |        10h | P2-04                                    | Dashboard muestra KPIs básicos reales                                                                              |
+| P2-07 | P2        | Documentación técnica alineada al sistema real                 | `README.md`, documentación de despliegue, scripts, ejemplos `.env`                                                                                                                                                                                                                                                                                                                                                                             |         6h | P1-07                                    | Cualquier desarrollador puede levantar el sistema siguiendo docs reales                                            |
+
+# Epics recomendados
+
+## Epic 1 — Seguridad y aislamiento
+
+Incluye:
+
+* P0-01
+* P0-04
+* P0-05
+* P0-06
+* P0-07
+* P1-01
+* P1-02
+
+**Resultado esperado:** sistema seguro y multi-tenant confiable.
+
+## Epic 2 — Ejecutabilidad y despliegue
+
+Incluye:
+
+* P0-02
+* P0-03
+* P1-04
+* P1-07
+* P2-07
+
+**Resultado esperado:** entorno reproducible y desplegable.
+
+## Epic 3 — Frontend funcional
+
+Incluye:
+
+* P1-05
+* P1-06
+* P2-01
+* P2-05
+* P2-06
+
+**Resultado esperado:** interfaz que compila y opera sobre API real.
+
+## Epic 4 — Calidad y pruebas
+
+Incluye:
+
+* P1-08
+
+**Resultado esperado:** regresión controlada y menos errores ocultos.
+
+## Epic 5 — Terminación de módulos faltantes
+
+Incluye:
+
+* P2-02
+* P2-03
+* P2-04
+
+**Resultado esperado:** sistema comercial más completo.
+
+# Sprint sugerido
+
+## Sprint 1
+
+* P0-01
+* P0-02
+* P0-03
+* P0-04
+
+**Meta:** el sistema levanta limpio.
+
+## Sprint 2
+
+* P0-05
+* P0-06
+* P0-07
+* P1-01
+* P1-02
+
+**Meta:** seguridad y tenant isolation cerrados.
+
+## Sprint 3
+
+* P1-03
+* P1-04
+* P1-05
+* P1-06
+
+**Meta:** backend consistente y frontend compilando.
+
+## Sprint 4
+
+* P1-07
+* P1-08
+* P2-01
+
+**Meta:** pipeline verde y base frontend reusable.
+
+## Sprint 5
+
+* P2-02
+* P2-03
+* P2-05
+
+**Meta:** clientes, proveedores y POS real.
+
+## Sprint 6
+
+* P2-04
+* P2-06
+* P2-07
+
+**Meta:** reportes, dashboard y documentación final.
+
+# Ruta crítica
+
+La ruta crítica real es esta:
+
+**P0-01 → P0-02 → P0-03 → P0-05 → P0-06 → P0-07 → P1-01 → P1-02 → P1-03 → P1-05 → P1-06 → P1-07 → P1-08**
+
+Si esa cadena no se cierra, el sistema seguirá “pareciendo grande” pero no estará terminado.
+
+# Estimación global honesta
+
+Si una sola persona lo hace bien, con foco técnico real:
+
+* **Estabilización fuerte:** 2 a 3 semanas
+* **Terminación del core usable:** 4 a 6 semanas
+* **Terminación más completa con clientes/proveedores/reportes:** 6 a 8 semanas
+
+Eso asumiendo que no rehaces arquitectura y trabajas sobre lo existente.
+
+# Definición de Done final
+
+El sistema estará “terminado” cuando puedas marcar esto:
+
+* backend único y estable
+* frontend compila sin hacks
+* login funcional
+* rutas protegidas
+* tenant isolation probado
+* catálogo operativo
+* inventario operativo
+* ventas operativas
+* POS operativo
+* dashboard básico operativo
+* clientes y proveedores operativos
+* reportes mínimos operativos
+* CI verde
+* documentación real de despliegue
+
+En el siguiente paso te lo convierto a **plan de ejecución diario**, tipo:
+
+**Día 1, Día 2, Día 3... con qué tocar, en qué orden y qué validar al final de cada día.**
+
+
+
+Perfecto. Aquí tienes la **versión académica estilo tesis universitaria**, estructurada formalmente para que puedas usarla como base de documento, informe de grado, memoria técnica o capítulo de implementación.
+
+# Tesis técnica académica
+
+## Fase de estabilización, contenedorización y auditoría integral del sistema SaaS Dulcería
+
+**Autor:** Bryan Stiven B
+**Proyecto:** Sistema SaaS Dulcería
+**Fecha:** 14 de marzo de 2026
+
+---
+
+## Resumen
+
+La presente investigación técnica documenta la fase de estabilización, contenedorización y auditoría integral aplicada al proyecto **Sistema SaaS Dulcería**, una plataforma orientada a la gestión empresarial bajo arquitectura modular. La intervención surgió como respuesta a una condición de inestabilidad operativa caracterizada por inconsistencias entre la estructura física del repositorio, la configuración del despliegue, la organización del frontend, la conexión del backend con la base de datos y la coexistencia de múltiples configuraciones heredadas.
+
+El trabajo desarrollado tuvo como propósito restaurar la capacidad de ejecución del sistema, asegurar la coherencia mínima entre sus componentes y dejar evidencia verificable de su estado técnico. Para ello se empleó una metodología incremental basada en saneamiento de configuración, reconstrucción del despliegue Docker, corrección de módulos críticos, validación funcional por servicios HTTP y ejecución de una auditoría integral apoyada en scripts de inspección y semáforo técnico.
+
+Como resultado, el sistema fue recuperado a un estado funcional verificable: el backend quedó operativo mediante FastAPI y Uvicorn, el frontend fue reconstruido y desplegado mediante Vite y Nginx, PostgreSQL y Redis quedaron en estado saludable, y se generó una auditoría integral con salida semaforizada. No obstante, el análisis final permitió identificar observaciones pendientes relacionadas con secretos embebidos, archivos heredados, deuda técnica y cambios no consolidados en Git.
+
+La investigación concluye que la fase fue exitosa en términos de estabilización operativa, pero también demuestra que la recuperación funcional de un sistema no equivale automáticamente a su madurez productiva. El mayor valor de la fase radica en haber transformado un estado de desorden implícito en una base operativa controlable y en deuda técnica explícita.
+
+**Palabras clave:** estabilización de software, Docker, auditoría técnica, FastAPI, Vite, deuda técnica, despliegue reproducible, SaaS.
+
+---
+
+# Capítulo 1. Planteamiento del problema
+
+## 1.1. Descripción del problema
+
+Los sistemas de software empresariales construidos sobre arquitecturas modulares suelen evolucionar mediante múltiples iteraciones, refactorizaciones y ajustes de infraestructura. Aunque esta evolución es natural, también introduce riesgo de fragmentación técnica cuando el código, la estructura del repositorio y la configuración de despliegue dejan de corresponder entre sí. Esta situación se presentó en el proyecto **Sistema SaaS Dulcería**.
+
+Durante el proceso de revisión del sistema se evidenció que la plataforma había perdido coherencia operativa entre sus componentes. El despliegue mediante Docker no era reproducible, el backend referenciaba configuraciones afectadas por modificaciones defectuosas, el frontend no coincidía con el contexto de build esperado y coexistían diferentes archivos de configuración con valores heredados o inconsistentes. Adicionalmente, el repositorio contenía artefactos residuales, caches, backups y configuraciones ambiguas que dificultaban la trazabilidad del estado real del sistema.
+
+La consecuencia directa de esta situación fue la imposibilidad de garantizar que el sistema pudiera ejecutarse de forma estable y verificable. Más allá del fallo puntual de un servicio, el problema se extendía a la pérdida de confianza técnica sobre la fuente real de ejecución, la exposición de configuraciones inseguras y la ausencia de una validación unificada del estado del proyecto.
+
+## 1.2. Formulación del problema
+
+¿Cómo restablecer la estabilidad operativa, la coherencia estructural y la verificabilidad técnica del sistema SaaS Dulcería mediante una fase integral de estabilización, contenedorización y auditoría?
+
+## 1.3. Sistematización del problema
+
+Para abordar el problema general, se derivan las siguientes preguntas específicas:
+
+1. ¿Cómo corregir la configuración de despliegue para que refleje la estructura real del repositorio?
+2. ¿Cómo reorganizar el frontend para hacerlo compatible con el proceso de build y despliegue en contenedores?
+3. ¿Cómo restaurar el backend cuando uno de sus módulos críticos presenta errores de sintaxis derivados de refactorización?
+4. ¿Cómo comprobar objetivamente que backend, frontend, base de datos y cache se encuentran operativos?
+5. ¿Cómo identificar deuda técnica, residuos y riesgos de configuración en una auditoría única y reproducible?
+6. ¿Cómo cerrar la fase dejando una base apta para futuras correcciones sin ocultar las observaciones pendientes?
+
+---
+
+# Capítulo 2. Justificación
+
+La relevancia de esta fase radica en que un sistema empresarial no puede continuar su evolución funcional si su base operativa carece de estabilidad. Las nuevas funcionalidades, las pruebas de negocio, la automatización de despliegues y cualquier proceso de endurecimiento de seguridad dependen de una condición previa: que el sistema sea capaz de ejecutarse de manera consistente y auditable.
+
+Desde la perspectiva técnica, la fase es importante porque permitió recuperar el control sobre el sistema. Antes de la intervención, el proyecto presentaba síntomas de desalineación estructural: archivos de despliegue apuntando a rutas inexistentes, frontend parcialmente desplazado respecto a su contexto de construcción, errores críticos en la conexión a base de datos y coexistencia de configuraciones históricas no homologadas. En ese escenario, cada intento de ejecutar o corregir el sistema podía producir resultados distintos y poco confiables.
+
+Desde la perspectiva metodológica, esta fase demuestra la necesidad de abordar la estabilización como una investigación aplicada y no como una simple colección de parches. La auditoría final, el semáforo técnico, la limpieza de residuos y la documentación generada convirtieron una recuperación táctica en un proceso trazable.
+
+Desde la perspectiva organizacional, el valor de la fase consiste en dejar al equipo una base controlable desde la cual continuar el proyecto. La estabilización no solo solucionó errores visibles; también hizo evidente la deuda técnica oculta, lo cual facilita su tratamiento posterior con criterios más claros.
+
+---
+
+# Capítulo 3. Objetivos
+
+## 3.1. Objetivo general
+
+Restablecer la estabilidad operativa, la coherencia estructural y la verificabilidad técnica del sistema SaaS Dulcería mediante una fase integral de estabilización, contenedorización y auditoría.
+
+## 3.2. Objetivos específicos
+
+1. Normalizar los archivos base de configuración necesarios para el despliegue del sistema.
+2. Reestructurar el proceso de construcción del backend y del frontend en Docker.
+3. Reparar el módulo crítico de conexión PostgreSQL para recuperar el arranque del backend.
+4. Garantizar la disponibilidad operativa de backend, frontend, PostgreSQL y Redis.
+5. Diseñar y ejecutar una auditoría integral automatizada del sistema.
+6. Eliminar residuos técnicos que afecten la limpieza y trazabilidad del repositorio.
+7. Identificar y documentar las observaciones técnicas pendientes al cierre de la fase.
+
+---
+
+# Capítulo 4. Marco teórico
+
+## 4.1. Estabilización de sistemas de software
+
+La estabilización de software es un proceso orientado a recuperar un estado controlado de ejecución cuando un sistema presenta inconsistencias estructurales, errores acumulados o pérdida de trazabilidad operativa. A diferencia del desarrollo funcional, la estabilización no persigue añadir nuevas capacidades de negocio, sino restaurar las condiciones técnicas mínimas que permiten que el sistema funcione, pueda ser evaluado y continúe evolucionando.
+
+## 4.2. Contenedorización como estrategia de reproducibilidad
+
+Docker constituye una herramienta fundamental para garantizar reproducibilidad en entornos de desarrollo y despliegue. La contenedorización encapsula dependencias, entorno de ejecución, configuración y proceso de arranque. Sin embargo, esta reproducibilidad solo se consigue si las rutas de build, los Dockerfiles y la estructura real del proyecto están alineados. Cuando esa alineación se rompe, Docker no corrige el problema: lo hace visible.
+
+## 4.3. Deuda técnica
+
+La deuda técnica se refiere al conjunto de decisiones, residuos, inconsistencias o atajos que incrementan el costo futuro de mantenimiento del sistema. En esta fase, la deuda técnica se manifestó en múltiples formas: valores heredados de configuraciones antiguas, archivos temporales dentro del repositorio, defaults inseguros, múltiples compose sin consolidar y una transición incompleta entre estructuras de frontend y backend.
+
+## 4.4. Auditoría técnica integral
+
+La auditoría técnica integral consiste en examinar el sistema desde múltiples perspectivas: archivos críticos, despliegue, salud de servicios, sintaxis, estructura, logs, seguridad básica y estado del control de versiones. Su objetivo no es solo detectar fallos, sino producir un diagnóstico unificado y comprensible del estado actual del software.
+
+---
+
+# Capítulo 5. Metodología
+
+## 5.1. Enfoque metodológico
+
+La fase se desarrolló bajo un enfoque aplicado, incremental y empírico. Cada intervención fue validada mediante evidencia observable antes de continuar con la siguiente. No se asumió que una corrección aislada resolvería el sistema completo; por el contrario, se abordó la recuperación por capas.
+
+## 5.2. Fases metodológicas
+
+### 5.2.1. Saneamiento de archivos base
+
+Se revisaron y ajustaron los archivos:
+
+* `.gitignore`
+* `.dockerignore`
+* `.env.example`
+
+El objetivo fue separar artefactos temporales del repositorio, reducir contaminación de builds y establecer variables mínimas de ejemplo.
+
+### 5.2.2. Parametrización de componentes críticos
+
+Se reemplazaron configuraciones rígidas por variables de entorno en componentes clave del backend, especialmente en la gestión de JWT, CORS y conexión a base de datos. Esta etapa mejoró la flexibilidad, aunque una sustitución defectuosa en el módulo PostgreSQL produjo un error de sintaxis que obligó a una corrección manual posterior.
+
+### 5.2.3. Reconstrucción del despliegue Docker
+
+Se corrigió el archivo principal `docker-compose.yml`, sustituyendo referencias a rutas inexistentes y definiendo explícitamente:
+
+* el backend desde `Dockerfile.backend`,
+* el frontend desde `cliente/web/Dockerfile`,
+* servicios auxiliares para PostgreSQL y Redis,
+* dependencias y puertos operativos.
+
+### 5.2.4. Reestructuración del frontend
+
+El frontend fue adaptado hasta lograr una estructura mínima funcional bajo `cliente/web`, incorporando:
+
+* `package.json`,
+* `package-lock.json`,
+* `vite.config.js`,
+* `index.html`,
+* páginas del módulo principal.
+
+Esto resolvió errores progresivos de build relacionados con rutas, contexto y módulos.
+
+### 5.2.5. Recuperación del backend
+
+Se reescribió `conexion_postgresql.py` de forma limpia y explícita, devolviendo estabilidad a la carga del backend.
+
+### 5.2.6. Validación operativa
+
+Se comprobó el estado del sistema mediante:
+
+* `docker compose ps`,
+* acceso HTTP al backend,
+* acceso HTTP al frontend,
+* lectura de logs,
+* verificación de `openapi.json`,
+* comprobación de servicios healthy.
+
+### 5.2.7. Auditoría integral
+
+Se ejecutó un comando único de auditoría que examinó:
+
+* archivos críticos,
+* contenedores,
+* healthchecks,
+* estructura del frontend,
+* sintaxis Python,
+* secretos y defaults inseguros,
+* logs,
+* residuos técnicos,
+* estado Git,
+* semáforo final.
+
+### 5.2.8. Precierre técnico
+
+Finalmente se eliminaron residuos técnicos como `.bak`, `__pycache__` y `dist`, y se reforzó `.gitignore` con reglas adicionales.
+
+---
+
+# Capítulo 6. Desarrollo de la intervención
+
+## 6.1. Corrección del despliegue principal
+
+El primer hallazgo crítico fue que el archivo principal de Docker apuntaba a una ruta de backend inexistente. El sistema intentaba construir una imagen desde `servicios/Dockerfile`, aunque esa ruta ya no representaba el estado real del proyecto. Esta inconsistencia impedía la construcción de imágenes.
+
+Se decidió entonces crear una estrategia de despliegue basada en la raíz del repositorio, utilizando `Dockerfile.backend` para el backend y una ruta clara para el frontend.
+
+## 6.2. Corrección progresiva del frontend
+
+Durante la reconstrucción del frontend surgieron varios errores encadenados:
+
+* falta de `package.json`,
+* falta de `index.html`,
+* imposibilidad de resolver `src/main.jsx`,
+* fallos en imports de páginas como `LoginPage`.
+
+Cada uno de estos errores permitió inferir que el frontend no estaba siendo construido desde la ruta correcta o que su estructura aún no estaba completamente trasladada. La solución consistió en rearmar la estructura mínima de `cliente/web` con los archivos necesarios para que Vite pudiera compilar.
+
+## 6.3. Corrección del módulo PostgreSQL
+
+Una modificación automática en `conexion_postgresql.py` dejó una estructura sintácticamente inválida. Este error se evidenció al arrancar Uvicorn, que falló al importar el módulo. La solución consistió en reemplazar por completo el contenido del archivo por una versión limpia, explícita y compatible con `psycopg`.
+
+## 6.4. Validación del sistema
+
+Tras las correcciones, se verificó que:
+
+* el backend respondiera en `/docs`,
+* el endpoint `/openapi.json` devolviera respuesta válida,
+* el frontend devolviera HTTP 200,
+* PostgreSQL y Redis estuvieran saludables,
+* los logs no mostraran errores graves visibles.
+
+## 6.5. Auditoría y semáforo
+
+La auditoría integral concluyó con un estado:
+
+**SEMAFORO: APTO CON OBSERVACIONES**
+
+Este resultado indicó que la fase logró estabilizar el sistema, aunque quedaron riesgos y tareas pendientes de cierre.
+
+---
+
+# Capítulo 7. Resultados
+
+## 7.1. Resultados operativos
+
+Se obtuvo la ejecución simultánea y estable de:
+
+* `dulceria_backend`
+* `dulceria_frontend`
+* `dulceria_postgres`
+* `dulceria_redis`
+
+El backend respondió correctamente con HTTP 200 en `/docs` y `/openapi.json`. El frontend respondió con HTTP 200 en la raíz.
+
+## 7.2. Resultados estructurales
+
+Se dejó una estructura coherente para despliegue mínimo:
+
+* `docker-compose.yml` funcional en raíz,
+* `Dockerfile.backend`,
+* `cliente/web/Dockerfile`,
+* frontend web organizado en `cliente/web`,
+* backend corregido en conexión PostgreSQL.
+
+## 7.3. Resultados de limpieza
+
+Se eliminaron:
+
+* archivos `.bak`,
+* directorios `__pycache__`,
+* build `dist` del frontend.
+
+Además, se reforzó `.gitignore` con reglas para evitar que estos residuos vuelvan a contaminar el repositorio.
+
+## 7.4. Resultados de auditoría
+
+La auditoría detectó:
+
+* ausencia de fallos bloqueantes,
+* existencia de secretos o placeholders inseguros,
+* cambios pendientes en Git,
+* residuos heredados ya en proceso de limpieza,
+* necesidad de consolidación posterior de configuraciones históricas.
+
+---
+
+# Capítulo 8. Discusión
+
+Los resultados obtenidos demuestran que la estabilidad de un sistema complejo depende tanto de su lógica de negocio como de su coherencia estructural. En este caso, el mayor obstáculo no fue una falla funcional aislada, sino la acumulación de desajustes entre configuración, despliegue y organización del repositorio.
+
+La reconstrucción del sistema permitió evidenciar una lección importante: cuando la arquitectura real y la arquitectura ejecutable se separan, el problema deja de ser programático y se vuelve sistémico. Docker, Vite y FastAPI no fallaron por sí mismos; los fallos aparecieron porque estaban recibiendo rutas, dependencias y archivos que ya no correspondían al estado real del proyecto.
+
+También se confirma que una fase de estabilización no debe medirse solo por el hecho de que el sistema “levante”. Un criterio más sólido consiste en determinar si el sistema puede:
+
+1. ejecutarse,
+2. verificarse,
+3. auditarse,
+4. mantenerse,
+5. evolucionar sin aumentar el caos previo.
+
+Bajo este criterio, la fase fue satisfactoria, aunque todavía no completa en términos de endurecimiento productivo.
+
+---
+
+# Capítulo 9. Conclusiones
+
+1. La fase de estabilización permitió restablecer la ejecutabilidad del sistema SaaS Dulcería mediante la corrección de su despliegue, la reorganización del frontend y la recuperación del backend.
+2. La contenedorización funcional del sistema evidenció que el principal problema no residía únicamente en errores de código, sino en la ruptura de coherencia entre estructura real y configuración de despliegue.
+3. La corrección del archivo `conexion_postgresql.py` fue determinante para recuperar el backend y restituir la disponibilidad del servicio.
+4. La auditoría integral aportó un mecanismo objetivo para evaluar el sistema y clasificar su estado final como apto con observaciones.
+5. La limpieza técnica redujo residuos y mejoró la trazabilidad del repositorio, aunque aún quedan configuraciones históricas y secretos/defaults inseguros por normalizar.
+6. La fase fue exitosa como recuperación operativa, pero no debe considerarse cierre total del proceso de maduración técnica del sistema.
+
+---
+
+# Capítulo 10. Recomendaciones
+
+1. Ejecutar una fase inmediata de saneamiento de secretos y variables de entorno.
+2. Consolidar un único conjunto canónico de archivos Docker Compose.
+3. Revisar la estructura definitiva del frontend para confirmar que `cliente/web` sea su ubicación formal y no solo táctica.
+4. Ordenar los cambios de Git en commits limpios y semánticamente agrupados.
+5. Refinar el script de auditoría para reducir ruido y mejorar clasificación de severidades.
+6. Realizar pruebas funcionales por dominio: autenticación, catálogo, inventario, ventas y organización.
+7. Preparar una fase de endurecimiento para producción con manejo seguro de credenciales, entornos y observabilidad.
+
+---
+
+# Bibliografía técnica de referencia
+
+* Merkel, D. *Docker: lightweight Linux containers for consistent development and deployment*.
+* Fowler, M. *Technical Debt Quadrant*.
+* FastAPI Documentation. *Building APIs with Python*.
+* Docker Documentation. *Compose specification and container orchestration*.
+* Vite Documentation. *Frontend tooling and build system*.
+* PostgreSQL Documentation. *Operational deployment and connectivity*.
+* Git Documentation. *Source control and change management practices*.
+
+---
+
+# Anexo A. Síntesis ejecutiva
+
+**Estado inicial:**
+Despliegue roto, rutas inválidas, frontend inconsistente, backend con error crítico de sintaxis, múltiples configuraciones heredadas y residuos técnicos.
+
+**Intervención realizada:**
+Corrección de configuración base, reconstrucción Docker, reorganización de frontend, corrección manual de conexión PostgreSQL, validación HTTP, auditoría integral y limpieza técnica.
+
+**Estado final:**
+Sistema operativo en Docker, backend y frontend respondiendo correctamente, servicios auxiliares saludables, auditoría finalizada y semáforo en estado apto con observaciones.
+
+**Pendientes:**
+Secretos/defaults inseguros, consolidación de compose heredados, confirmación de cambios en Git y validación funcional más profunda.
+
+---
+
+Si quieres, te la paso ahora en una **versión aún más formal con formato de trabajo de grado**: dedicatoria, agradecimientos, introducción, capítulos numerados, conclusiones y anexos listos para pegar en Word.
+

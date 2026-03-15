@@ -1,0 +1,260 @@
+﻿# VARIANTE NO CANONICA
+# Este archivo no es el compose principal del proyecto.
+# Usar preferentemente el docker-compose.yml de la raiz.
+# Mantener este archivo solo para escenarios alternos, legado o soporte.
+# ==========================================================
+# ARQUITECTURA DE PRODUCCION PARA SISTEMA SAAS DULCERIA
+# ESTE DOCKER COMPOSE DEFINE LOS SERVICIOS PRINCIPALES
+# DEL SISTEMA: API, BASE DE DATOS, CACHE, MENSAJERIA,
+# PROXY REVERSO Y MONITOREO.
+# ==========================================================
+
+services:
+
+  # ==========================================================
+  # BASE DE DATOS PRINCIPAL
+  # POSTGRESQL ALMACENA TODA LA INFORMACION TRANSACCIONAL
+  # DEL SISTEMA: CLIENTES, PRODUCTOS, PEDIDOS, FACTURACION.
+  # ==========================================================
+  postgres:
+    image: postgres:15
+    container_name: dulceria_postgres
+    restart: always
+
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-app_db}
+      POSTGRES_USER: ${POSTGRES_USER:-app_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-__SET_IN_ENV__}
+
+    volumes:
+      # PERSISTENCIA DE DATOS
+      - postgres_data:/var/lib/postgresql/data
+
+      # CONFIGURACION PERSONALIZADA
+      - ../postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ../postgres/postgres.conf:/etc/postgresql/postgresql.conf
+      - ../postgres/pg_hba.conf:/etc/postgresql/pg_hba.conf
+
+    networks:
+      - backend_network
+
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # ==========================================================
+  # CACHE EN MEMORIA
+  # REDIS SE UTILIZA PARA ACELERAR CONSULTAS FRECUENTES
+  # Y ALMACENAR SESIONES O DATOS TEMPORALES.
+  # ==========================================================
+  redis:
+    image: redis:7
+    container_name: dulceria_redis
+    restart: always
+
+    networks:
+      - backend_network
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  # ==========================================================
+  # SISTEMA DE MENSAJERIA
+  # RABBITMQ PERMITE PROCESAMIENTO ASINCRONO
+  # PARA TAREAS COMO FACTURACION, NOTIFICACIONES
+  # O PROCESAMIENTO DE PEDIDOS.
+  # ==========================================================
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: dulceria_rabbitmq
+    restart: always
+
+    ports:
+      - "15672:15672"
+
+    volumes:
+      - ../mensajeria/rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
+    networks:
+      - backend_network
+
+
+  # ==========================================================
+  # SERVICIO BACKEND (API)
+  # CONTIENE LA LOGICA DEL NEGOCIO DEL SISTEMA.
+  # ==========================================================
+  backend:
+    build:
+      context: ../../servidor
+      dockerfile: ../infraestructura/docker/Dockerfiles/backend.Dockerfile
+
+    container_name: dulceria_backend
+    restart: always
+
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://app_user:__SET_IN_ENV__@postgres:5432/app_db}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      RABBITMQ_URL: amqp://rabbitmq
+
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+    networks:
+      - backend_network
+      - frontend_network
+
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+
+  # ==========================================================
+  # WORKER DE PROCESAMIENTO
+  # ESTE CONTENEDOR EJECUTA TAREAS EN SEGUNDO PLANO
+  # COMO COLAS DE MENSAJERIA O PROCESOS PESADOS.
+  # ==========================================================
+  worker:
+    build:
+      context: ../../servidor
+      dockerfile: ../infraestructura/docker/Dockerfiles/worker.Dockerfile
+
+    container_name: dulceria_worker
+    restart: always
+
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://app_user:__SET_IN_ENV__@postgres:5432/app_db}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      RABBITMQ_URL: amqp://rabbitmq
+
+    depends_on:
+      - rabbitmq
+      - redis
+      - postgres
+
+    networks:
+      - backend_network
+
+
+  # ==========================================================
+  # SERVIDOR WEB / PROXY REVERSO
+  # NGINX ES EL PUNTO DE ENTRADA DEL SISTEMA.
+  # MANEJA TRAFICO HTTP Y REDIRIGE A LOS SERVICIOS.
+  # ==========================================================
+  nginx:
+    image: nginx:stable
+    container_name: dulceria_nginx
+    restart: always
+
+    ports:
+      - "80:80"
+
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ../nginx/proxy.conf:/etc/nginx/proxy.conf
+      - ../nginx/ssl:/etc/nginx/ssl
+
+    depends_on:
+      - backend
+
+    networks:
+      - frontend_network
+
+
+  # ==========================================================
+  # PROMETHEUS
+  # SISTEMA DE RECOLECCION DE METRICAS
+  # PARA MONITOREO DE CONTENEDORES Y SERVICIOS.
+  # ==========================================================
+  prometheus:
+    image: prom/prometheus
+    container_name: dulceria_prometheus
+
+    volumes:
+      - ../monitoreo/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+
+    ports:
+      - "9090:9090"
+
+    networks:
+      - monitoring_network
+
+
+  # ==========================================================
+  # GRAFANA
+  # HERRAMIENTA DE VISUALIZACION DE METRICAS.
+  # UTILIZADA PARA CREAR DASHBOARDS DE MONITOREO.
+  # ==========================================================
+  grafana:
+    image: grafana/grafana
+    container_name: dulceria_grafana
+
+    ports:
+      - "3001:3000"
+
+    volumes:
+      - ../monitoreo/grafana:/var/lib/grafana
+
+    depends_on:
+      - prometheus
+
+    networks:
+      - monitoring_network
+
+
+  # ==========================================================
+  # LOKI
+  # SISTEMA DE CENTRALIZACION DE LOGS.
+  # PERMITE CONSULTAR LOGS DE TODOS LOS CONTENEDORES.
+  # ==========================================================
+  loki:
+    image: grafana/loki
+    container_name: dulceria_loki
+
+    volumes:
+      - ../monitoreo/loki/loki-config.yml:/etc/loki/local-config.yaml
+
+    ports:
+      - "3100:3100"
+
+    networks:
+      - monitoring_network
+
+
+# ==========================================================
+# REDES
+# SEPARACION DE TRAFICO ENTRE CAPAS DEL SISTEMA
+# ==========================================================
+networks:
+
+  backend_network:
+    driver: bridge
+
+  frontend_network:
+    driver: bridge
+
+  monitoring_network:
+    driver: bridge
+
+
+# ==========================================================
+# VOLUMENES PERSISTENTES
+# GARANTIZAN QUE LOS DATOS NO SE PIERDAN
+# AL REINICIAR LOS CONTENEDORES.
+# ==========================================================
+volumes:
+
+  postgres_data:
+
+

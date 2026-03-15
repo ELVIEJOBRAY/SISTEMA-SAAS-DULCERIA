@@ -1,0 +1,642 @@
+Perfecto. Pasemos a la **fase de consolidación** de la Fase 6.
+
+En esta etapa, el objetivo ya no es solo probar endpoints, sino **cerrar la evidencia**, **dejar criterios claros de aceptación** y **preparar el paso a la siguiente fase**.
+
+## Consolidación propuesta
+
+### 1. Estado consolidado actual
+
+Con lo ejecutado hasta ahora, puedes dejar este estado:
+
+**Fase 6 – Kardex y Trazabilidad**
+
+* Login: OK
+* Kardex por producto: OK
+* Kardex por presentación: OK
+* Endpoints accesibles y operativos
+* Sin errores visibles de autenticación ni ejecución
+* Pendiente consolidar validación funcional del contenido
+
+## 2. Criterios de cierre de la fase
+
+La fase puede marcarse como **cerrada técnicamente** si cumples estos puntos:
+
+* autenticación funcional
+* consulta de kardex por producto funcional
+* consulta de kardex por presentación funcional
+* respuestas HTTP correctas
+* estructura JSON estable
+* evidencia guardada de ejecución
+* validaciones mínimas documentadas
+
+La fase puede marcarse como **cerrada funcionalmente** si además confirmas:
+
+* movimientos coherentes
+* saldos correctos
+* orden cronológico correcto
+* trazabilidad completa por movimiento
+* consistencia entre producto y presentación
+
+## 3. Resultado consolidado recomendado
+
+Puedes dejarlo así en tu bitácora o informe:
+
+**Resultado consolidado – Fase 6**
+
+* Se valida exitosamente el acceso autenticado al sistema.
+* Se validan exitosamente los endpoints de kardex por producto y por presentación.
+* La prueba E2E ejecutada no presenta errores visibles.
+* Queda confirmada la disponibilidad técnica de los servicios.
+* Se deja pendiente o en curso la validación detallada de integridad funcional de datos, saldos y trazabilidad.
+
+## 4. Clasificación del estado
+
+Te recomiendo usar esta clasificación:
+
+* **Estado técnico:** Aprobado
+* **Estado funcional:** Aprobado con validación complementaria pendiente
+
+O, si quieres ser más estricto:
+
+* **Estado general:** Consolidado parcialmente
+* **Observación:** falta evidencia del contenido de respuesta para cierre funcional total
+
+## 5. Entregables de consolidación
+
+En esta fase deberías dejar listos estos artefactos:
+
+* log de ejecución E2E
+* endpoints probados
+* ids usados en prueba
+* resultado por endpoint
+* observaciones
+* criterios pendientes
+* decisión de cierre
+
+## 6. Decisión sugerida
+
+Con lo que mostraste, la decisión más prudente sería:
+
+**Fase 6 consolidada a nivel técnico** y lista para continuar con:
+
+* validación profunda de datos, o
+* apertura de la siguiente fase del plan de pruebas
+
+## 7. Texto listo para usar
+
+Puedes pegar esto tal cual:
+
+**CONSOLIDACIÓN FASE 6 – KARDEX Y TRAZABILIDAD**
+Se ejecutó satisfactoriamente la prueba E2E de la Fase 6.
+Se validó el login exitoso y la correcta respuesta de los endpoints:
+
+* `GET /inventario/kardex/productos/{producto_id}`
+* `GET /inventario/kardex/presentaciones/{presentacion_id}`
+
+No se evidenciaron errores de ejecución, autenticación ni disponibilidad.
+La fase queda consolidada técnicamente.
+Como siguiente paso, se recomienda complementar con validación funcional del contenido de las respuestas para confirmar integridad de movimientos, saldos y trazabilidad.
+
+Si quieres, te estructuro ahora la **Fase de consolidación** en formato más formal tipo **acta QA**, **checklist de cierre**, o **matriz de estado por fases**.
+
+
+Perfecto. Te entrego un **Acta QA** y un **Checklist de Cierre** con enfoque **alineado a ISO**, sin afirmar certificación formal. Está redactado con criterio de calidad, trazabilidad, evidencia, conformidad, no conformidad y decisión de liberación, útil para marcos como **ISO 9001** e **ISO/IEC 25010**.
+
+---
+
+# ACTA QA DE CONSOLIDACIÓN
+
+## Fase 6 – Kardex y Trazabilidad
+
+**Proyecto:** Sistema SaaS Dulcería
+**Módulo:** Inventario – Kardex y Trazabilidad
+**Fase:** Fase 6
+**Tipo de prueba:** End-to-End (E2E)
+**Fecha:** 14 de marzo de 2026
+**Responsable QA:** Bryan Stiven B
+**Ambiente:** Local / desarrollo
+**Base URL:** `http://127.0.0.1:8000`
+**Estado del acta:** Consolidada
+**Clasificación:** Control de calidad funcional y técnico
+
+---
+
+## 1. Objetivo
+
+Verificar la disponibilidad operativa, accesibilidad, respuesta técnica y comportamiento funcional inicial de los endpoints asociados al módulo de **Kardex y Trazabilidad**, asegurando evidencia de ejecución, trazabilidad de prueba y criterio de cierre controlado.
+
+---
+
+## 2. Alcance
+
+Se incluyen las siguientes validaciones:
+
+* autenticación de acceso al sistema
+* consulta de kardex por producto
+* consulta de kardex por presentación
+* respuesta operativa de endpoints
+* verificación de ejecución sin errores visibles
+* consolidación de evidencia de prueba
+
+No se incluye aún, dentro de esta acta, una validación exhaustiva de:
+
+* integridad detallada del contenido del JSON
+* consistencia matemática fila a fila de saldos
+* validación total de reglas de negocio
+* pruebas negativas extensivas
+* pruebas de rendimiento o seguridad
+
+---
+
+## 3. Casos / endpoints evaluados
+
+### 3.1 Login
+
+**Resultado:** Conforme
+**Observación:** autenticación exitosa
+
+### 3.2 Kardex por producto
+
+**Endpoint evaluado:**
+`GET /inventario/kardex/productos/{producto_id}`
+
+**URL ejecutada:**
+`http://127.0.0.1:8000/inventario/kardex/productos/427465e7-0321-4249-9436-f4abfe852fa9?empresa_id=9c285d45-9adc-4065-b78a-a69a6bf0ac53`
+
+**Resultado:** Conforme
+
+### 3.3 Kardex por presentación
+
+**Endpoint evaluado:**
+`GET /inventario/kardex/presentaciones/{presentacion_id}`
+
+**URL ejecutada:**
+`http://127.0.0.1:8000/inventario/kardex/presentaciones/5b37740f-f008-4bd3-80da-d8d55e13f9af?empresa_id=9c285d45-9adc-4065-b78a-a69a6bf0ac53`
+
+**Resultado:** Conforme
+
+---
+
+## 4. Evidencia de ejecución
+
+Resumen de salida de prueba:
+
+* Login exitoso
+* Kardex por producto: OK
+* Kardex por presentación: OK
+* Finalización de prueba sin errores visibles
+
+**Fuente de evidencia:** consola de ejecución E2E
+**Tipo de evidencia:** registro técnico directo
+**Trazabilidad:** disponible por endpoint y por identificadores usados en la prueba
+
+---
+
+## 5. Criterios de evaluación QA
+
+La evaluación se realizó sobre estos criterios:
+
+* **Funcionalidad básica:** el sistema responde a las solicitudes esperadas
+* **Confiabilidad operativa:** no se presentan fallos visibles de ejecución
+* **Trazabilidad de prueba:** se identifica qué recurso fue probado
+* **Control de evidencia:** se conserva registro del resultado
+* **Conformidad técnica inicial:** endpoints disponibles y accesibles
+
+---
+
+## 6. Hallazgos
+
+### 6.1 Conformidades
+
+* autenticación operativa
+* endpoints disponibles
+* ejecución completada sin error visible
+* evidencia mínima de prueba disponible
+* cobertura básica de la fase ejecutada
+
+### 6.2 Observaciones
+
+* no se visualiza en el log el cuerpo de respuesta
+* no hay evidencia en consola de aserciones funcionales profundas
+* la sección “validaciones rápidas” no muestra detalle de controles ejecutados
+
+### 6.3 No conformidades
+
+**No se registran no conformidades críticas visibles** en la ejecución presentada.
+
+### 6.4 Riesgos residuales
+
+Persisten riesgos funcionales no descartados por falta de validación detallada de:
+
+* saldos acumulados
+* orden cronológico
+* origen de movimientos
+* consistencia de trazabilidad
+* exactitud del contenido del kardex
+
+---
+
+## 7. Evaluación de conformidad
+
+### Conformidad técnica
+
+**Resultado:** Conforme
+
+### Conformidad funcional completa
+
+**Resultado:** Parcialmente conforme
+**Justificación:** los servicios responden correctamente, pero no se ha consolidado evidencia suficiente sobre integridad funcional del contenido.
+
+---
+
+## 8. Decisión QA
+
+**Decisión:** Fase 6 aprobada técnicamente y consolidada de forma controlada.
+
+**Condición de cierre:**
+Se recomienda cierre técnico de fase con seguimiento posterior de validación funcional detallada, antes de una liberación de alta criticidad.
+
+---
+
+## 9. Recomendaciones
+
+1. anexar el JSON real de respuesta de ambos endpoints
+2. validar secuencia cronológica de movimientos
+3. verificar saldo anterior, variación y saldo resultante
+4. validar referencia documental por movimiento
+5. ejecutar pruebas negativas y de recursos inexistentes
+6. registrar evidencia ampliada para auditoría QA
+
+---
+
+## 10. Aprobación
+
+**Responsable QA:** ________________________
+**Fecha:** ________________________
+**VoBo técnico:** ________________________
+**VoBo funcional:** ________________________
+
+---
+
+# CHECKLIST DE CIERRE QA
+
+## Fase 6 – Kardex y Trazabilidad
+
+### Enfoque alineado a control ISO
+
+Marca cada punto como:
+**[ ] Cumple**
+**[ ] No cumple**
+**[ ] No aplica**
+
+---
+
+## A. Gestión de ejecución
+
+* [ ] La prueba fue ejecutada en un ambiente identificado
+* [ ] Se registró fecha de ejecución
+* [ ] Se identificó responsable de prueba
+* [ ] Se conservó evidencia verificable
+* [ ] El alcance de la prueba quedó documentado
+
+## B. Acceso y autenticación
+
+* [ ] El login fue exitoso
+* [ ] El token o sesión fue aceptado correctamente
+* [ ] No se presentaron errores de autenticación
+* [ ] La prueba se ejecutó con contexto de empresa válido
+
+## C. Cobertura funcional mínima
+
+* [ ] Se probó kardex por producto
+* [ ] Se probó kardex por presentación
+* [ ] Ambos endpoints respondieron satisfactoriamente
+* [ ] No hubo errores HTTP visibles
+* [ ] La ejecución finalizó completamente
+
+## D. Validación estructural de respuesta
+
+* [ ] La respuesta tiene estructura JSON válida
+* [ ] El recurso consultado corresponde al identificador enviado
+* [ ] Existe colección de movimientos o respuesta vacía controlada
+* [ ] Los campos clave están presentes
+* [ ] La respuesta mantiene consistencia de formato
+
+## E. Validación funcional de negocio
+
+* [ ] Los movimientos están en orden consistente
+* [ ] Las entradas y salidas son coherentes
+* [ ] El saldo acumulado es consistente
+* [ ] Cada movimiento tiene trazabilidad de origen
+* [ ] La presentación corresponde al producto relacionado
+* [ ] No existen movimientos huérfanos o sin referencia
+
+## F. Validaciones negativas
+
+* [ ] Se validó comportamiento sin token
+* [ ] Se validó comportamiento con `empresa_id` inválido
+* [ ] Se validó comportamiento con `producto_id` inválido
+* [ ] Se validó comportamiento con `presentacion_id` inválido
+* [ ] Se validó recurso sin movimientos
+* [ ] El sistema responde con códigos controlados
+
+## G. Evidencia y trazabilidad QA
+
+* [ ] Existe log de prueba
+* [ ] Se registraron endpoints exactos
+* [ ] Se registraron ids utilizados
+* [ ] Se identifican resultados por caso
+* [ ] Se documentaron observaciones
+* [ ] Se registraron conformidades y no conformidades
+
+## H. Criterio de cierre
+
+* [ ] La fase puede cerrarse técnicamente
+* [ ] La fase puede cerrarse funcionalmente
+* [ ] Los riesgos residuales fueron documentados
+* [ ] Existe decisión QA explícita
+* [ ] Se definieron acciones posteriores, si aplican
+
+---
+
+# DICTAMEN DE CIERRE
+
+## Opción 1 – Cierre técnico
+
+**Se aprueba el cierre técnico de la Fase 6**, dado que la autenticación y los endpoints principales responden correctamente y no se evidencian fallos de ejecución.
+
+## Opción 2 – Cierre funcional condicionado
+
+**Se aprueba de forma condicionada**, pendiente de anexar evidencia funcional detallada del contenido del kardex y su trazabilidad.
+
+---
+
+# FORMATO BREVE DE ESTADO ISO-ORIENTADO
+
+**Estado del control:** Conforme parcial
+**Tipo de conformidad:** Técnica
+**Nivel de riesgo residual:** Medio
+**Evidencia disponible:** Sí
+**No conformidad crítica:** No
+**Acción requerida:** Validación funcional ampliada
+**Decisión:** Aprobado con seguimiento
+
+---
+
+# TEXTO EJECUTIVO PARA PEGAR EN INFORME
+
+**Acta QA de consolidación – Fase 6 Kardex y Trazabilidad**
+Se ejecutó la validación E2E correspondiente a la Fase 6 del módulo de inventario. La autenticación fue satisfactoria y los endpoints de kardex por producto y kardex por presentación respondieron correctamente, sin evidenciar errores visibles de ejecución. Con base en la evidencia disponible, la fase se considera conforme a nivel técnico. No obstante, el cierre funcional integral queda sujeto a la revisión detallada del contenido de las respuestas, especialmente en lo relativo a consistencia de saldos, orden de movimientos y trazabilidad documental.
+
+---
+
+Puedo dejártelo también en formato **más formal de auditoría**, con secciones de **objetivo, criterio, evidencia, hallazgo, riesgo, acción correctiva y veredicto final**.
+
+
+Claro. Aquí tienes una **tesis técnica de la fase de estabilización y cierre** del sistema SaaS de dulcería, redactada en tono académico-técnico y alineada con lo que realmente ejecutaste.
+
+# Tesis técnica de la fase de estabilización, endurecimiento y cierre operativo
+
+## Título
+
+**Estabilización técnica, normalización de despliegue y validación funcional de un sistema SaaS de dulcería basado en FastAPI, React, PostgreSQL, Redis y Docker Compose**
+
+## Resumen
+
+La presente fase tuvo como objetivo consolidar operativamente el sistema SaaS de dulcería mediante un proceso controlado de corrección estructural, saneamiento de configuración, endurecimiento técnico, validación funcional y cierre de despliegue. El sistema, compuesto por un backend en FastAPI, un frontend en React/Vite, persistencia en PostgreSQL, caché en Redis y orquestación mediante Docker Compose, presentaba inicialmente inconsistencias de configuración, errores de compilación, dependencias de rutas no resueltas, problemas de arranque en backend, exposición de valores inseguros en archivos de configuración y fallas de navegación SPA en el frontend servido con Nginx.
+
+La fase se ejecutó por etapas sucesivas. Primero se corrigió la estructura de despliegue del frontend, resolviendo ausencia de `package.json`, `index.html` y componentes esperados por Vite. Luego se corrigieron errores de sintaxis y configuración en backend, particularmente en la capa de conexión a PostgreSQL. Posteriormente se validó la operación del stack completo, confirmando disponibilidad HTTP del backend y frontend, salud de PostgreSQL y Redis, y generación correcta del contrato OpenAPI. En una etapa posterior se realizó la auditoría integral del sistema, identificando residuos técnicos, placeholders inseguros, archivos temporales, cachés Python y cambios no confirmados en Git.
+
+Después de la auditoría, se desarrollaron fases de saneamiento y consolidación. Estas incluyeron la normalización de múltiples archivos `docker-compose`, la definición del compose raíz como despliegue canónico, la marcación de variantes históricas o alternativas, la consolidación de `.env.example`, y la eliminación de fallbacks inseguros en el acceso a base de datos. Finalmente, se endureció la configuración para depender de variables de entorno reales, se corrigió la publicación del frontend como SPA con React Router sobre Nginx, y se validaron rutas funcionales directas como `/login`, `/dashboard`, `/productos` e `/inventario`.
+
+El resultado final evidenció un sistema estable, con backend y frontend operativos, navegación SPA corregida, configuración de entorno consistente, rutas del API publicadas correctamente y stack desplegable mediante un comando principal reproducible. La fase concluye con un cierre técnico satisfactorio, dejando el sistema listo para control de cambios, pruebas de usuario, despliegue controlado o continuación funcional.
+
+## Planteamiento técnico del problema
+
+Al inicio de esta fase, el sistema no presentaba una condición homogénea de despliegue ni de ejecución. Los problemas se distribuían en varios niveles:
+
+En el frontend, la construcción del contenedor fallaba por ausencia de archivos base requeridos por Vite, como `package.json` e `index.html`, además de dependencias de páginas no correctamente resueltas desde `App.jsx`. Aunque la estructura lógica del proyecto existía, no estaba alineada con el contexto real de build usado por Docker.
+
+En el backend, se detectó un error crítico de sintaxis en `conexion_postgresql.py`, lo que impedía el arranque del servidor Uvicorn. Más adelante, incluso con el backend corrigiendo su sintaxis, persistía el riesgo de arranque con configuraciones inseguras o inconsistentes, especialmente en el uso de `DATABASE_URL`.
+
+En infraestructura, coexistían múltiples archivos `docker-compose` con valores heredados, placeholders inseguros y convenciones distintas para variables críticas. Esto generaba riesgo de ambigüedad operativa y de despliegue no reproducible.
+
+En seguridad y operación, los archivos de entorno y configuración conservaban cadenas placeholder como `CAMBIAR_EN_PRODUCCION`, `TU_PASSWORD_SEGURA` o `__SET_IN_ENV__`, además de restos históricos como `sgdd_usuario` y `sgdd_contraseña`. Aunque varias de estas apariciones eran documentales o residuales, su presencia representaba deuda técnica y riesgo de confusión.
+
+En el frontend desplegado, aun cuando la raíz `/` respondía correctamente, las rutas directas de una SPA como `/login` o `/dashboard` devolvían 404 bajo Nginx, lo que impedía considerar funcional el sistema desde un enfoque de uso real.
+
+Por tanto, el problema técnico no era únicamente “hacer correr contenedores”, sino **transformar un conjunto de componentes parcialmente funcionales en una plataforma coherente, estable, auditable y preparada para uso controlado**.
+
+## Objetivo general
+
+Estabilizar, endurecer y cerrar operativamente el sistema SaaS de dulcería, garantizando su despliegue reproducible, su consistencia de configuración, la disponibilidad de sus componentes principales y la funcionalidad real de backend, frontend y navegación SPA.
+
+## Objetivos específicos
+
+Corregir errores estructurales del frontend para permitir su compilación en contenedor.
+
+Corregir errores de sintaxis y configuración del backend para garantizar el arranque del API.
+
+Validar la disponibilidad HTTP del backend y frontend, así como la salud de PostgreSQL y Redis.
+
+Auditar el sistema completo para detectar residuos técnicos, configuraciones inseguras, placeholders y deuda operativa.
+
+Normalizar los archivos `docker-compose` y establecer un compose canónico del proyecto.
+
+Eliminar dependencias inseguras de fallbacks embebidos en la conexión a base de datos.
+
+Consolidar el uso de variables de entorno reales y coherentes.
+
+Corregir la publicación del frontend como aplicación SPA servida por Nginx.
+
+Realizar pruebas funcionales y de navegación para confirmar el cierre técnico de la fase.
+
+## Arquitectura intervenida
+
+Durante esta fase se consolidó la siguiente arquitectura operativa:
+
+El backend se ejecuta como servicio Python sobre FastAPI y Uvicorn, exponiendo el puerto 8000. La aplicación se conecta a PostgreSQL mediante `psycopg` y utiliza Redis como servicio auxiliar.
+
+El frontend se construye con Node.js usando Vite y se publica mediante Nginx en el puerto 5173. Su cliente está organizado como SPA React con React Router.
+
+PostgreSQL 15 opera como motor de persistencia principal y Redis 7 como servicio de caché o soporte.
+
+Docker Compose actúa como mecanismo canónico de orquestación local, unificando arranque, variables de entorno, dependencias entre servicios y políticas de reinicio.
+
+Esta arquitectura quedó validada de manera efectiva mediante respuestas HTTP 200 para los endpoints críticos del backend y frontend, salud positiva de servicios auxiliares y exposición correcta del contrato OpenAPI.
+
+## Metodología técnica aplicada
+
+La intervención siguió una metodología incremental de estabilización por fases.
+
+Primero se corrigieron fallos bloqueantes de compilación y arranque. Esta etapa fue indispensable porque sin build funcional del frontend y sin parseo correcto del backend no era posible avanzar a validaciones superiores.
+
+Luego se aplicó validación de infraestructura mediante Docker Compose, verificando levantamiento efectivo de servicios, resolución de dependencias, healthchecks y exposición de puertos.
+
+Después se ejecutó una auditoría integral con enfoque semafórico. Dicha auditoría no se limitó a disponibilidad, sino que también inspeccionó estructura del repositorio, presencia de archivos críticos, patrones inseguros, logs, residuos técnicos, estado Git y coherencia general del sistema.
+
+Posteriormente se realizó una fase de saneamiento y normalización. En ella se unificaron convenciones de variables, se trataron múltiples archivos compose y se consolidó el uso de `.env` como fuente efectiva de configuración sensible.
+
+Finalmente, se ejecutó un endurecimiento técnico seguido de validaciones robustas y pruebas funcionales, incluyendo la corrección específica del comportamiento SPA sobre Nginx y la confirmación de acceso directo a rutas internas del frontend.
+
+## Desarrollo técnico de la fase
+
+### 1. Corrección de la construcción del frontend
+
+La primera dificultad material se presentó en la construcción del contenedor frontend. Inicialmente, Docker no encontraba `package.json` dentro del contexto `cliente/web`, lo que ocasionaba el fallo de `npm install`. Una vez corregido ese punto mediante reubicación o copia de archivos críticos, el proceso avanzó hasta encontrar la ausencia de `index.html`, elemento esencial en proyectos Vite.
+
+Superado este nivel, apareció un nuevo error de resolución de módulos desde `App.jsx`, relacionado con imports de páginas no encontradas. La validación posterior de estructura confirmó la existencia de componentes como `LoginPage.jsx`, `DashboardPage.jsx`, `ProductosPage.jsx`, `InventarioPage.jsx` y otros, alineando finalmente el árbol real del frontend con lo esperado por el build.
+
+El resultado fue una compilación exitosa del frontend y su publicación vía Nginx.
+
+### 2. Corrección de backend y capa de conexión
+
+El backend presentó un fallo crítico de sintaxis en `nucleo/infraestructura/db/conexion_postgresql.py`. El error impedía incluso la carga del módulo principal de FastAPI y generaba reinicios continuos del contenedor.
+
+La corrección consistió en reescribir el archivo con una implementación válida que centralizara el acceso a `DATABASE_URL`, construyera conexiones mediante `psycopg` y expusiera funciones de utilidad como `obtener_conexion`, `crear_cursor`, `obtener_cursor`, `cerrar_cursor` y `cerrar_conexion`.
+
+Posteriormente, en fases más avanzadas, se endureció este archivo para eliminar fallbacks inseguros y obligar el uso de `DATABASE_URL` proveniente del entorno, reduciendo el riesgo de que credenciales placeholder quedaran embebidas en tiempo de ejecución.
+
+### 3. Validación inicial del stack
+
+Con frontend y backend corregidos, se validó el levantamiento completo del stack. Los contenedores `dulceria_backend`, `dulceria_frontend`, `dulceria_postgres` y `dulceria_redis` quedaron en estado operativo, con PostgreSQL y Redis en condición healthy.
+
+Las comprobaciones HTTP confirmaron:
+
+* `http://localhost:8000/docs` con respuesta 200
+* `http://localhost:8000/openapi.json` con respuesta 200
+* `http://localhost:5173` con respuesta 200
+
+Esto permitió afirmar que el sistema alcanzó una primera condición de operación mínima.
+
+### 4. Auditoría integral del sistema
+
+La auditoría integral reveló observaciones importantes aunque no bloqueantes. Entre ellas:
+
+* presencia de placeholders inseguros en múltiples archivos compose
+* archivos temporales `.bak`
+* gran cantidad de directorios `__pycache__`
+* residuos de builds
+* cambios sin confirmar en Git
+* configuración ambigua entre varios `docker-compose`
+
+La auditoría también permitió cuantificar que la API exponía 29 rutas en OpenAPI, dato útil para validar cobertura funcional del backend.
+
+Esta auditoría fue clave porque permitió pasar de una validación superficial basada en “HTTP 200” a una evaluación estructural del estado real del sistema.
+
+### 5. Saneamiento técnico y normalización de Compose
+
+En fases siguientes se abordó la deuda de configuración. Se normalizaron múltiples archivos `docker-compose` distribuidos entre raíz e infraestructura. El objetivo fue reducir valores heredados, reemplazar placeholders problemáticos por variables de entorno y homologar claves críticas como:
+
+* `POSTGRES_USER`
+* `POSTGRES_PASSWORD`
+* `POSTGRES_DB`
+* `DATABASE_URL`
+* `JWT_SECRET`
+* `JWT_ALGORITHM`
+* `REDIS_URL`
+* `ALLOWED_ORIGINS`
+
+También se estableció el `docker-compose.yml` de raíz como **compose canónico del proyecto**, mientras que los demás archivos quedaron conceptualmente marcados como variantes no canónicas, históricas o de soporte.
+
+Este punto es fundamental desde la perspectiva de ingeniería, porque uno de los mayores riesgos en proyectos medianos no es la falta de configuración, sino la existencia de demasiadas configuraciones válidas pero divergentes.
+
+### 6. Consolidación de variables de entorno
+
+La normalización de `.env` y `.env.example` permitió separar claramente:
+
+* variables documentales para onboarding
+* valores reales requeridos en tiempo de despliegue
+* placeholders aceptables en ejemplo, pero no en runtime
+
+Se detectó que el compose seguía esperando variables como `ALLOWED_ORIGINS`, `JWT_ALGORITHM` y `ACCESS_TOKEN_EXPIRE_MINUTES`; por tanto, fueron agregadas o normalizadas en `.env` para evitar warnings y comportamientos por defecto vacíos.
+
+Una vez hecho esto, la validación de variables efectivas dentro del contenedor backend mostró consistencia plena:
+
+* `DATABASE_URL` correcta
+* `JWT_SECRET` presente
+* `JWT_ALGORITHM=HS256`
+* `ACCESS_TOKEN_EXPIRE_MINUTES=30`
+* `ALLOWED_ORIGINS` configurado
+* `REDIS_URL` correcta
+
+### 7. Endurecimiento técnico
+
+El endurecimiento consistió en eliminar configuraciones tolerantes o ambiguas que podían funcionar en entorno local, pero eran incorrectas desde el punto de vista de operación seria.
+
+El caso más claro fue eliminar el fallback embebido en `conexion_postgresql.py`. Técnicamente, un fallback puede ayudar al arranque rápido, pero en sistemas endurecidos introduce riesgo de dependencia oculta, despliegues inconsistentes y uso involuntario de credenciales de ejemplo.
+
+El compose canónico también fue endurecido para depender del `.env` real y no de defaults sensibles incrustados en YAML.
+
+### 8. Corrección SPA del frontend
+
+Aunque la aplicación React compilaba y el endpoint raíz respondía, las rutas directas `/login`, `/dashboard`, `/productos`, `/inventario` y similares devolvían 404. Esto es típico cuando Nginx intenta resolver la ruta como archivo estático en lugar de reenviarla a `index.html`.
+
+La solución técnica fue incorporar una configuración Nginx con:
+
+* `root /usr/share/nginx/html`
+* `index index.html`
+* `try_files $uri $uri/ /index.html;`
+
+En la primera implementación apareció un problema adicional causado por codificación BOM en `nginx.conf`, lo cual provocó errores de parsing dentro de Nginx. Tras reescribir el archivo en UTF-8 sin BOM, el frontend quedó correctamente servido como SPA.
+
+La validación posterior confirmó respuesta 200 para todas las rutas directas relevantes del sistema.
+
+## Resultados obtenidos
+
+Los resultados finales de la fase pueden resumirse así:
+
+El backend quedó estable y accesible por HTTP, con documentación Swagger operativa y contrato OpenAPI válido.
+
+El frontend quedó compilado correctamente, servido por Nginx y compatible con navegación SPA en rutas internas.
+
+PostgreSQL y Redis quedaron operativos y saludables dentro del stack.
+
+El sistema de configuración fue unificado alrededor del compose raíz y del uso explícito de variables de entorno.
+
+Se eliminaron residuos técnicos relevantes y se acotó la ambigüedad de despliegue.
+
+La fase cerró con validación positiva de infraestructura, API, frontend, rutas internas y estado general del stack.
+
+## Discusión técnica
+
+Desde una perspectiva de ingeniería de software, esta fase demuestra que la estabilidad de un sistema no depende únicamente de la lógica de negocio, sino del acoplamiento correcto entre código, infraestructura, configuración y publicación.
+
+El sistema ya tenía una base funcional importante, pero estaba afectado por problemas típicos de madurez intermedia: dispersión de configuraciones, residuos históricos, diferencias entre estructura real y estructura esperada por herramientas de build, y falta de endurecimiento en el manejo de variables sensibles.
+
+La corrección del backend mostró que una sola falla sintáctica en una capa transversal como la conexión a base de datos puede bloquear toda la plataforma. La corrección del frontend mostró que una SPA no está “terminada” solo porque compile: necesita además estar correctamente servida por el servidor web para soportar rutas internas reales.
+
+La normalización de Compose y `.env` tiene un valor estratégico: reduce deuda operativa, baja el riesgo de errores humanos y mejora la reproducibilidad del entorno. Esto es especialmente importante en proyectos que evolucionan por fases, donde se acumulan archivos alternos y configuraciones heredadas.
+
+## Conclusión
+
+La fase de estabilización y cierre técnico cumplió su propósito. El sistema SaaS de dulcería pasó de un estado parcialmente funcional y con múltiples inconsistencias de despliegue a una condición estable, reproducible y técnicamente defendible.
+
+Se corrigieron errores críticos de backend y frontend, se validó la disponibilidad completa del stack, se normalizó la configuración de despliegue, se endureció el uso de variables de entorno, y se resolvió el comportamiento SPA del cliente web. Como resultado, el sistema quedó en condiciones reales de operación técnica.
+
+La evidencia empírica del cierre quedó reflejada en:
+
+* respuestas HTTP 200 del backend y frontend
+* contrato OpenAPI disponible
+* rutas SPA funcionando correctamente
+* servicios auxiliares saludables
+* variables efectivas cargadas adecuadamente
+* stack levantable mediante `docker compose up --build -d`
+
+En consecuencia, esta fase puede considerarse **cerrada con éxito**, dejando el proyecto listo para una siguiente etapa de pruebas de negocio profundas, control de calidad funcional, despliegue en ambiente superior o preparación de entrega formal.
+
+## Recomendaciones para la siguiente fase
+
+Como continuación natural de esta tesis técnica, lo que sigue ya no es estabilización base sino evolución controlada. Las prioridades recomendadas son:
+
+Primero, realizar commit limpio del estado final, excluyendo archivos accidentales o no deseados.
+
+Segundo, ejecutar pruebas funcionales de negocio con datos reales o semilla: autenticación, catálogo, inventario, ventas, clientes, proveedores y reportes.
+
+Tercero, incorporar pruebas automatizadas de humo para backend y frontend, de modo que el estado alcanzado no se pierda en iteraciones futuras.
+
+Cuarto, revisar los compose alternos históricos y decidir si deben conservarse, documentarse mejor o archivarse fuera del flujo principal.
+
+Quinto, preparar una fase de despliegue controlado, idealmente separando entorno local, desarrollo, staging y producción.
+
+Si quieres, en el siguiente mensaje te la convierto en formato **documento de tesis ADSo**, con secciones como **introducción, justificación, objetivos, marco teórico, metodología, resultados, conclusiones y recomendaciones** listas para entregar.

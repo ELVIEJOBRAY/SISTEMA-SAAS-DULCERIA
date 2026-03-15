@@ -1,0 +1,32 @@
+﻿# SISTEMA-SAAS-DULCERIA - CONFIGURACIÓN PROMETHEUS
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Configuración de Alertmanager
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Archivos de reglas
+rule_files: []
+
+# Configuración de scrape
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'backend'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets: ['backend:8000']
+
+  - job_name: 'postgres'
+    static_configs:
+      - targets: ['postgres:9187']
+
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:9121']

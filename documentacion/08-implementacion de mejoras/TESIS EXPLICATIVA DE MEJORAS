@@ -1,0 +1,642 @@
+Claro. Aquí tienes una **sesión explicativa completa**, en español claro, para que la uses como guía, exposición, bitácora técnica o respaldo de avance.
+
+# Sesión de cierre técnico: módulo de ventas e inventario
+
+## 1. Objetivo general de lo que hicimos
+
+El trabajo consistió en **llevar el módulo de ventas desde una ruta que existía en código pero no funcionaba de forma real**, hasta un flujo completo con estas capacidades:
+
+* iniciar sesión con usuario real,
+* registrar ventas reales en base de datos,
+* integrar ventas con inventario,
+* evitar persistencias incorrectas cuando falla el stock,
+* consultar ventas por id y listarlas,
+* anular ventas,
+* filtrar ventas por distintos criterios,
+* dejar todo validado por pruebas manuales reales sobre la API y PostgreSQL.
+
+En otras palabras, no nos quedamos en teoría ni en “el código compila”, sino que lo llevamos a **funcionamiento comprobado**.
+
+---
+
+## 2. Punto de partida: qué problemas encontramos al inicio
+
+Cuando comenzamos, el sistema tenía varias piezas construidas, pero había fallas importantes en el flujo real.
+
+### Problema 1: autenticación incompleta o no validada
+
+Primero intentaste hacer login y registrar ventas, pero aparecieron varios errores:
+
+* rutas equivocadas o no encontradas,
+* respuestas 422 por esquema de entrada,
+* 405 por métodos HTTP no válidos,
+* problemas para identificar el `tenant_id` correcto,
+* dificultad para usar credenciales reales.
+
+### Problema 2: el endpoint `/ventas` existía, pero no persistía de forma física
+
+Después del diagnóstico vimos que:
+
+* el router de ventas sí estaba registrado,
+* el caso de uso sí existía,
+* los modelos SQLAlchemy sí existían,
+* el repositorio también existía,
+
+pero **las tablas físicas `ventas` y `detalle_ventas` no existían en PostgreSQL**.
+
+Eso explicaba por qué el POST fallaba con error 500: el código quería guardar ventas en tablas que aún no estaban creadas.
+
+### Problema 3: la contraseña del usuario de prueba no era compatible con el gestor real
+
+Se reseteó una contraseña manualmente, pero el hash no coincidía con el formato que el proyecto realmente esperaba. Al revisar:
+
+* el hash almacenado no validaba con `GestorContrasenas`,
+* se generó un hash correcto con el gestor real,
+* se actualizó el usuario con ese hash,
+* luego el login sí funcionó.
+
+### Problema 4: ventas e inventario estaban separados
+
+Al principio una venta podía registrarse sin afectar el inventario. Eso era un hueco funcional, porque en negocio real una venta debe descargar stock.
+
+### Problema 5: el flujo de venta no era transaccional
+
+Cuando integramos inventario, apareció un error serio:
+
+* una venta se guardaba,
+* luego intentaba descargar inventario,
+* si el inventario no existía o no alcanzaba, la operación fallaba,
+* pero la venta ya había quedado persistida.
+
+Eso generó **ventas inválidas en la base de datos**.
+
+---
+
+## 3. Fase 1: activación real del módulo de ventas
+
+En la primera fase resolvimos la persistencia real del módulo.
+
+### Qué hicimos
+
+Primero identificamos información real del tenant y del usuario:
+
+* `tenant_id`
+* `empresa_id`
+* `sucursal_id`
+* `bodega_id`
+* `producto_id`
+* `presentacion_id`
+* `usuario_id`
+
+Luego verificamos en base de datos las tablas clave:
+
+* `tenants`
+* `usuarios`
+* `membresias_tenant`
+* `membresias_empresa`
+* `empresas`
+* `sucursales`
+* `bodegas`
+* `productos`
+* `presentaciones`
+
+Después confirmamos que **no existían**:
+
+* `ventas`
+* `detalle_ventas`
+
+### Solución aplicada
+
+Se hizo el despliegue físico de tablas en PostgreSQL:
+
+* creación de `ventas`,
+* creación de `detalle_ventas`,
+* índices por tenant, empresa, sucursal, bodega, usuario y cliente,
+* índices del detalle por venta, producto y presentación.
+
+### Resultado
+
+Con las tablas ya creadas:
+
+* el login funcionó,
+* el POST `/ventas` respondió correctamente,
+* se registró una venta real,
+* se verificó la evidencia directamente en base de datos.
+
+### Evidencia funcional
+
+Se logró registrar una venta con:
+
+* subtotal `7000`,
+* total `7000`,
+* estado `registrada`,
+* detalle con cantidad `2`.
+
+Eso cerró la primera fase: **ventas ya persistían de verdad**.
+
+---
+
+## 4. Fase 2: integración de ventas con inventario
+
+Luego pasamos a la parte más importante: conectar ventas con inventario.
+
+## Objetivo de esta fase
+
+Que al registrar una venta:
+
+* se cree la venta,
+* se descuenten existencias,
+* se registre un movimiento de salida,
+* y si no hay stock suficiente, la operación falle.
+
+### Análisis del inventario
+
+Revisamos el servicio de inventario y vimos que ya existían operaciones para:
+
+* entrada,
+* salida,
+* ajuste,
+* consulta por bodega,
+* consulta por producto,
+* kardex.
+
+En especial, `registrar_salida` ya validaba:
+
+* existencia de tenant,
+* empresa,
+* sucursal,
+* bodega,
+* producto,
+* presentación,
+* que la presentación pertenezca al producto,
+* que exista inventario en esa bodega,
+* que haya suficiente stock.
+
+### Integración que hicimos
+
+Se modificó el caso de uso `RegistrarVenta` para que, después de guardar una venta, recorriera sus detalles y llamara `registrar_salida` del servicio de inventario, generando:
+
+* `referencia_origen="venta"`
+* `documento_referencia=<id de la venta>`
+* `observacion="Salida por venta <id>"`
+
+### Primer error detectado
+
+Al probar, el endpoint `/ventas` empezó a fallar porque la ruta estaba construyendo `RegistrarVenta` solo con:
+
+* repositorio_venta
+* servicio_aplicacion_ventas
+
+pero la nueva clase ya requería además:
+
+* `servicio_inventario`
+* `db`
+
+Entonces se corrigió la **inyección de dependencias** en FastAPI.
+
+### Segundo error detectado
+
+Una vez solucionada la inyección, el error real apareció:
+
+`No existe inventario para la presentacion en la bodega indicada`
+
+Eso mostró que la integración ya estaba viva, porque la venta ahora sí estaba intentando descontar stock.
+
+### Tercer error detectado
+
+Intentaste cargar stock por `/inventario/entradas`, pero la petición falló porque el esquema pedía `tenant_id` y no lo estabas enviando.
+
+Luego se corrigió el payload incluyendo `tenant_id`.
+
+### Resultado de la integración
+
+Después de crear stock inicial correctamente:
+
+* una entrada de inventario creó 50 unidades,
+* una venta normal sí se registró,
+* el inventario bajó de 50 a 49,
+* se creó el movimiento de salida,
+* una venta exagerada fue rechazada por stock insuficiente.
+
+Hasta ahí, funcionalmente la lógica ya estaba bien conectada.
+
+---
+
+## 5. Hallazgo crítico: problema transaccional
+
+Aunque la lógica ya estaba conectada, apareció un problema serio de integridad.
+
+### Qué pasó
+
+Antes del arreglo transaccional, la secuencia era:
+
+1. se guardaba la venta,
+2. el repositorio hacía `commit`,
+3. luego se intentaba la salida de inventario,
+4. si fallaba el inventario, la venta ya había quedado en la base.
+
+Eso produjo varias ventas inválidas de prueba, por ejemplo ventas exageradas que debieron fallar, pero quedaron guardadas.
+
+### Causa técnica
+
+El problema estaba en `RepositorioVentaSQLAlchemy.guardar()`:
+
+* estaba usando `commit()` dentro del repositorio.
+
+Eso rompía la transacción global del caso de uso.
+
+---
+
+## 6. Fase 3.1: corrección transaccional
+
+Esta fue una de las mejoras más importantes.
+
+### Solución aplicada
+
+Se cambió el repositorio de ventas para que:
+
+* en `guardar()` use `flush()` en vez de `commit()`,
+* solo prepare y sincronice el objeto con la sesión,
+* no cierre la transacción todavía.
+
+Luego el caso de uso `RegistrarVenta` quedó así:
+
+* guarda la venta con `flush`,
+* intenta todas las salidas de inventario,
+* si todo sale bien, hace `db.commit()`,
+* si algo falla, hace `db.rollback()`.
+
+### Qué ganamos con eso
+
+Ahora la operación completa es atómica:
+
+* o se guarda la venta y se descuenta inventario,
+* o no se guarda nada.
+
+### Limpieza histórica
+
+Como antes quedaron ventas inválidas persistidas, se creó un script que eliminó las ventas de prueba incorrectas asociadas a observaciones como:
+
+* ventas exageradas,
+* pruebas de stock insuficiente,
+* debug posts antiguos.
+
+Se eliminaron 5 ventas inválidas.
+
+### Resultado validado
+
+Se hizo reprueba completa:
+
+* venta normal: sí quedó persistida,
+* venta exagerada: fue rechazada,
+* al consultar `GET /ventas`, la exagerada **ya no aparecía**.
+
+Eso confirmó que la corrección transaccional quedó bien.
+
+---
+
+## 7. Fase 3: consultas de ventas
+
+Con la persistencia y la transacción ya sólidas, el siguiente paso fue exponer consultas.
+
+### Qué agregamos
+
+Se habilitaron rutas para:
+
+* `GET /ventas`
+* `GET /ventas/{venta_id}`
+
+### Resultado
+
+Se comprobó que:
+
+* el listado devolvía ventas reales,
+* el detalle por id devolvía la venta esperada,
+* los detalles de cada venta venían correctamente incluidos.
+
+Esto dejó el módulo no solo con escritura, sino también con lectura.
+
+---
+
+## 8. Fase 4: anulación de ventas
+
+Después se construyó la capacidad de anular una venta.
+
+## Objetivo
+
+Permitir que una venta registrada pase a estado `anulada` y, además, devolver stock al inventario.
+
+### Cambios aplicados
+
+#### En dominio
+
+A la entidad `Venta` se le agregaron:
+
+* `puede_anularse()`
+* `anular()`
+
+La lógica de dominio valida que solo se pueda anular una venta que esté en estado `registrada`.
+
+#### En aplicación
+
+Se creó el caso de uso `AnularVenta`.
+
+Ese caso de uso:
+
+1. busca la venta,
+2. valida que exista,
+3. cambia su estado a `anulada`,
+4. actualiza el registro,
+5. recorre los detalles,
+6. por cada detalle ejecuta una **entrada de inventario**,
+7. hace commit si todo sale bien,
+8. rollback si algo falla.
+
+#### En repositorio
+
+Se agregó `actualizar()` al repositorio SQLAlchemy de ventas.
+
+#### En rutas
+
+Se habilitó:
+
+* `POST /ventas/{venta_id}/anular`
+
+### Resultado
+
+La prueba E2E fue exitosa:
+
+* se creó una venta nueva,
+* se anuló correctamente,
+* al consultar la venta luego, su estado era `anulada`,
+* si se intentaba anular de nuevo, respondía 400.
+
+Eso dejó cerrada la anulación funcional.
+
+---
+
+## 9. Fase 5: filtros reales en consultas de ventas
+
+Luego avanzamos a las consultas filtradas reales.
+
+## Objetivo
+
+Que `GET /ventas` no solo liste todo, sino que permita filtrar por:
+
+* `empresa_id`
+* `sucursal_id`
+* `bodega_id`
+* `usuario_id`
+* `estado`
+
+### Cambios aplicados
+
+#### En contrato del repositorio
+
+Se amplió la interfaz `RepositorioVenta` con el método `listar(...)` con filtros opcionales.
+
+#### En aplicación
+
+Se creó el caso de uso `ListarVentas`, que recibe:
+
+* `tenant_id`
+* filtros opcionales
+
+y delega al repositorio.
+
+#### En infraestructura
+
+El repositorio SQLAlchemy implementó `listar(...)` armando la consulta dinámicamente con filtros condicionales.
+
+#### En rutas
+
+La ruta `GET /ventas` quedó preparada para recibir query params y pasarlos al caso de uso.
+
+### Error detectado durante esta fase
+
+La carga de app falló porque la ruta importaba:
+
+* `obtener_venta`
+
+pero ese caso de uso no existía con ese nombre.
+
+Se corrigió creando o ajustando el caso de uso correspondiente y luego la app volvió a cargar bien.
+
+### Resultado de las pruebas
+
+Se probaron filtros reales y todo respondió correctamente:
+
+* `GET /ventas?estado=registrada`
+* `GET /ventas?estado=anulada`
+* `GET /ventas?empresa_id=...&sucursal_id=...`
+* `GET /ventas?bodega_id=...`
+* `GET /ventas?usuario_id=...`
+
+### Validaciones finales
+
+Salió correcto que:
+
+* registradas: 7
+* anuladas: 1
+* empresa+sucursal: correcto
+* bodega: correcto
+* usuario: correcto
+
+Y además:
+
+* `estado=registrada` solo devolvía registradas,
+* `estado=anulada` solo devolvía anuladas,
+* no hubo cruces inválidos,
+* los filtros por contexto devolvieron exactamente lo esperado.
+
+Fase 5 quedó validada.
+
+---
+
+## 10. Qué fue lo más importante técnicamente
+
+Si tuviera que resumir los hitos más importantes de todo el trabajo, serían estos:
+
+### 1. Activación real de ventas en base de datos
+
+No solo estaba el código: se crearon tablas físicas y se logró persistencia real.
+
+### 2. Corrección del login real
+
+Se resolvió tenant, usuario y hash de contraseña para autenticar con datos reales.
+
+### 3. Integración ventas + inventario
+
+Las ventas dejaron de ser solo registros contables y empezaron a afectar stock.
+
+### 4. Corrección transaccional
+
+Este fue probablemente el avance más crítico. Se evitó que ventas fallidas quedaran guardadas.
+
+### 5. Anulación con reintegro de stock
+
+Se añadió reversión operativa de la venta.
+
+### 6. Consultas y filtros reales
+
+El módulo ya no solo escribe; también consulta con criterio.
+
+---
+
+## 11. Qué errores aprendimos a detectar
+
+Durante el proceso aparecieron varios aprendizajes importantes:
+
+### Error de infraestructura
+
+Tener modelos SQLAlchemy no significa que las tablas existan físicamente.
+
+### Error de seguridad
+
+Generar hashes manualmente puede romper compatibilidad con el gestor real del proyecto.
+
+### Error de integración
+
+Agregar dependencias nuevas a un caso de uso obliga a actualizar la inyección en la ruta.
+
+### Error transaccional
+
+Nunca conviene hacer `commit()` dentro del repositorio si el caso de uso necesita coordinar varias operaciones atómicas.
+
+### Error de pruebas
+
+Una venta “rechazada” puede igual haber quedado persistida si la transacción está mal cerrada.
+
+### Error de evolución
+
+Al crear nuevas fases, hay que vigilar imports y nombres de casos de uso para no romper la carga de la app.
+
+---
+
+## 12. Estado actual del sistema al final de esta sesión
+
+Al cierre de todo lo que hicimos, el módulo quedó así:
+
+### Ya funciona
+
+* login real
+* POST `/ventas`
+* integración con inventario
+* rechazo por stock insuficiente
+* persistencia transaccional correcta
+* GET `/ventas`
+* GET `/ventas/{venta_id}`
+* POST `/ventas/{venta_id}/anular`
+* filtros reales por estado, empresa, sucursal, bodega y usuario
+
+### Ya fue validado
+
+* creación de stock inicial
+* venta normal
+* venta exagerada rechazada
+* anulación de venta
+* detalle por id
+* filtros funcionales
+* limpieza de ventas inválidas históricas
+
+---
+
+## 13. Qué archivos fueron claves en todo el trabajo
+
+Los puntos más importantes tocaron principalmente estos lugares:
+
+### Ventas
+
+* `nucleo/dominio/ventas/entidades/venta.py`
+* `nucleo/dominio/ventas/repositorios/repositorio_venta.py`
+* `nucleo/aplicacion/ventas/casos_uso/registrar_venta.py`
+* `nucleo/aplicacion/ventas/casos_uso/anular_venta.py`
+* `nucleo/aplicacion/ventas/casos_uso/listar_ventas.py`
+* `nucleo/aplicacion/ventas/casos_uso/obtener_venta*.py`
+* `nucleo/interfaz/api/v1/ventas/rutas/rutas_ventas.py`
+* `nucleo/interfaz/api/v1/ventas/dependencias/dependencias_ventas.py`
+* `nucleo/infraestructura/db/repositorios/ventas/repositorio_venta_sqlalchemy.py`
+
+### Inventario
+
+* `nucleo/aplicacion/inventario/servicios/servicio_aplicacion_inventario.py`
+
+### Base de datos
+
+* tablas `ventas`
+* tablas `detalle_ventas`
+
+### Scripts de apoyo
+
+* scripts de inspección,
+* scripts de evidencia,
+* scripts de limpieza,
+* scripts de verificación por fases.
+
+---
+
+## 14. Qué NO conviene dejar pendiente
+
+Después de este trabajo, lo recomendable es no frenar todavía. Los siguientes pasos naturales serían:
+
+### Fase 6
+
+Kardex y trazabilidad por venta:
+
+* consultar movimientos generados por una venta,
+* relacionar venta con salida y anulación con entrada,
+* dejar trazabilidad funcional completa.
+
+### Fase 7
+
+Validaciones de negocio más fuertes:
+
+* impedir anular ventas en estados no permitidos,
+* validar si se permite anular ventas antiguas,
+* validar múltiples detalles y distintos productos.
+
+### Fase 8
+
+Pruebas automáticas:
+
+* unitarias,
+* integración,
+* e2e.
+
+### Fase 9
+
+Migraciones formales
+Ahora mismo hubo despliegues manuales y ajustes directos; lo ideal es consolidar eso en migraciones oficiales.
+
+### Fase 10
+
+Limpieza técnica
+
+* retirar prints de debug,
+* borrar scripts temporales innecesarios,
+* decidir qué se queda en `scripts/`,
+* eliminar residuos de pruebas viejas si no aportan valor.
+
+---
+
+## 15. Conclusión ejecutiva
+
+En esta sesión pasamos de un módulo de ventas parcialmente armado a un módulo que ya tiene comportamiento real de negocio.
+
+Se logró:
+
+* persistencia real en PostgreSQL,
+* login real con usuario funcional,
+* integración con inventario,
+* control de stock,
+* corrección transaccional,
+* anulación de ventas con reintegro,
+* consultas por id y listados,
+* filtros reales,
+* validaciones manuales exitosas en API.
+
+El avance más valioso no fue solo “hacer que responda 200”, sino lograr que el sistema se comporte correctamente cuando las cosas salen bien y también cuando salen mal.
+
+Eso deja al módulo en un punto mucho más serio y usable.
+
+Si quieres, te lo convierto ahora en formato **informe técnico formal**, **acta de avance**, o **guion para exposición oral**.
